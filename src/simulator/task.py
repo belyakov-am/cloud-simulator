@@ -1,6 +1,6 @@
 class File:
     """
-    Representation for a file, that is used or produced by a task.
+    Representation of a file, that is used or produced by a task.
     """
 
     def __init__(
@@ -14,7 +14,7 @@ class File:
 
 class Task:
     """
-    Representation for a task entity.
+    Representation of a task entity.
     """
 
     def __init__(
