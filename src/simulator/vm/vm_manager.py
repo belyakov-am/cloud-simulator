@@ -1,10 +1,8 @@
-from simulator.vm.vm import VM
+from simulator.vm.instance import VM
 
 
 class VMManager:
-    """
-    Class docstring
-    """
+    """Class docstring"""
 
     def __init__(self):
         self.vm_list: list[VM] = []
