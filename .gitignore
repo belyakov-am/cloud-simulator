@@ -1,3 +1,8 @@
+# PyCharm files
 .idea
 
+# Python files
 __pycache__/
+
+# Workflow files
+workflow-traces
