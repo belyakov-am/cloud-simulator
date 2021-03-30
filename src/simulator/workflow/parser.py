@@ -68,7 +68,7 @@ class PegasusTraceParser:
 
             # Save task
             task = Task(
-                task_id=ind + 1,
+                task_id=ind,
                 name=task_json["name"],
                 parents=parents,
                 input_files=input_files,
