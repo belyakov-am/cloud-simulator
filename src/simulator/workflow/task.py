@@ -6,6 +6,12 @@ class File:
             name: str,
             size: int,
     ):
+        """
+
+        :param name: Name of the file
+        :param size: Size of the file (in KB)
+        """
+
         self.name = name
         self.size = size
 
