@@ -1,5 +1,5 @@
-from simulator.scheduler import Scheduler
-from simulator.vm import VMManager
+import simulator as sm
+import simulator.vm as vm
 
 
 class CloudManager:
@@ -12,5 +12,5 @@ class CloudManager:
     """
 
     def __init__(self):
-        self.scheduler: Scheduler = Scheduler()
-        self.vm_manager: VMManager = VMManager()
+        self.scheduler: sm.Scheduler = sm.Scheduler()
+        self.vm_manager: vm.VMManager = vm.VMManager()

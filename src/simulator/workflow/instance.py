@@ -1,4 +1,4 @@
-from simulator.workflow import Task
+import simulator.workflow as wf
 
 
 class Workflow:
@@ -9,4 +9,4 @@ class Workflow:
     def __init__(self, name: str, description: str):
         self.name = name
         self.description = description
-        self.tasks: list[Task] = []
+        self.tasks: list[wf.Task] = []
