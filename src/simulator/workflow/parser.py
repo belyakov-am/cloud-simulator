@@ -40,7 +40,7 @@ class PegasusTraceParser:
         # is listed only after all its predecessors (if exists).
         tasks: dict[str, wf.Task] = dict()
 
-        for ind, task_json in enumerate(self._data["jobs"]):
+        for ind, task_json in enumerate(self._data["workflow"]["jobs"]):
             # Process parents
             parents_names = task_json["parents"]
             parents: list[wf.Task] = []
@@ -56,7 +56,7 @@ class PegasusTraceParser:
             input_files: list[wf.File] = []
             output_files: list[wf.File] = []
 
-            for task_file in task_json["file"]:
+            for task_file in task_json["files"]:
                 file_obj = wf.File(name=task_file["name"], size=task_file["size"])
                 if task_file["link"] == "input":
                     input_files.append(file_obj)
