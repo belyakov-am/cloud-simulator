@@ -21,6 +21,7 @@ class Task:
 
     def __init__(
             self,
+            workflow_uuid: str,
             task_id: int,
             name: str,
             parents: list["Task"],
@@ -28,6 +29,7 @@ class Task:
             output_files: list[File],
 
     ):
+        self.workflow_uuid = workflow_uuid
         self.id = task_id
         self.name = name
         self.parents = parents

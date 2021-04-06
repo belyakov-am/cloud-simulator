@@ -65,6 +65,7 @@ class PegasusTraceParser:
 
             # Save task
             task = wf.Task(
+                workflow_uuid=self.workflow.uuid,
                 task_id=ind,
                 name=task_json["name"],
                 parents=parents,
