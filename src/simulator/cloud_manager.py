@@ -1,4 +1,4 @@
-import simulator as sm
+import simulator.schedulers as sch
 import simulator.vm as vm
 
 
@@ -11,6 +11,6 @@ class CloudManager:
     other entities.
     """
 
-    def __init__(self):
-        self.scheduler: sm.Scheduler = sm.Scheduler()
+    def __init__(self, scheduler: sch.SchedulerInterface) -> None:
+        self.scheduler: sch.SchedulerInterface = scheduler
         self.vm_manager: vm.VMManager = vm.VMManager()
