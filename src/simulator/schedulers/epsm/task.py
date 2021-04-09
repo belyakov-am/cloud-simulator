@@ -9,3 +9,4 @@ class Task(wf.Task):
     def __init__(self, *args, **kwargs):
         super(Task, self).__init__(*args, **kwargs)
         self.eft = 0
+        self.parents: list[Task] = self.parents
