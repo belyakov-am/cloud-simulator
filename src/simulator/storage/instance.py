@@ -8,8 +8,8 @@ class Storage:
 
     def __init__(
             self,
-            read_rate: float,
-            write_rate: float,
+            read_rate: int,
+            write_rate: int,
     ):
         """
 
