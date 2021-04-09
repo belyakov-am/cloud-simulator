@@ -1,5 +1,4 @@
 import simulator.schedulers as sch
-import simulator.vm as vm
 import simulator.workflow as wf
 
 
@@ -14,7 +13,6 @@ class CloudManager:
 
     def __init__(self, scheduler: sch.SchedulerInterface) -> None:
         self.scheduler: sch.SchedulerInterface = scheduler
-        self.vm_manager: vm.VMManager = vm.VMManager()
         self.workflows: dict[str, wf.Workflow] = dict()
 
     def execute_workflow(self, workflow: wf.Workflow) -> None:
