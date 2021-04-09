@@ -6,8 +6,13 @@ import simulator.workflow as wf
 class SchedulerInterface(ABC):
     """Interface for implementing scheduling algorithms"""
 
+    @abstractmethod
     def __init__(self):
-        self.workflows: dict[str, wf.Workflow] = dict()
+        """Probably need to create a variable for saving incoming
+        workflows. dict[str, Workflow] should work perfectly.
+        """
+
+        pass
 
     @abstractmethod
     def submit_workflow(self, workflow: wf.Workflow) -> None:
