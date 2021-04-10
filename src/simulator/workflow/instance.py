@@ -9,9 +9,12 @@ class Workflow:
     Contains a list of Tasks.
     """
 
-    def __init__(self, name: str, description: str, deadline: datetime):
+    def __init__(self, name: str, description: str):
         self.uuid = str(uuid.uuid4())
         self.name = name
         self.description = description
         self.tasks: list[wf.Task] = []
-        self.deadline: datetime = deadline
+        self.deadline: datetime = datetime.now()
+
+    def set_deadline(self, deadline: datetime):
+        self.deadline = deadline
