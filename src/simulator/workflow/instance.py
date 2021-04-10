@@ -1,6 +1,8 @@
 from datetime import datetime
 import uuid
 
+import networkx as nx
+
 import simulator.workflow as wf
 
 
@@ -15,6 +17,7 @@ class Workflow:
         self.description = description
         self.tasks: list[wf.Task] = []
         self.deadline: datetime = datetime.now()
+        self.dag: nx.DiGraph = nx.DiGraph()
 
     def set_deadline(self, deadline: datetime):
         self.deadline = deadline

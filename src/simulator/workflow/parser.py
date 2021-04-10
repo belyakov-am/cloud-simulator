@@ -47,7 +47,11 @@ class PegasusTraceParser:
 
             for name in parents_names:
                 try:
-                    parents.append(tasks[name])
+                    parent = tasks[name]
+                    parents.append(parent)
+
+                    # set edge from parent to current in DAG structure
+                    self.workflow.dag.add_edge(parent.id, ind)
                 except KeyError:
                     raise SyntaxError("Bad file structure. "
                                       "Child task is before its parent")
