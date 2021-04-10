@@ -1,16 +1,17 @@
 from datetime import datetime, timedelta
 
-import simulator.schedulers as sch
 import simulator.workflow as wf
 import simulator.utils.task_execution_prediction as tep
 
-import simulator.schedulers.epsm as epsm
+from ..interface import SchedulerInterface
+from .task import Task
+from .workflow import Workflow
 
 
-class EPSMScheduler(sch.SchedulerInterface):
+class EPSMScheduler(SchedulerInterface):
     def __init__(self):
         super().__init__()
-        self.workflows: dict[str, epsm.Workflow] = dict()
+        self.workflows: dict[str, Workflow] = dict()
 
     def submit_workflow(self, workflow: wf.Workflow) -> None:
         self._convert_to_epsm_instances(workflow=workflow)
@@ -21,23 +22,23 @@ class EPSMScheduler(sch.SchedulerInterface):
 
     def _convert_to_epsm_instances(self, workflow: wf.Workflow) -> None:
         # create EPSM workflow from basic
-        epsm_workflow = epsm.Workflow(
+        epsm_workflow = Workflow(
             name=workflow.name,
             description=workflow.description,
         )
         epsm_workflow.uuid = workflow.uuid
 
         # create EPSM tasks from basic
-        epsm_tasks: list[epsm.Task] = []
-        tasks_dict: dict[str, epsm.Task] = dict()
+        epsm_tasks: list[Task] = []
+        tasks_dict: dict[str, Task] = dict()
 
         for task in workflow.tasks:
             # get proper parents list (i.e. as epsm.Task)
-            parents: list[epsm.Task] = []
+            parents: list[Task] = []
             for parent in task.parents:
                 parents.append(tasks_dict[parent.name])
 
-            epsm_task = epsm.Task(
+            epsm_task = Task(
                 workflow_uuid=task.workflow_uuid,
                 task_id=task.id,
                 name=task.name,
@@ -69,7 +70,7 @@ class EPSMScheduler(sch.SchedulerInterface):
             if current_eft > workflow.makespan:
                 workflow.makespan = current_eft
 
-    def _calculate_eft(self, task: epsm.Task) -> float:
+    def _calculate_eft(self, task: Task) -> float:
         max_parent_eft = max(parent.eft for parent in task.parents)
         task_execution_time = tep.io_consumption(
             task=task,
