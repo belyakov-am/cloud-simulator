@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import simulator.schedulers as sch
 import simulator.workflow as wf
@@ -17,6 +17,7 @@ class EPSMScheduler(sch.SchedulerInterface):
         self._calculate_efts_and_makespan(workflow_uuid=workflow.uuid)
         self._calculate_total_spare_time(workflow_uuid=workflow.uuid)
         self._distribute_spare_time_among_tasks(workflow_uuid=workflow.uuid)
+        self._calculate_tasks_deadlines(workflow_uuid=workflow.uuid)
 
     def _convert_to_epsm_instances(self, workflow: wf.Workflow) -> None:
         # create EPSM workflow from basic
@@ -57,6 +58,9 @@ class EPSMScheduler(sch.SchedulerInterface):
         # WARNING
         # assumed that every parent task is listed before its child
 
+        # TODO: check that makespan is within a deadline.
+        # Otherwise iterate over VM types until OK. If impossible - set
+        # proper status for this workflow (i.e. rejected)
         workflow = self.workflows[workflow_uuid]
         for task in workflow.tasks:
             current_eft = self._calculate_eft(task)
@@ -96,6 +100,14 @@ class EPSMScheduler(sch.SchedulerInterface):
         for task in workflow.tasks:
             task.spare_time = (task.execution_time_prediction
                                * spare_to_makespan_proportion)
+
+    def _calculate_tasks_deadlines(self, workflow_uuid: str) -> None:
+        workflow = self.workflows[workflow_uuid]
+
+        for task in workflow.tasks:
+            task.deadline = (workflow.start_time
+                             + timedelta(seconds=task.eft)
+                             + timedelta(seconds=task.spare_time))
 
     def schedule_workflow(self, workflow_uuid: str) -> None:
         pass
