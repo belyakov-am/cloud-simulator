@@ -15,7 +15,9 @@ class CloudManager:
         self.scheduler: sch.SchedulerInterface = scheduler
         self.workflows: dict[str, wf.Workflow] = dict()
 
-    def execute_workflow(self, workflow: wf.Workflow) -> None:
+    def submit_workflow(self, workflow: wf.Workflow) -> None:
         self.workflows[workflow.uuid] = workflow
         self.scheduler.submit_workflow(workflow=workflow)
-        self.scheduler.schedule_workflow(workflow_uuid=workflow.uuid)
+
+    def execute_workflow(self, workflow_uuid: str) -> None:
+        self.scheduler.schedule_workflow(workflow_uuid=workflow_uuid)
