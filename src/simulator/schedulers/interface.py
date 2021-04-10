@@ -1,18 +1,21 @@
 from abc import ABC, abstractmethod
 
+import simulator.storage as st
+import simulator.vm as vm
 import simulator.workflow as wf
 
 
 class SchedulerInterface(ABC):
     """Interface for implementing scheduling algorithms"""
 
-    @abstractmethod
     def __init__(self):
         """Probably need to create a variable for saving incoming
-        workflows. dict[str, Workflow] should work perfectly.
+        workflows in a scheduler.
+        dict[str, Workflow] should work perfectly.
         """
 
-        pass
+        self.storage_manager: st.Manager = st.Manager()
+        self.vm_manager: vm.Manager = vm.Manager()
 
     @abstractmethod
     def submit_workflow(self, workflow: wf.Workflow) -> None:
