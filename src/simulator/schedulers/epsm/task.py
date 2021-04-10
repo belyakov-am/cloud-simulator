@@ -10,10 +10,15 @@ class Task(wf.Task):
 
     def __init__(self, *args, **kwargs):
         super(Task, self).__init__(*args, **kwargs)
-        self.eft = 0.0
-        self.execution_time_prediction = 0.0
-        self.spare_time = 0.0
 
+        # in seconds
+        self.eft: float = 0.0
+        # in seconds
+        self.execution_time_prediction: float = 0.0
+        # in seconds
+        self.spare_time: float = 0.0
+
+        # now() only for initialization purpose
         self.deadline: datetime = datetime.now()
 
         self.parents: list[Task] = self.parents

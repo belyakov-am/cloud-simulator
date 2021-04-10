@@ -14,8 +14,9 @@ class Workflow(wf.Workflow):
         self.tasks: list[epsm.Task] = []
 
         # in seconds
-        self.makespan = 0.0
+        self.makespan: float = 0.0
         # in seconds
-        self.spare_time = 0.0
+        self.spare_time: float = 0.0
 
+        # now() only for initialization purpose
         self.start_time: datetime = datetime.now()
