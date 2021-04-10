@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import simulator.workflow as wf
 
 
@@ -11,5 +13,7 @@ class Task(wf.Task):
         self.eft = 0.0
         self.execution_time_prediction = 0.0
         self.spare_time = 0.0
+
+        self.deadline: datetime = datetime.now()
 
         self.parents: list[Task] = self.parents
