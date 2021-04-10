@@ -8,7 +8,8 @@ class Task(wf.Task):
 
     def __init__(self, *args, **kwargs):
         super(Task, self).__init__(*args, **kwargs)
-        self.eft = 0
+        self.eft = 0.0
         self.execution_time_prediction = 0.0
+        self.spare_time = 0.0
 
         self.parents: list[Task] = self.parents

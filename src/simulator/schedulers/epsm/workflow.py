@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import simulator.schedulers.epsm as epsm
 import simulator.workflow as wf
 
@@ -14,4 +16,6 @@ class Workflow(wf.Workflow):
         # in seconds
         self.makespan = 0.0
         # in seconds
-        self.total_spare_time = 0.0
+        self.spare_time = 0.0
+
+        self.start_time: datetime = datetime.now()
