@@ -42,7 +42,7 @@ class EPSMScheduler(SchedulerInterface):
                 workflow_uuid=task.workflow_uuid,
                 task_id=task.id,
                 name=task.name,
-                parents=task.parents,
+                parents=parents,
                 input_files=task.input_files,
                 output_files=task.output_files,
             )
