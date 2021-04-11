@@ -71,7 +71,10 @@ class EPSMScheduler(SchedulerInterface):
                 workflow.makespan = current_eft
 
     def _calculate_eft(self, task: Task) -> float:
-        max_parent_eft = max(parent.eft for parent in task.parents)
+        max_parent_eft = (max(parent.eft for parent in task.parents)
+                          if task.parents
+                          else 0)
+
         task_execution_time = tep.io_consumption(
             task=task,
             vm_instance=self.vm_manager.get_slowest_vm(),
