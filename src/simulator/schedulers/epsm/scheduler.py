@@ -1,4 +1,5 @@
 import asyncio
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 
 import simulator.workflow as wf
@@ -9,6 +10,14 @@ from .task import Task
 from .workflow import Workflow
 
 
+@dataclass
+class Settings:
+    # Indicates scheduling cycle, which occurs every
+    # `scheduling_interval`, during which tasks in queue are processed.
+    # Declared in seconds.
+    scheduling_interval: int = 10
+
+
 class EPSMScheduler(SchedulerInterface):
     def __init__(self):
         super().__init__()
@@ -16,6 +25,8 @@ class EPSMScheduler(SchedulerInterface):
 
         # queue for placing ready-to-execute tasks
         self.task_queue: asyncio.Queue = asyncio.Queue()
+
+        self.settings: Settings = Settings()
 
         self._init_queue_worker()
 
