@@ -17,3 +17,6 @@ class File:
 
         self.name = name
         self.size = size
+
+    def size_in_megabits(self) -> float:
+        return self.size / KILOBYTES_IN_MEGABIT
