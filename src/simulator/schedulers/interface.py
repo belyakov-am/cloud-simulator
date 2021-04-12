@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-import simulator.storage as st
+import simulator.storages as sts
 import simulator.vms as vms
 import simulator.workflows as wfs
 
@@ -14,7 +14,7 @@ class SchedulerInterface(ABC):
         dict[str, Workflow] should work perfectly.
         """
 
-        self.storage_manager: st.Manager = st.Manager()
+        self.storage_manager: sts.Manager = sts.Manager()
         self.vm_manager: vms.Manager = vms.Manager()
 
     @abstractmethod

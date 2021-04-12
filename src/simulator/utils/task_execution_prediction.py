@@ -1,4 +1,4 @@
-import simulator.storage as st
+import simulator.storages as sts
 import simulator.vms as vms
 import simulator.workflows as wfs
 
@@ -9,7 +9,7 @@ KILOBYTES_IN_MEGABIT = 125
 def io_consumption(
         task: wfs.Task,
         vm_instance: vms.VM,
-        storage: st.Storage
+        storage: sts.Storage
 ) -> float:
     """Return prediction for time execution based on IO consumption.
     It includes time for process data over network and disk.
