@@ -1,19 +1,4 @@
-class File:
-    """Representation of a file, that is used or produced by a task."""
-
-    def __init__(
-            self,
-            name: str,
-            size: int,
-    ):
-        """
-
-        :param name: Name of the file
-        :param size: Size of the file (in KB)
-        """
-
-        self.name = name
-        self.size = size
+import simulator.workflow as wf
 
 
 class Task:
@@ -25,8 +10,8 @@ class Task:
             task_id: int,
             name: str,
             parents: list["Task"],
-            input_files: list[File],
-            output_files: list[File],
+            input_files: list[wf.File],
+            output_files: list[wf.File],
 
     ):
         self.workflow_uuid = workflow_uuid
