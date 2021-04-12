@@ -90,7 +90,7 @@ class EPSMScheduler(SchedulerInterface):
     def _calculate_total_spare_time(self, workflow_uuid: str) -> None:
         now = datetime.now()
         workflow = self.workflows[workflow_uuid]
-        available_time = (workflow.deadline - now).seconds
+        available_time = (workflow.deadline - now).total_seconds()
 
         workflow.spare_time = available_time - workflow.makespan
         workflow.start_time = now
