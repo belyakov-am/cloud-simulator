@@ -11,6 +11,10 @@ def io_consumption(
         vm_instance: vm.VM,
         storage: st.Storage
 ) -> float:
+    """Return prediction for time execution based on IO consumption.
+    It includes time for process data over network and disk.
+    Calculations are made in seconds.
+    """
     total_time = 0.0
 
     for input_file in task.input_files:
