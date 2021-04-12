@@ -1,5 +1,5 @@
 import simulator.storage as st
-import simulator.vm as vm
+import simulator.vms as vms
 import simulator.workflow as wf
 
 
@@ -8,7 +8,7 @@ KILOBYTES_IN_MEGABIT = 125
 
 def io_consumption(
         task: wf.Task,
-        vm_instance: vm.VM,
+        vm_instance: vms.VM,
         storage: st.Storage
 ) -> float:
     """Return prediction for time execution based on IO consumption.

@@ -2,6 +2,7 @@ import asyncio
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
+import simulator.vms as vms
 import simulator.workflow as wf
 import simulator.utils.task_execution_prediction as tep
 
@@ -145,3 +146,6 @@ class EPSMScheduler(SchedulerInterface):
         while True:
             # TODO: sleep for `sched` time and get all tasks from queue
             task = await self.task_queue.get()
+
+    async def schedule_task(self, task: Task, vm_instance: vms.VM):
+        pass

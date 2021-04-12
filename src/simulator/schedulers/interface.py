@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 import simulator.storage as st
-import simulator.vm as vm
+import simulator.vms as vms
 import simulator.workflow as wf
 
 
@@ -15,7 +15,7 @@ class SchedulerInterface(ABC):
         """
 
         self.storage_manager: st.Manager = st.Manager()
-        self.vm_manager: vm.Manager = vm.Manager()
+        self.vm_manager: vms.Manager = vms.Manager()
 
     @abstractmethod
     def submit_workflow(self, workflow: wf.Workflow) -> None:
