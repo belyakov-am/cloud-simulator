@@ -27,6 +27,7 @@ class EPSMScheduler(SchedulerInterface):
             description=workflow.description,
         )
         epsm_workflow.uuid = workflow.uuid
+        epsm_workflow.set_deadline(deadline=workflow.deadline)
 
         # create EPSM tasks from basic
         epsm_tasks: list[Task] = []
