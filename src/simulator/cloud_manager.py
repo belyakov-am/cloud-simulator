@@ -1,5 +1,5 @@
 import simulator.schedulers as sch
-import simulator.workflow as wf
+import simulator.workflows as wfs
 
 
 class CloudManager:
@@ -13,9 +13,9 @@ class CloudManager:
 
     def __init__(self, scheduler: sch.SchedulerInterface) -> None:
         self.scheduler: sch.SchedulerInterface = scheduler
-        self.workflows: dict[str, wf.Workflow] = dict()
+        self.workflows: dict[str, wfs.Workflow] = dict()
 
-    def submit_workflow(self, workflow: wf.Workflow) -> None:
+    def submit_workflow(self, workflow: wfs.Workflow) -> None:
         self.workflows[workflow.uuid] = workflow
         self.scheduler.submit_workflow(workflow=workflow)
 

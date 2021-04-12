@@ -1,5 +1,5 @@
 import simulator.schedulers
 import simulator.vms
-import simulator.workflow
+import simulator.workflows
 
 from .cloud_manager import CloudManager

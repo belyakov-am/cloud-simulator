@@ -1,4 +1,4 @@
-import simulator.workflow as wf
+import simulator.workflows as wfs
 
 
 class Task:
@@ -10,8 +10,8 @@ class Task:
             task_id: int,
             name: str,
             parents: list["Task"],
-            input_files: list[wf.File],
-            output_files: list[wf.File],
+            input_files: list[wfs.File],
+            output_files: list[wfs.File],
 
     ):
         self.workflow_uuid = workflow_uuid

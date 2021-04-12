@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 
 import simulator.vms as vms
-import simulator.workflow as wf
+import simulator.workflows as wfs
 import simulator.utils.task_execution_prediction as tep
 
 from ..interface import SchedulerInterface
@@ -34,14 +34,14 @@ class EPSMScheduler(SchedulerInterface):
     def _init_queue_worker(self):
         asyncio.create_task(self.schedule_queued_tasks())
 
-    def submit_workflow(self, workflow: wf.Workflow) -> None:
+    def submit_workflow(self, workflow: wfs.Workflow) -> None:
         self._convert_to_epsm_instances(workflow=workflow)
         self._calculate_efts_and_makespan(workflow_uuid=workflow.uuid)
         self._calculate_total_spare_time(workflow_uuid=workflow.uuid)
         self._distribute_spare_time_among_tasks(workflow_uuid=workflow.uuid)
         self._calculate_tasks_deadlines(workflow_uuid=workflow.uuid)
 
-    def _convert_to_epsm_instances(self, workflow: wf.Workflow) -> None:
+    def _convert_to_epsm_instances(self, workflow: wfs.Workflow) -> None:
         # create EPSM workflow from basic
         epsm_workflow = Workflow(
             name=workflow.name,
@@ -144,6 +144,7 @@ class EPSMScheduler(SchedulerInterface):
 
     async def schedule_queued_tasks(self):
         while True:
+            await asyncio.sleep(self.settings.scheduling_interval)
             # TODO: sleep for `sched` time and get all tasks from queue
             task = await self.task_queue.get()
 

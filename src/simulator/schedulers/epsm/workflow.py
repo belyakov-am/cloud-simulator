@@ -1,10 +1,10 @@
 from datetime import datetime
 
 import simulator.schedulers.epsm as epsm
-import simulator.workflow as wf
+import simulator.workflows as wfs
 
 
-class Workflow(wf.Workflow):
+class Workflow(wfs.Workflow):
     """Extends basic functionality of a Workflow class with specific
     fields and methods required by the EPSM algorithm
     """

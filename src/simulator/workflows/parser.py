@@ -1,6 +1,6 @@
 import json
 
-import simulator.workflow as wf
+import simulator.workflows as wfs
 
 
 class PegasusTraceParser:
@@ -28,7 +28,7 @@ class PegasusTraceParser:
         with open(self.filename) as f:
             self._data = json.load(f)
 
-        self.workflow: wf.Workflow = wf.Workflow(
+        self.workflow: wfs.Workflow = wfs.Workflow(
             name=self._data["name"],
             description=self._data["description"],
         )
@@ -38,12 +38,12 @@ class PegasusTraceParser:
         # however current architecture requires Task instances.
         # Warning: works only in assumption that in trace file each task
         # is listed only after all its predecessors (if exists).
-        tasks: dict[str, wf.Task] = dict()
+        tasks: dict[str, wfs.Task] = dict()
 
         for ind, task_json in enumerate(self._data["workflow"]["jobs"]):
             # Process parents
             parents_names = task_json["parents"]
-            parents: list[wf.Task] = []
+            parents: list[wfs.Task] = []
 
             for name in parents_names:
                 try:
@@ -57,18 +57,18 @@ class PegasusTraceParser:
                                       "Child task is before its parent")
 
             # Process files
-            input_files: list[wf.File] = []
-            output_files: list[wf.File] = []
+            input_files: list[wfs.File] = []
+            output_files: list[wfs.File] = []
 
             for task_file in task_json["files"]:
-                file_obj = wf.File(name=task_file["name"], size=task_file["size"])
+                file_obj = wfs.File(name=task_file["name"], size=task_file["size"])
                 if task_file["link"] == "input":
                     input_files.append(file_obj)
                 elif task_file["link"] == "output":
                     output_files.append(file_obj)
 
             # Save task
-            task = wf.Task(
+            task = wfs.Task(
                 workflow_uuid=self.workflow.uuid,
                 task_id=ind,
                 name=task_json["name"],
@@ -80,5 +80,5 @@ class PegasusTraceParser:
             tasks[task.name] = task
             self.workflow.tasks.append(task)
 
-    def get_workflow(self) -> wf.Workflow:
+    def get_workflow(self) -> wfs.Workflow:
         return self.workflow

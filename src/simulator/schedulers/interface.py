@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import simulator.storage as st
 import simulator.vms as vms
-import simulator.workflow as wf
+import simulator.workflows as wfs
 
 
 class SchedulerInterface(ABC):
@@ -18,7 +18,7 @@ class SchedulerInterface(ABC):
         self.vm_manager: vms.Manager = vms.Manager()
 
     @abstractmethod
-    def submit_workflow(self, workflow: wf.Workflow) -> None:
+    def submit_workflow(self, workflow: wfs.Workflow) -> None:
         """This method can be used for any preprocessing required by
         an algorithm. If an algorithm doesn't require any initial setup,
         one should save given workflow to class instance variable

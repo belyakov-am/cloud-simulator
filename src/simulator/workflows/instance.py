@@ -3,7 +3,7 @@ import uuid
 
 import networkx as nx
 
-import simulator.workflow as wf
+import simulator.workflows as wfs
 
 
 class Workflow:
@@ -15,7 +15,7 @@ class Workflow:
         self.uuid = str(uuid.uuid4())
         self.name = name
         self.description = description
-        self.tasks: list[wf.Task] = []
+        self.tasks: list[wfs.Task] = []
         self.deadline: datetime = datetime.now()
         self.dag: nx.DiGraph = nx.DiGraph()
 

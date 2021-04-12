@@ -1,9 +1,9 @@
 from datetime import datetime
 
-import simulator.workflow as wf
+import simulator.workflows as wfs
 
 
-class Task(wf.Task):
+class Task(wfs.Task):
     """Extends basic functionality of a Task class with specific fields
     and methods required by the EPSM algorithm
     """
