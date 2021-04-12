@@ -19,5 +19,5 @@ class CloudManager:
         self.workflows[workflow.uuid] = workflow
         self.scheduler.submit_workflow(workflow=workflow)
 
-    def execute_workflow(self, workflow_uuid: str) -> None:
-        self.scheduler.schedule_workflow(workflow_uuid=workflow_uuid)
+    async def execute_workflow(self, workflow_uuid: str) -> None:
+        await self.scheduler.schedule_workflow(workflow_uuid=workflow_uuid)
