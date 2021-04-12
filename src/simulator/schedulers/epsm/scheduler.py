@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timedelta
 
 import simulator.workflow as wf
@@ -12,6 +13,14 @@ class EPSMScheduler(SchedulerInterface):
     def __init__(self):
         super().__init__()
         self.workflows: dict[str, Workflow] = dict()
+
+        # queue for placing ready-to-execute tasks
+        self.task_queue: asyncio.Queue = asyncio.Queue()
+
+        self._init_queue_worker()
+
+    def _init_queue_worker(self):
+        asyncio.create_task(self.schedule_queued_tasks())
 
     def submit_workflow(self, workflow: wf.Workflow) -> None:
         self._convert_to_epsm_instances(workflow=workflow)
@@ -114,5 +123,14 @@ class EPSMScheduler(SchedulerInterface):
                              + timedelta(seconds=task.eft)
                              + timedelta(seconds=task.spare_time))
 
-    def schedule_workflow(self, workflow_uuid: str) -> None:
-        pass
+    async def schedule_workflow(self, workflow_uuid: str) -> None:
+        workflow = self.workflows[workflow_uuid]
+
+        for task in workflow.tasks:
+            if not task.parents:
+                await self.task_queue.put(task)
+
+    async def schedule_queued_tasks(self):
+        while True:
+            # TODO: sleep for `sched` time and get all tasks from queue
+            task = await self.task_queue.get()

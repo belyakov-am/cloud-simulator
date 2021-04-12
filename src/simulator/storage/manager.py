@@ -9,4 +9,7 @@ class Manager:
 
     # TODO: implement
     def get_storage(self):
-        return st.Storage(1, 1)
+        return st.Storage(
+            read_rate=1000,
+            write_rate=1000,
+        )
