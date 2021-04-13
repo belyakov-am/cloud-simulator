@@ -5,7 +5,11 @@ import simulator.vms as vms
 
 
 class Manager:
-    """VM Manager"""
+    """VM Manager is top-level entity that is responsible for
+    communicating with VMs.
+    It has information about available VM types, idle, provisioned and
+    busy VMs.
+    """
 
     def __init__(self):
         # List of VM types. Sorted by price in ascending order.
