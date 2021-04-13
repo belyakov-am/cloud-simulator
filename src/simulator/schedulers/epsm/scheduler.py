@@ -2,6 +2,8 @@ import asyncio
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
+from loguru import logger
+
 import simulator.vms as vms
 import simulator.workflows as wfs
 import simulator.utils.task_execution_prediction as tep
@@ -35,6 +37,8 @@ class EPSMScheduler(SchedulerInterface):
         asyncio.create_task(self.schedule_queued_tasks())
 
     def submit_workflow(self, workflow: wfs.Workflow) -> None:
+        logger.debug(f"Got new workflow {workflow.uuid}")
+
         self._convert_to_epsm_instances(workflow=workflow)
         self._calculate_efts_and_makespan(workflow_uuid=workflow.uuid)
         self._calculate_total_spare_time(workflow_uuid=workflow.uuid)

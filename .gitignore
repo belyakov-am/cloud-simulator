@@ -6,3 +6,6 @@ __pycache__/
 
 # Workflow files
 workflow-traces
+
+# Simulator logs
+logs
