@@ -10,7 +10,6 @@ class Manager:
     # TODO: implement
     def get_slowest_vm(self):
         return vms.VM(
-            mips=1,
-            processor_cores=1,
+            cpu=1,
             io_bandwidth=100000,
         )
