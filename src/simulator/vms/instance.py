@@ -29,5 +29,14 @@ class VM:
             self,
             vm_type: VMType,
     ):
-        self.type = vm_type
         self.uuid = str(uuid.uuid4())
+        self.type = vm_type
+
+    def __str__(self):
+        return (f"<VM "
+                f"uuid = {self.uuid}, "
+                f"type = {self.type}>")
+
+    def __repr__(self):
+        return (f"VM("
+                f"type = {self.type})")
