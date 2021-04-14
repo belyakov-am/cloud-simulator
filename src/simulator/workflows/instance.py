@@ -11,7 +11,7 @@ class Workflow:
     Contains a list of Tasks.
     """
 
-    def __init__(self, name: str, description: str):
+    def __init__(self, name: str, description: str) -> None:
         self.uuid = str(uuid.uuid4())
         self.name = name
         self.description = description

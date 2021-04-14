@@ -8,7 +8,7 @@ import simulator.workflows as wfs
 class SchedulerInterface(ABC):
     """Interface for implementing scheduling algorithms"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Probably need to create a variable for saving incoming
         workflows in a scheduler.
         dict[str, Workflow] should work perfectly.

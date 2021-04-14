@@ -13,7 +13,7 @@ class Manager:
     busy VMs.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         # List of VM types. Sorted by price in ascending order.
         self.vm_types: list[vms.VMType] = []
 
@@ -24,7 +24,7 @@ class Manager:
 
         self._get_vm_types()
 
-    def _get_vm_types(self):
+    def _get_vm_types(self) -> None:
         with open(config.VM_TYPES) as f:
             json_data = json.load(f)
 

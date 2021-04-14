@@ -10,7 +10,7 @@ class Storage:
             self,
             read_rate: int,
             write_rate: int,
-    ):
+    ) -> None:
         """
 
         :param read_rate: read rate from storage. Measures in megabits
@@ -21,12 +21,12 @@ class Storage:
         self.read_rate = read_rate
         self.write_rate = write_rate
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (f"<Storage "
                 f"read_rate = {self.read_rate} Mbps, "
                 f"write_rate = {self.write_rate} Mbps>")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"Storage("
                 f"read_rate = {self.read_rate}, "
                 f"write_rate = {self.write_rate})")

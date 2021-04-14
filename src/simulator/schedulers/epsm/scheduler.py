@@ -145,11 +145,15 @@ class EPSMScheduler(SchedulerInterface):
             if not task.parents:
                 await self.task_queue.put(task)
 
-    async def schedule_queued_tasks(self):
+    async def schedule_queued_tasks(self) -> None:
         while True:
             await asyncio.sleep(self.settings.scheduling_interval)
             # TODO: sleep for `sched` time and get all tasks from queue
             task = await self.task_queue.get()
 
-    async def schedule_task(self, task: Task, vm_instance: vms.VM):
+    async def schedule_task(
+            self,
+            task: Task,
+            vm_instance: vms.VM
+    ) -> None:
         pass

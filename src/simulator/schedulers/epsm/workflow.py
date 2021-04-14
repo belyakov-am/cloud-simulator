@@ -9,7 +9,7 @@ class Workflow(wfs.Workflow):
     fields and methods required by the EPSM algorithm.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super(Workflow, self).__init__(*args, **kwargs)
         self.tasks: list[epsm.Task] = []
 

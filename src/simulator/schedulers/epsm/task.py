@@ -8,7 +8,7 @@ class Task(wfs.Task):
     and methods required by the EPSM algorithm.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super(Task, self).__init__(*args, **kwargs)
 
         self.eft: float = 0.0  # in seconds

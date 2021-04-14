@@ -30,7 +30,7 @@ class VM:
     def __init__(
             self,
             vm_type: VMType,
-    ):
+    ) -> None:
         self.uuid = str(uuid.uuid4())
         self.type = vm_type
 
@@ -40,12 +40,12 @@ class VM:
         self.files: list[wfs.File] = []
         self.files_set = set[wfs.File] = set()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (f"<VM "
                 f"uuid = {self.uuid}, "
                 f"type = {self.type}>")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"VM("
                 f"type = {self.type})")
 

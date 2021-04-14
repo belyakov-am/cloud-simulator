@@ -13,7 +13,7 @@ class Task:
             input_files: list[wfs.File],
             output_files: list[wfs.File],
 
-    ):
+    ) -> None:
         self.workflow_uuid = workflow_uuid
         self.id = task_id
         self.name = name
@@ -21,7 +21,7 @@ class Task:
         self.input_files = input_files
         self.output_files = output_files
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (f"<Task "
                 f"workflow_uuid = {self.workflow_uuid}, "
                 f"id = {self.id}, "
@@ -30,7 +30,7 @@ class Task:
                 f"output_files = {self.output_files}, "
                 f"parents = {self.parents}>")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"Task("
                 f"workflow_uuid = {self.workflow_uuid}, "
                 f"id = {self.id}, "

@@ -8,7 +8,7 @@ class File:
             self,
             name: str,
             size: int,
-    ):
+    ) -> None:
         """
 
         :param name: Name of the file.
@@ -21,12 +21,12 @@ class File:
     def size_in_megabits(self) -> float:
         return self.size / KILOBYTES_IN_MEGABIT
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (f"<File "
                 f"name = {self.name}, "
                 f"size = {self.size} KB>")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"File("
                 f"name = {self.name}, "
                 f"size = {self.size})")

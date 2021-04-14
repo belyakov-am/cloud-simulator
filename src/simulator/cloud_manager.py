@@ -20,7 +20,7 @@ class CloudManager:
 
         self._init_logger()
 
-    def _init_logger(self):
+    def _init_logger(self) -> None:
         logger.add(
             sink=config.LOGS_DIR + "/debug.txt",
             level="DEBUG",
