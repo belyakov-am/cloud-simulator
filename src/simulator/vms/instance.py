@@ -37,7 +37,8 @@ class VM:
         # Set of present files on VM. They can appear as task output
         # or can be delivered over network.
         # TODO: clean up old files
-        self.files = set[wfs.File] = set()
+        self.files: set[wfs.File] = set()
+        self.containers: set[wfs.Container] = set()
 
     def __str__(self) -> str:
         return (f"<VM "
@@ -58,3 +59,13 @@ class VM:
         incoming_files_set = set(files)
 
         return self.files.issubset(incoming_files_set)
+
+    def provision_container(self, container: wfs.Container) -> None:
+        """Provisions container that takes `provision_time`.
+
+        :param container: container to provision.
+        :return: None.
+        """
+
+        # TODO: do something with time
+        self.containers.add(container)
