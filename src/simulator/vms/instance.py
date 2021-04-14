@@ -37,8 +37,7 @@ class VM:
         # List of present files on VM. They can appear as task output
         # or can be delivered over network.
         # TODO: clean up old files
-        self.files: list[wfs.File] = []
-        self.files_set = set[wfs.File] = set()
+        self.files = set[wfs.File] = set()
 
     def __str__(self) -> str:
         return (f"<VM "
@@ -57,6 +56,5 @@ class VM:
         """
 
         incoming_files_set = set(files)
-        local_files_set = set()
 
-        return local_files_set.issubset(incoming_files_set)
+        return self.files.issubset(incoming_files_set)
