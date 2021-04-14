@@ -30,3 +30,9 @@ class File:
         return (f"File("
                 f"name = {self.name}, "
                 f"size = {self.size})")
+
+    def __eq__(self, other: "File") -> bool:
+        return self.name == other.name and self.size == other.size
+
+    def __hash__(self) -> int:
+        return hash(self.name) ^ hash(self.size)

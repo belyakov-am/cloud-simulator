@@ -34,6 +34,12 @@ class VM:
         self.uuid = str(uuid.uuid4())
         self.type = vm_type
 
+        # List of present files on VM. They can appear as task output
+        # or can be delivered over network.
+        # TODO: clean up old files
+        self.files: list[wfs.File] = []
+        self.files_set = set[wfs.File] = set()
+
     def __str__(self):
         return (f"<VM "
                 f"uuid = {self.uuid}, "
@@ -42,3 +48,15 @@ class VM:
     def __repr__(self):
         return (f"VM("
                 f"type = {self.type})")
+
+    def check_if_files_present(self, files: list[wfs.File]) -> bool:
+        """Check if all incoming files are present on VM.
+
+        :param files: list of files to check.
+        :return: True if exist, False otherwise
+        """
+
+        incoming_files_set = set(files)
+        local_files_set = set()
+
+        return local_files_set.issubset(incoming_files_set)

@@ -1,7 +1,9 @@
 import json
+import typing as tp
 
 import simulator.config as config
 import simulator.vms as vms
+import simulator.workflows as wfs
 
 
 class Manager:
@@ -14,7 +16,11 @@ class Manager:
     def __init__(self):
         # List of VM types. Sorted by price in ascending order.
         self.vm_types: list[vms.VMType] = []
+
         self.vms: list[vms.VM] = []
+
+        # List of idle (i.e. provisioned but not buse) VMs
+        self.idle_vms: list[vms.VM] = []
 
         self._get_vm_types()
 
@@ -55,3 +61,25 @@ class Manager:
         """Return list of all available VM types."""
 
         return self.vm_types
+
+    def get_idle_vms(
+            self,
+            task: tp.Optional[wfs.Task] = None,
+    ) -> list[vms.VM]:
+        """Return list of idle VMs. If `task` was passed, filter idle
+        VMs on corresponding input files of task, so only VMs with
+        task.input_files will be returned.
+
+        :param task: task to filter on.
+        :return: list of idle VMs.
+        """
+
+        if task is None:
+            return self.idle_vms
+
+        idle_vms_input: list[vms.VM] = []
+        for idle_vm in self.idle_vms:
+            if idle_vm.check_if_files_present(task.input_files):
+                idle_vms_input.append(idle_vm)
+
+        return idle_vms_input
