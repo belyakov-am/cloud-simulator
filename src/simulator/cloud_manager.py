@@ -6,7 +6,7 @@ import simulator.workflows as wfs
 
 
 class CloudManager:
-    """Cloud Manager is a top-level entity that acts as a middleman
+    """Cloud Manager is top-level entity that acts as middleman
     between user requests and all other entities. It has information
     about available VMs, executed and scheduled tasks and so on.
 

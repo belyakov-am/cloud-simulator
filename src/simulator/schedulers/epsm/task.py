@@ -4,8 +4,8 @@ import simulator.workflows as wfs
 
 
 class Task(wfs.Task):
-    """Extends basic functionality of a Task class with specific fields
-    and methods required by the EPSM algorithm
+    """Extends basic functionality of Task class with specific fields
+    and methods required by the EPSM algorithm.
     """
 
     def __init__(self, *args, **kwargs):

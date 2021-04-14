@@ -5,8 +5,8 @@ import simulator.workflows as wfs
 
 
 class Workflow(wfs.Workflow):
-    """Extends basic functionality of a Workflow class with specific
-    fields and methods required by the EPSM algorithm
+    """Extends basic functionality of Workflow class with specific
+    fields and methods required by the EPSM algorithm.
     """
 
     def __init__(self, *args, **kwargs):

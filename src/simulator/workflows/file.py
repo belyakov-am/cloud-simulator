@@ -11,8 +11,8 @@ class File:
     ):
         """
 
-        :param name: Name of the file
-        :param size: Size of the file (in KB)
+        :param name: Name of the file.
+        :param size: Size of the file (in KB).
         """
 
         self.name = name

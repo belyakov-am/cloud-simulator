@@ -25,7 +25,7 @@ class VMType:
 
 
 class VM:
-    """Representation of a Virtual Machine."""
+    """Representation of Virtual Machine."""
 
     def __init__(
             self,

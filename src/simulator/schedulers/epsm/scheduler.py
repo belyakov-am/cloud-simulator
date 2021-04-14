@@ -26,7 +26,7 @@ class EPSMScheduler(SchedulerInterface):
         super().__init__()
         self.workflows: dict[str, Workflow] = dict()
 
-        # queue for placing ready-to-execute tasks
+        # Queue for placing ready-to-execute tasks
         self.task_queue: asyncio.Queue = asyncio.Queue()
 
         self.settings: Settings = Settings()
@@ -46,7 +46,7 @@ class EPSMScheduler(SchedulerInterface):
         self._calculate_tasks_deadlines(workflow_uuid=workflow.uuid)
 
     def _convert_to_epsm_instances(self, workflow: wfs.Workflow) -> None:
-        # create EPSM workflow from basic
+        # Create EPSM workflow from basic
         epsm_workflow = Workflow(
             name=workflow.name,
             description=workflow.description,
@@ -54,12 +54,12 @@ class EPSMScheduler(SchedulerInterface):
         epsm_workflow.uuid = workflow.uuid
         epsm_workflow.set_deadline(deadline=workflow.deadline)
 
-        # create EPSM tasks from basic
+        # Create EPSM tasks from basic
         epsm_tasks: list[Task] = []
         tasks_dict: dict[str, Task] = dict()
 
         for task in workflow.tasks:
-            # get proper parents list (i.e. as epsm.Task)
+            # Get proper parents list (i.e. as epsm.Task)
             parents: list[Task] = []
             for parent in task.parents:
                 parents.append(tasks_dict[parent.name])
@@ -78,16 +78,16 @@ class EPSMScheduler(SchedulerInterface):
 
         epsm_workflow.tasks = epsm_tasks
 
-        # save in scheduler dict
+        # Save in scheduler dict
         self.workflows[epsm_workflow.uuid] = epsm_workflow
 
     def _calculate_efts_and_makespan(self, workflow_uuid: str) -> None:
-        # WARNING
-        # assumed that every parent task is listed before its child
+        # WARNING!
+        # Assumed that every parent task is listed before its child.
 
         # TODO: check that makespan is within a deadline.
         # Otherwise iterate over VM types until OK. If impossible - set
-        # proper status for this workflow (i.e. rejected)
+        # proper status for this workflow (i.e. rejected).
         workflow = self.workflows[workflow_uuid]
         for task in workflow.tasks:
             current_eft = self._calculate_eft(task)
@@ -120,7 +120,7 @@ class EPSMScheduler(SchedulerInterface):
         workflow.start_time = now
 
     def _distribute_spare_time_among_tasks(self, workflow_uuid: str) -> None:
-        # spare time should be distributed proportionally to tasks
+        # Spare time should be distributed proportionally to tasks
         # runtime
 
         workflow = self.workflows[workflow_uuid]

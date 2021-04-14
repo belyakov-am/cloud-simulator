@@ -20,12 +20,12 @@ class SchedulerInterface(ABC):
     @abstractmethod
     def submit_workflow(self, workflow: wfs.Workflow) -> None:
         """This method can be used for any preprocessing required by
-        an algorithm. If an algorithm doesn't require any initial setup,
+        algorithm. If algorithm doesn't require any initial setup,
         one should save given workflow to class instance variable
-        `workflows`
+        `workflows`.
 
-        :param workflow: workflow for saving and preprocessing
-        :return: None
+        :param workflow: workflow for saving and preprocessing.
+        :return: None.
         """
 
         pass
@@ -34,8 +34,8 @@ class SchedulerInterface(ABC):
     async def schedule_workflow(self, workflow_uuid: str) -> None:
         """Schedules given workflow according to algorithm's policy.
 
-        :param workflow_uuid: UUID of a workflow to schedule
-        :return: None
+        :param workflow_uuid: UUID of a workflow to schedule.
+        :return: None.
         """
 
         pass

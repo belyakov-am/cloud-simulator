@@ -1,8 +1,8 @@
 class Storage:
-    """Representation of a Simple Storage Service (S3).
+    """Representation of Simple Storage Service (S3).
     For simplicity, each cloud manager has only one storage service.
     This storage is used for sharing input and output files of tasks.
-    It is assumed that a storage has a sufficient capacity for handling
+    It is assumed that storage has sufficient capacity for handling
     any amount of data.
     """
 
