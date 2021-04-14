@@ -16,8 +16,14 @@ class Workflow:
         self.name = name
         self.description = description
         self.tasks: list[wfs.Task] = []
+
+        # Soft deadline for executing all tasks
         self.deadline: datetime = datetime.now()
+
+        # Directed Acyclic Graph
         self.dag: nx.DiGraph = nx.DiGraph()
+
+        # Container that simulates required libraries and software
         self.container: wfs.Container = wfs.Container(0)
 
     def set_deadline(self, deadline: datetime):
