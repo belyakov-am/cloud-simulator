@@ -8,7 +8,7 @@ KILOBYTES_IN_MEGABIT = 125
 
 def io_consumption(
         task: wfs.Task,
-        vm_instance: vms.VM,
+        vm_type: vms.VMType,
         storage: sts.Storage
 ) -> float:
     """Return prediction for time execution based on IO consumption.
@@ -19,14 +19,14 @@ def io_consumption(
 
     for input_file in task.input_files:
         # time for VM to read a file
-        total_time += input_file.size_in_megabits() / vm_instance.io_bandwidth
+        total_time += input_file.size_in_megabits() / vm_type.io_bandwidth
 
         # time for storage to process a file
         total_time += input_file.size_in_megabits() / storage.read_rate
 
     for output_file in task.output_files:
         # time for VM to write a file
-        total_time += output_file.size_in_megabits() / vm_instance.io_bandwidth
+        total_time += output_file.size_in_megabits() / vm_type.io_bandwidth
 
         # time for storage to process a file
         total_time += output_file.size_in_megabits() / storage.write_rate

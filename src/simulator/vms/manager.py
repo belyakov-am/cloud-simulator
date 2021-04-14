@@ -13,7 +13,7 @@ class Manager:
 
     def __init__(self):
         # List of VM types. Sorted by price in ascending order.
-        self.vm_types: list[vms.VM] = []
+        self.vm_types: list[vms.VMType] = []
         self.vms: list[vms.VM] = []
 
         self._get_vm_types()
@@ -24,7 +24,7 @@ class Manager:
 
         json_vms = json_data["vms"]
         for json_vm in json_vms:
-            vm = vms.VM(
+            vm = vms.VMType(
                 name=json_vm["name"],
                 cpu=json_vm["cpu"],
                 memory=json_vm["memory"],
@@ -38,7 +38,7 @@ class Manager:
             key=lambda v: v.price_per_hour,
         )
 
-    def get_slowest_vm(self):
+    def get_slowest_vm_type(self) -> vms.VMType:
         # Slowest VM is defined by its CPU
         # WARNING: in default setup slowest VM is the cheapest one.
         # One my change possible VM types and maybe need to change this

@@ -103,9 +103,8 @@ class EPSMScheduler(SchedulerInterface):
 
         task_execution_time = tep.io_consumption(
             task=task,
-            vm_instance=self.vm_manager.get_slowest_vm(),
-            storage=self.storage_manager.get_storage(),
-        )
+            vm_type=self.vm_manager.get_slowest_vm_type(),
+            storage=self.storage_manager.get_storage())
 
         task.eft = max_parent_eft + task_execution_time
         task.execution_time_prediction = task_execution_time
