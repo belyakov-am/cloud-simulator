@@ -39,9 +39,16 @@ class Manager:
         )
 
     def get_slowest_vm_type(self) -> vms.VMType:
-        # Slowest VM is defined by its CPU
-        # WARNING: in default setup slowest VM is the cheapest one.
-        # One my change possible VM types and maybe need to change this
-        # logic
+        """Return slowest VM which is defined by its CPU.
+
+        WARNING: in default setup slowest VM is the cheapest one.
+        One my change possible VM types and maybe need to change this
+        logic
+        """
 
         return self.vm_types[0]
+
+    def get_vm_types(self) -> list[vms.VMType]:
+        """Return list of all available VM types."""
+
+        return self.vm_types
