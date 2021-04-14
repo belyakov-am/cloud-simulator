@@ -1,23 +1,25 @@
 from dataclasses import dataclass
 import uuid
 
+import simulator.workflows as wfs
+
 
 @dataclass
 class VMType:
     name: str
 
-    # amount of RAM memory. Measures in gigabytes (GB)
+    # Amount of RAM memory. Measures in gigabytes (GB)
     cpu: int
 
-    # number of virtual processor cores in VM. Each
+    # Number of virtual processor cores in VM. Each
     # core has power of `mips` (it is assumed that cores are equal).
     memory: int
 
-    # price of leasing VM for one hour.
+    # Price of leasing VM for one hour.
     # Measures in dollars.
     price_per_hour: float
 
-    # bandwidth capacity of I/O operations with
+    # Bandwidth capacity of I/O operations with
     # other VMs. Measures in megabits per second (Mbps).
     io_bandwidth: int
 
