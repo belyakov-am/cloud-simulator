@@ -21,3 +21,16 @@ class Workflow:
 
     def set_deadline(self, deadline: datetime):
         self.deadline = deadline
+
+    def __str__(self):
+        return (f"<Workflow "
+                f"uuid = {self.uuid}, "
+                f"name = {self.name}, "
+                f"description = {self.description}, "
+                f"deadline = {self.deadline}, "
+                f"tasks = {self.tasks}>")
+
+    def __repr__(self):
+        return (f"Workflow("
+                f"name = {self.name}, "
+                f"description = {self.description})")

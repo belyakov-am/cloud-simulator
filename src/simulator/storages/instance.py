@@ -20,3 +20,13 @@ class Storage:
         """
         self.read_rate = read_rate
         self.write_rate = write_rate
+
+    def __str__(self):
+        return (f"<Storage "
+                f"read_rate = {self.read_rate} Mbps, "
+                f"write_rate = {self.write_rate} Mbps>")
+
+    def __repr__(self):
+        return (f"Storage("
+                f"read_rate = {self.read_rate}, "
+                f"write_rate = {self.write_rate})")

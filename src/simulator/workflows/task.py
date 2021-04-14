@@ -20,3 +20,21 @@ class Task:
         self.parents = parents
         self.input_files = input_files
         self.output_files = output_files
+
+    def __str__(self):
+        return (f"<Task "
+                f"workflow_uuid = {self.workflow_uuid}, "
+                f"id = {self.id}, "
+                f"name = {self.name}, "
+                f"input_files = {self.input_files}, "
+                f"output_files = {self.output_files}, "
+                f"parents = {self.parents}>")
+
+    def __repr__(self):
+        return (f"Task("
+                f"workflow_uuid = {self.workflow_uuid}, "
+                f"id = {self.id}, "
+                f"name = {self.name}, "
+                f"input_files = {self.input_files}, "
+                f"output_files = {self.output_files}, "
+                f"parents = {self.parents})")

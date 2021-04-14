@@ -20,3 +20,13 @@ class File:
 
     def size_in_megabits(self) -> float:
         return self.size / KILOBYTES_IN_MEGABIT
+
+    def __str__(self):
+        return (f"<File "
+                f"name = {self.name}, "
+                f"size = {self.size} KB>")
+
+    def __repr__(self):
+        return (f"File("
+                f"name = {self.name}, "
+                f"size = {self.size})")
