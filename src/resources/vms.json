@@ -5,28 +5,32 @@
       "cpu": 1,
       "memory": 2,
       "pricePerHour": 0.0168,
-      "IOBandwidth": 100000
+      "IOBandwidth": 100000,
+      "enable": true
     },
     {
       "name": "medium",
       "cpu": 2,
       "memory": 4,
       "pricePerHour": 0.0336,
-      "IOBandwidth": 100000
+      "IOBandwidth": 100000,
+      "enable": true
     },
     {
       "name": "large",
       "cpu": 4,
       "memory": 8,
       "pricePerHour": 0.0672,
-      "IOBandwidth": 100000
+      "IOBandwidth": 100000,
+      "enable": true
     },
     {
       "name": "xlarge",
       "cpu": 8,
       "memory": 16,
       "pricePerHour": 0.1344,
-      "IOBandwidth": 100000
+      "IOBandwidth": 100000,
+      "enable": true
     }
   ]
 }

@@ -24,6 +24,9 @@ class Manager:
 
         json_vms = json_data["vms"]
         for json_vm in json_vms:
+            if not json_vm["enable"]:
+                continue
+
             vm = vms.VMType(
                 name=json_vm["name"],
                 cpu=json_vm["cpu"],
