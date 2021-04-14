@@ -34,7 +34,7 @@ class VM:
         self.uuid = str(uuid.uuid4())
         self.type = vm_type
 
-        # List of present files on VM. They can appear as task output
+        # Set of present files on VM. They can appear as task output
         # or can be delivered over network.
         # TODO: clean up old files
         self.files = set[wfs.File] = set()
