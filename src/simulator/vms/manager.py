@@ -19,7 +19,7 @@ class Manager:
 
         self.vms: list[vms.VM] = []
 
-        # List of idle (i.e. provisioned but not buse) VMs
+        # List of idle (i.e. provisioned but not busy) VMs
         self.idle_vms: list[vms.VM] = []
 
         self._get_vm_types()
