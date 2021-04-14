@@ -18,6 +18,7 @@ class Workflow:
         self.tasks: list[wfs.Task] = []
         self.deadline: datetime = datetime.now()
         self.dag: nx.DiGraph = nx.DiGraph()
+        self.container: wfs.Container = wfs.Container(0)
 
     def set_deadline(self, deadline: datetime):
         self.deadline = deadline

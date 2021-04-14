@@ -33,6 +33,13 @@ class PegasusTraceParser:
             description=self._data["description"],
         )
 
+        workflow_json = self._data["workflow"]
+
+        # Parse container
+        provision_time = workflow_json["container"]["provision_time"]
+        container = wfs.Container(provision_time)
+        self.workflow.container = container
+
         # Will be used for filling Task's `parents` variable with
         # Task instance. In file they are listed as parent names,
         # however current architecture requires Task instances.
@@ -40,7 +47,8 @@ class PegasusTraceParser:
         # is listed only after all its predecessors (if exists).
         tasks: dict[str, wfs.Task] = dict()
 
-        for ind, task_json in enumerate(self._data["workflow"]["jobs"]):
+        # Parse tasks
+        for ind, task_json in enumerate(workflow_json["jobs"]):
             # Process parents
             parents_names = task_json["parents"]
             parents: list[wfs.Task] = []
