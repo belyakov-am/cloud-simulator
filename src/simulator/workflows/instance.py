@@ -35,10 +35,10 @@ class Workflow:
     def set_submit_time(self, time: datetime) -> None:
         self.submit_time = time
 
-    def set_deadline(self, time: datetime):
+    def set_deadline(self, time: datetime) -> None:
         self.deadline = time
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (f"<Workflow "
                 f"uuid = {self.uuid}, "
                 f"name = {self.name}, "
@@ -46,7 +46,7 @@ class Workflow:
                 f"deadline = {self.deadline}, "
                 f"tasks = {self.tasks}>")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"Workflow("
                 f"name = {self.name}, "
                 f"description = {self.description})")
