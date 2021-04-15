@@ -1,4 +1,7 @@
 import simulator.schedulers.epsm
 
-from .interface import SchedulerInterface
 from .epsm import EPSMScheduler
+
+from .event import Event, EventType
+from .event_loop import EventLoop
+from .interface import SchedulerInterface

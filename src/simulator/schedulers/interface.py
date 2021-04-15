@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 
+import simulator.schedulers as sch
 import simulator.storages as sts
 import simulator.vms as vms
 import simulator.workflows as wfs
@@ -17,14 +19,25 @@ class SchedulerInterface(ABC):
         self.storage_manager: sts.Manager = sts.Manager()
         self.vm_manager: vms.Manager = vms.Manager()
 
+        self.event_loop: sch.EventLoop = sch.EventLoop()
+
+    def run_event_loop(self) -> None:
+        self.event_loop.run(scheduler=self)
+
     @abstractmethod
-    def submit_workflow(self, workflow: wfs.Workflow) -> None:
+    def submit_workflow(
+            self,
+            workflow: wfs.Workflow,
+            time: datetime,
+    ) -> None:
         """This method can be used for any preprocessing required by
         algorithm. If algorithm doesn't require any initial setup,
         one should save given workflow to class instance variable
-        `workflows`.
+        `workflows` and put workflow to event loop with current virtual
+        time.
 
         :param workflow: workflow for saving and preprocessing.
+        :param time: virtual time to submit and process workflow.
         :return: None.
         """
 

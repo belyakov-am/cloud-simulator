@@ -4,11 +4,10 @@ from datetime import datetime, timedelta
 
 from loguru import logger
 
-import simulator.vms as vms
 import simulator.workflows as wfs
 import simulator.utils.task_execution_prediction as tep
 
-from ..event_loop import EventLoop
+from ..event import Event, EventType
 from ..interface import SchedulerInterface
 from .task import Task
 from .workflow import Workflow
@@ -29,16 +28,23 @@ class EPSMScheduler(SchedulerInterface):
 
         self.settings: Settings = Settings()
 
-        self._init_queue_worker()
-
-    def submit_workflow(self, workflow: wfs.Workflow) -> None:
+    def submit_workflow(self, workflow: wfs.Workflow, time: datetime) -> None:
         logger.debug(f"Got new workflow {workflow.uuid}")
 
+        # preprocess
         self._convert_to_epsm_instances(workflow=workflow)
         self._calculate_efts_and_makespan(workflow_uuid=workflow.uuid)
         self._calculate_total_spare_time(workflow_uuid=workflow.uuid)
         self._distribute_spare_time_among_tasks(workflow_uuid=workflow.uuid)
         self._calculate_tasks_deadlines(workflow_uuid=workflow.uuid)
+
+        # add to event loop
+        epsm_workflow = self.workflows[workflow.uuid]
+        self.event_loop.add_event(event=Event(
+            start_time=epsm_workflow.start_time,
+            event_type=EventType.SCHEDULE_WORKFLOW,
+            workflow=epsm_workflow,
+        ))
 
     def _convert_to_epsm_instances(self, workflow: wfs.Workflow) -> None:
         # Create EPSM workflow from basic
@@ -47,7 +53,8 @@ class EPSMScheduler(SchedulerInterface):
             description=workflow.description,
         )
         epsm_workflow.uuid = workflow.uuid
-        epsm_workflow.set_deadline(deadline=workflow.deadline)
+        epsm_workflow.set_deadline(time=workflow.deadline)
+        epsm_workflow.set_submit_time(time=workflow.submit_time)
 
         # Create EPSM tasks from basic
         epsm_tasks: list[Task] = []
