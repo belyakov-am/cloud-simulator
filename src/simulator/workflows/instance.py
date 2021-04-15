@@ -17,7 +17,10 @@ class Workflow:
         self.description = description
         self.tasks: list[wfs.Task] = []
 
-        # Soft deadline for executing all tasks
+        # Time to submit workflow to event loop. Should be set by user
+        self.submit_time: datetime = datetime.now()
+
+        # Soft deadline for executing all tasks. Should be set by user
         self.deadline: datetime = datetime.now()
 
         # Directed Acyclic Graph
@@ -29,8 +32,11 @@ class Workflow:
             provision_time=0,
         )
 
-    def set_deadline(self, deadline: datetime):
-        self.deadline = deadline
+    def set_submit_time(self, time: datetime) -> None:
+        self.submit_time = time
+
+    def set_deadline(self, time: datetime):
+        self.deadline = time
 
     def __str__(self):
         return (f"<Workflow "
