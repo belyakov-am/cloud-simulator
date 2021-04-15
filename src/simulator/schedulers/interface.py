@@ -31,7 +31,7 @@ class SchedulerInterface(ABC):
         pass
 
     @abstractmethod
-    async def schedule_workflow(self, workflow_uuid: str) -> None:
+    def schedule_workflow(self, workflow_uuid: str) -> None:
         """Schedules given workflow according to algorithm's policy.
 
         :param workflow_uuid: UUID of a workflow to schedule.

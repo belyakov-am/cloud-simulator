@@ -8,6 +8,7 @@ import simulator.vms as vms
 import simulator.workflows as wfs
 import simulator.utils.task_execution_prediction as tep
 
+from ..event_loop import EventLoop
 from ..interface import SchedulerInterface
 from .task import Task
 from .workflow import Workflow
@@ -26,15 +27,9 @@ class EPSMScheduler(SchedulerInterface):
         super().__init__()
         self.workflows: dict[str, Workflow] = dict()
 
-        # Queue for placing ready-to-execute tasks
-        self.task_queue: asyncio.Queue = asyncio.Queue()
-
         self.settings: Settings = Settings()
 
         self._init_queue_worker()
-
-    def _init_queue_worker(self):
-        asyncio.create_task(self.schedule_queued_tasks())
 
     def submit_workflow(self, workflow: wfs.Workflow) -> None:
         logger.debug(f"Got new workflow {workflow.uuid}")
@@ -138,22 +133,6 @@ class EPSMScheduler(SchedulerInterface):
                              + timedelta(seconds=task.eft)
                              + timedelta(seconds=task.spare_time))
 
-    async def schedule_workflow(self, workflow_uuid: str) -> None:
-        workflow = self.workflows[workflow_uuid]
-
-        for task in workflow.tasks:
-            if not task.parents:
-                await self.task_queue.put(task)
-
-    async def schedule_queued_tasks(self) -> None:
-        while True:
-            await asyncio.sleep(self.settings.scheduling_interval)
-            # TODO: sleep for `sched` time and get all tasks from queue
-            task = await self.task_queue.get()
-
-    async def schedule_task(
-            self,
-            task: Task,
-            vm_instance: vms.VM
-    ) -> None:
+    def schedule_workflow(self, workflow_uuid: str) -> None:
         pass
+
