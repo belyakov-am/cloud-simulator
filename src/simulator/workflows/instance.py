@@ -24,7 +24,10 @@ class Workflow:
         self.dag: nx.DiGraph = nx.DiGraph()
 
         # Container that simulates required libraries and software
-        self.container: wfs.Container = wfs.Container(self.uuid, 0)
+        self.container: wfs.Container = wfs.Container(
+            workflow_uuid=self.uuid,
+            provision_time=0,
+        )
 
     def set_deadline(self, deadline: datetime):
         self.deadline = deadline

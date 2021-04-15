@@ -37,7 +37,10 @@ class PegasusTraceParser:
 
         # Parse container
         provision_time = workflow_json["container"]["provision_time"]
-        container = wfs.Container(provision_time)
+        container = wfs.Container(
+            workflow_uuid=self.workflow.uuid,
+            provision_time=provision_time,
+        )
         self.workflow.container = container
 
         # Will be used for filling Task's `parents` variable with
