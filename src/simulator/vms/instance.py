@@ -60,6 +60,15 @@ class VM:
 
         return self.files.issubset(incoming_files_set)
 
+    def check_if_container_provisioned(self, container: wfs.Container) -> bool:
+        """Check if given container is provisioned on VM
+
+        :param container: container to check for
+        :return: True if provisioned, False otherwise
+        """
+
+        return container in self.containers
+
     def provision_container(self, container: wfs.Container) -> None:
         """Provisions container that takes `provision_time`.
 
