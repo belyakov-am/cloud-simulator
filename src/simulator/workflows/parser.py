@@ -86,6 +86,7 @@ class PegasusTraceParser:
                 parents=parents,
                 input_files=input_files,
                 output_files=output_files,
+                container=container,
             )
 
             tasks[task.name] = task
