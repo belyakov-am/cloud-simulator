@@ -140,7 +140,12 @@ class EPSMScheduler(SchedulerInterface):
                              + timedelta(seconds=task.spare_time))
 
     def schedule_workflow(self, workflow_uuid: str) -> None:
-        # schedule all entry tasks
+        """Schedule all entry tasks (i.e. put them into event loop).
+
+        :param workflow_uuid: uuid of workflow to schedule.
+        :return: None.
+        """
+
         workflow = self.workflows[workflow_uuid]
 
         for task in workflow.tasks:
