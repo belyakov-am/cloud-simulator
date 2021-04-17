@@ -53,4 +53,8 @@ class SchedulerInterface(ABC):
 
         pass
 
+    @abstractmethod
+    def schedule_task(self, workflow_uuid: str, task_id: int) -> None:
+        pass
+
     # TODO: add method(s) for getting workflow status

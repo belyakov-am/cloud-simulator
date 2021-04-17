@@ -9,10 +9,8 @@ class EventType(enum.Enum):
     SUBMIT_WORKFLOW = enum.auto()
     SCHEDULE_WORKFLOW = enum.auto()
 
-    DEPLOY_VM = enum.auto()
-    PRIVISION_VM = enum.auto()
-
     SCHEDULE_TASK = enum.auto()
+    FINISH_TASK = enum.auto()
     MANAGE_RESOURCES = enum.auto()
 
 
@@ -29,6 +27,7 @@ class Event:
         self.type: EventType = event_type
 
         self.workflow: tp.Optional[wfs.Workflow] = kwargs.get("workflow", None)
+        self.task: tp.Optional[wfs.Task] = kwargs.get("task", None)
 
     def __lt__(self, other: "Event") -> bool:
         return self.start_time < other.start_time

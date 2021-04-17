@@ -141,5 +141,18 @@ class EPSMScheduler(SchedulerInterface):
                              + timedelta(seconds=task.spare_time))
 
     def schedule_workflow(self, workflow_uuid: str) -> None:
-        pass
+        # schedule all entry tasks
+        workflow = self.workflows[workflow_uuid]
 
+        for task in workflow.tasks:
+            if not task.parents:
+                # TODO: replace datetime.now()
+                self.event_loop.add_event(event=Event(
+                    start_time=datetime.now(),
+                    event_type=EventType.SCHEDULE_TASK,
+                    task=task,
+                ))
+
+    def schedule_task(self, workflow_uuid: str, task_id: int) -> None:
+        workflow = self.workflows[workflow_uuid]
+        task = workflow.tasks[task_id]

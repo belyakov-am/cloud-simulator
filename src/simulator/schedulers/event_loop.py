@@ -21,3 +21,10 @@ class EventLoop:
 
             if event.type == sch.EventType.SCHEDULE_WORKFLOW:
                 scheduler.schedule_workflow(event.workflow.uuid)
+                continue
+
+            if event.type == sch.EventType.SCHEDULE_TASK:
+                scheduler.schedule_task(
+                    workflow_uuid=event.task.workflow_uuid,
+                    task_id=event.task.id,
+                )
