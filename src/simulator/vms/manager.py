@@ -66,7 +66,7 @@ class Manager:
     def get_idle_vms(
             self,
             task: tp.Optional[wfs.Task] = None,
-    ) -> list[vms.VM]:
+    ) -> set[vms.VM]:
         """Return list of idle VMs. If `task` was passed, filter idle
         VMs on corresponding input files of task, so only VMs with
         task.input_files will be returned.
@@ -76,11 +76,11 @@ class Manager:
         """
 
         if task is None:
-            return self.idle_vms
+            return set(self.idle_vms)
 
         idle_vms_input: list[vms.VM] = []
         for idle_vm in self.idle_vms:
             if idle_vm.check_if_files_present(task.input_files):
                 idle_vms_input.append(idle_vm)
 
-        return idle_vms_input
+        return set(idle_vms_input)
