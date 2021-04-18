@@ -18,17 +18,17 @@ def io_consumption(
     total_time = 0.0
 
     for input_file in task.input_files:
-        # Time for VM to read a file.
+        # Time for VM to read file.
         total_time += input_file.size_in_megabits() / vm_type.io_bandwidth
 
-        # Time for storage to process a file.
+        # Time for storage to process file.
         total_time += input_file.size_in_megabits() / storage.read_rate
 
     for output_file in task.output_files:
-        # Time for VM to write a file.
+        # Time for VM to write file.
         total_time += output_file.size_in_megabits() / vm_type.io_bandwidth
 
-        # Time for storage to process a file.
+        # Time for storage to process file.
         total_time += output_file.size_in_megabits() / storage.write_rate
 
     return total_time
