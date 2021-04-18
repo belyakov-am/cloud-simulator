@@ -40,7 +40,7 @@ class VM:
         self.uuid = str(uuid.uuid4())
         self.type = vm_type
 
-        # Used for calculating price based on billing periods
+        # Used for calculating price based on billing periods.
         self.start_time = start_time
 
         # Set of present files on VM. They can appear as task output
@@ -66,7 +66,7 @@ class VM:
         """Check if all incoming files are present on VM.
 
         :param files: list of files to check.
-        :return: True if exist, False otherwise
+        :return: True if exist, False otherwise.
         """
 
         incoming_files_set = set(files)
@@ -74,10 +74,10 @@ class VM:
         return self.files.issubset(incoming_files_set)
 
     def check_if_container_provisioned(self, container: wfs.Container) -> bool:
-        """Check if given container is provisioned on VM
+        """Check if given container is provisioned on VM.
 
-        :param container: container to check for
-        :return: True if provisioned, False otherwise
+        :param container: container to check for.
+        :return: True if provisioned, False otherwise.
         """
 
         return container in self.containers
