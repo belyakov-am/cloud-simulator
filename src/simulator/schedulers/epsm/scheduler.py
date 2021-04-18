@@ -1,10 +1,13 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+import typing as tp
 
 from loguru import logger
 
 import simulator.workflows as wfs
+import simulator.utils.cost as cst
 import simulator.utils.task_execution_prediction as tep
+import simulator.vms as vms
 
 from ..event import Event, EventType
 from ..interface import SchedulerInterface
@@ -156,6 +159,53 @@ class EPSMScheduler(SchedulerInterface):
                     event_type=EventType.SCHEDULE_TASK,
                     task=task,
                 ))
+
+    def _find_cheapest_vm_for_task(
+            self,
+            task: Task,
+            idle_vms: set[vms.VM],
+    ) -> tp.Optional[vms.VM]:
+        """Find VM that can finish task before its deadline with minimum
+        cost. Return None if there is no such VMs.
+
+        :param task: task to execute on VMs.
+        :param idle_vms: set of idle VMs.
+        :return: best VM or None.
+        """
+
+        minimum_cost: tp.Optional[float] = None
+        best_vm: tp.Optional[vms.VM] = None
+
+        current_time = self.event_loop.get_current_time()
+
+        for vm in idle_vms:
+            total_exec_time = tep.io_consumption(
+                task=task,
+                vm_type=vm.type,
+                storage=self.storage_manager.get_storage(),
+            )
+
+            if not vm.check_if_container_provisioned(task.container):
+                total_exec_time += task.container.provision_time
+
+            possible_finish_time = (current_time
+                                    + timedelta(seconds=total_exec_time))
+
+            # doesn't fit deadline, so skip it
+            if possible_finish_time > task.deadline:
+                continue
+
+            possible_cost = cst.calculate_price_for_vm(
+                current_time=current_time,
+                use_time=total_exec_time,
+                vm=vm,
+            )
+
+            if minimum_cost is None or possible_cost < minimum_cost:
+                minimum_cost = possible_cost
+                best_vm = vm
+
+        return best_vm
 
     def schedule_task(self, workflow_uuid: str, task_id: int) -> None:
         workflow = self.workflows[workflow_uuid]
