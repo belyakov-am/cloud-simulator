@@ -37,7 +37,8 @@ class Manager:
                 name=json_vm["name"],
                 cpu=json_vm["cpu"],
                 memory=json_vm["memory"],
-                price_per_hour=json_vm["pricePerHour"],
+                price=json_vm["price"],
+                billing_period=json_vm["billingPeriod"],
                 io_bandwidth=json_vm["IOBandwidth"],
             )
             self.vm_types.append(vm)

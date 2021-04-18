@@ -16,9 +16,13 @@ class VMType:
     # core has power of `mips` (it is assumed that cores are equal).
     memory: int
 
-    # Price of leasing VM for one hour.
+    # Price of leasing VM for one billing period.
     # Measures in dollars.
-    price_per_hour: float
+    price: float
+
+    # Minimal interval of time for leasing VM.
+    # Measures in seconds.
+    billing_period: int
 
     # Bandwidth capacity of I/O operations with
     # other VMs. Measures in megabits per second (Mbps).
