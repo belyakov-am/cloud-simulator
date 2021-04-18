@@ -13,7 +13,7 @@ class EventLoop:
         self.event_queue: list[sch.Event] = []
         hq.heapify(self.event_queue)
 
-        # datitime.now() only for init purpose
+        # datetime.now() only for init purpose
         self.current_time: datetime = datetime.now()
 
     def add_event(self, event: sch.Event) -> None:
