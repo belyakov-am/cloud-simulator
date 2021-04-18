@@ -12,7 +12,7 @@ def io_consumption(
         task: wfs.Task,
         vm_type: vms.VMType,
         storage: sts.Storage,
-        vm: tp.Optional[vms.VM],
+        vm: tp.Optional[vms.VM] = None,
 ) -> float:
     """Return prediction for time execution based on IO consumption.
     It includes time for process data over network and disk.

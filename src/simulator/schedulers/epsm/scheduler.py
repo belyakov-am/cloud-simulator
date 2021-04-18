@@ -183,6 +183,7 @@ class EPSMScheduler(SchedulerInterface):
                 task=task,
                 vm_type=vm.type,
                 storage=self.storage_manager.get_storage(),
+                vm=vm,
             )
 
             if not vm.check_if_container_provisioned(task.container):
