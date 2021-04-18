@@ -6,7 +6,7 @@ import simulator.vms as vms
 def calculate_price_for_vm(
         current_time: datetime,
         use_time: float,
-        vm: vms.VM
+        vm: vms.VM,
 ) -> float:
     """Calculate price for leasing given VM for given amount of time.
 
