@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 import uuid
 
 import simulator.workflows as wfs
@@ -30,9 +31,13 @@ class VM:
     def __init__(
             self,
             vm_type: VMType,
+            start_time: datetime,
     ) -> None:
         self.uuid = str(uuid.uuid4())
         self.type = vm_type
+
+        # Used for calculating price based on billing periods
+        self.start_time = start_time
 
         # Set of present files on VM. They can appear as task output
         # or can be delivered over network.
@@ -44,12 +49,14 @@ class VM:
         return (f"<VM "
                 f"uuid = {self.uuid}, "
                 f"type = {self.type}, "
+                f"start_time = {self.start_time}, "
                 f"files = {self.files}, "
                 f"containers = {self.containers}>")
 
     def __repr__(self) -> str:
         return (f"VM("
-                f"type = {self.type})")
+                f"type = {self.type}"
+                f"start_time = {self.start_time})")
 
     def check_if_files_present(self, files: list[wfs.File]) -> bool:
         """Check if all incoming files are present on VM.
