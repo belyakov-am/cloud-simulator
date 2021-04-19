@@ -39,14 +39,14 @@ class EPSMScheduler(SchedulerInterface):
     def submit_workflow(self, workflow: wfs.Workflow, time: datetime) -> None:
         logger.debug(f"Got new workflow {workflow.uuid}")
 
-        # preprocess
+        # Preprocess.
         self._convert_to_epsm_instances(workflow=workflow)
         self._calculate_efts_and_makespan(workflow_uuid=workflow.uuid)
         self._calculate_total_spare_time(workflow_uuid=workflow.uuid)
         self._distribute_spare_time_among_tasks(workflow_uuid=workflow.uuid)
         self._calculate_tasks_deadlines(workflow_uuid=workflow.uuid)
 
-        # add to event loop
+        # Add to event loop.
         epsm_workflow = self.workflows[workflow.uuid]
         self.event_loop.add_event(event=Event(
             start_time=epsm_workflow.start_time,
@@ -55,7 +55,7 @@ class EPSMScheduler(SchedulerInterface):
         ))
 
     def _convert_to_epsm_instances(self, workflow: wfs.Workflow) -> None:
-        # Create EPSM workflow from basic
+        # Create EPSM workflow from basic.
         epsm_workflow = Workflow(
             name=workflow.name,
             description=workflow.description,
@@ -64,12 +64,12 @@ class EPSMScheduler(SchedulerInterface):
         epsm_workflow.set_deadline(time=workflow.deadline)
         epsm_workflow.set_submit_time(time=workflow.submit_time)
 
-        # Create EPSM tasks from basic
+        # Create EPSM tasks from basic.
         epsm_tasks: list[Task] = []
         tasks_dict: dict[str, Task] = dict()
 
         for task in workflow.tasks:
-            # Get proper parents list (i.e. as epsm.Task)
+            # Get proper parents list (i.e. as epsm.Task).
             parents: list[Task] = []
             for parent in task.parents:
                 parents.append(tasks_dict[parent.name])
@@ -88,7 +88,7 @@ class EPSMScheduler(SchedulerInterface):
 
         epsm_workflow.tasks = epsm_tasks
 
-        # Save in scheduler dict
+        # Save in scheduler dict.
         self.workflows[epsm_workflow.uuid] = epsm_workflow
 
     def _calculate_efts_and_makespan(self, workflow_uuid: str) -> None:
@@ -102,7 +102,7 @@ class EPSMScheduler(SchedulerInterface):
         for task in workflow.tasks:
             current_eft = self._calculate_eft(task)
 
-            # update workflow's total makespan
+            # Update workflow's total makespan.
             if current_eft > workflow.makespan:
                 workflow.makespan = current_eft
 
@@ -131,7 +131,7 @@ class EPSMScheduler(SchedulerInterface):
 
     def _distribute_spare_time_among_tasks(self, workflow_uuid: str) -> None:
         # Spare time should be distributed proportionally to tasks
-        # runtime
+        # runtime.
 
         workflow = self.workflows[workflow_uuid]
         spare_to_makespan_proportion = workflow.spare_time / workflow.makespan
