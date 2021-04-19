@@ -30,10 +30,14 @@ class EventLoop:
             self.current_time = event.start_time
 
             if event.type == sch.EventType.SCHEDULE_WORKFLOW:
+                assert event.workflow is not None
+
                 scheduler.schedule_workflow(event.workflow.uuid)
                 continue
 
             if event.type == sch.EventType.SCHEDULE_TASK:
+                assert event.task is not None
+
                 scheduler.schedule_task(
                     workflow_uuid=event.task.workflow_uuid,
                     task_id=event.task.id,
@@ -41,6 +45,9 @@ class EventLoop:
                 continue
 
             if event.type == sch.EventType.FINISH_TASK:
+                assert event.task is not None
+                assert event.vm is not None
+
                 scheduler.finish_task(
                     workflow_uuid=event.task.workflow_uuid,
                     task_id=event.task.id,
