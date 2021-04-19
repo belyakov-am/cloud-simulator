@@ -253,5 +253,120 @@ class EPSMScheduler(SchedulerInterface):
         return vm_types[-1]
 
     def schedule_task(self, workflow_uuid: str, task_id: int) -> None:
+        """Schedule task according to EPSM algorithm.
+
+        :param workflow_uuid: uuid of workflow from which pick task.
+        :param task_id: task ID inside workflow.
+        :return: None.
+        """
+
+        current_time = self.event_loop.get_current_time()
+
         workflow = self.workflows[workflow_uuid]
         task = workflow.tasks[task_id]
+
+        idle_vms = self.vm_manager.get_idle_vms()
+        idle_vms_with_input = self.vm_manager.get_idle_vms(task=task)
+
+        # Search for VM with task's input files.
+        vm = self._find_cheapest_vm_for_task(
+            task=task,
+            idle_vms=idle_vms_with_input,
+        )
+
+        # If no available VM with input files, search for VM with
+        # task's provisioned container.
+        if vm is None:
+            idle_vms -= idle_vms_with_input
+            idle_vms_with_container = self.vm_manager.get_idle_vms(
+                container=task.container
+            )
+            vm = self._find_cheapest_vm_for_task(
+                task=task,
+                idle_vms=idle_vms_with_container,
+            )
+
+            # If no available VM with container, search just for idle
+            # VMs.
+            if vm is None:
+                idle_vms -= idle_vms_with_container
+
+                vm = self._find_cheapest_vm_for_task(
+                    task=task,
+                    idle_vms=idle_vms,
+                )
+
+                # If no available idle VM, try to delay task scheduling
+                # until next scheduling phase.
+                if vm is None:
+                    time_left = (task.deadline - current_time).total_seconds()
+                    spare_time = (time_left
+                                  - task.execution_time_prediction
+                                  - self.settings.scheduling_interval)
+
+                    # If there is no time for delaying, initialize new
+                    # VM for cheapest price that can finish task on
+                    # time.
+                    if spare_time <= 0:
+                        cheapest_vmt = self._find_cheapest_vm_type_for_task(
+                            task=task,
+                            vm_types=self.vm_manager.get_vm_types(),
+                        )
+
+                        vm = self.vm_manager.init_vm(vm_type=cheapest_vmt)
+
+        # If no VM found, it is possible to postpone task scheduling.
+        if vm is None:
+            # TODO: schedule on next cycle.
+            # i.e. put in event loop after `scheduling_interval`.
+            return
+
+        # If VM was found, calculate execution time and schedule task.
+        if vm is not None:
+            total_exec_time = 0.0
+
+            # Provision VM if required.
+            if vm.get_state() == vms.State.NOT_PROVISIONED:
+                self.vm_manager.provision_vm(vm=vm, start_time=current_time)
+                total_exec_time += self.settings.vm_provision_delay
+
+            # Provision container if required.
+            if not vm.check_if_container_provisioned(container=task.container):
+                vm.provision_container(container=task.container)
+                total_exec_time += task.container.provision_time
+
+            # Get task execution time.
+            total_exec_time += tep.io_consumption(
+                task=task,
+                vm_type=vm.type,
+                storage=self.storage_manager.get_storage(),
+                vm=vm,
+            )
+
+            # Reserve VM and submit event to event loop.
+            self.vm_manager.reserve_vm(vm)
+
+            finish_time = current_time + timedelta(seconds=total_exec_time)
+            self.event_loop.add_event(event=Event(
+                start_time=finish_time,
+                event_type=EventType.FINISH_TASK,
+                workflow=workflow,
+                task=task,
+                vm=vm,
+            ))
+
+    def finish_task(
+            self,
+            workflow_uuid: str,
+            task_id: int,
+            vm: vms.VM,
+    ) -> None:
+        """TODO
+
+        :param workflow_uuid:
+        :param task_id:
+        :param vm:
+        :return:
+        """
+
+        pass
