@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+import enum
 import uuid
 
 import simulator.workflows as wfs
@@ -29,25 +30,33 @@ class VMType:
     io_bandwidth: int
 
 
+class State(enum.Enum):
+    NOT_PROVISIONED = enum.auto()
+    PROVISIONED = enum.auto()
+    BUSY = enum.auto()
+
+
 class VM:
     """Representation of Virtual Machine."""
 
     def __init__(
             self,
             vm_type: VMType,
-            start_time: datetime,
     ) -> None:
         self.uuid = str(uuid.uuid4())
         self.type = vm_type
 
         # Used for calculating price based on billing periods.
-        self.start_time = start_time
+        # datetime.now only for init purpose.
+        self.start_time: datetime = datetime.now()
 
         # Set of present files on VM. They can appear as task output
         # or can be delivered over network.
         # TODO: clean up old files
         self.files: set[wfs.File] = set()
         self.containers: set[wfs.Container] = set()
+
+        self.state: State = State.NOT_PROVISIONED
 
     def __str__(self) -> str:
         return (f"<VM "
@@ -83,7 +92,7 @@ class VM:
         return container in self.containers
 
     def provision_container(self, container: wfs.Container) -> None:
-        """Provisions container that takes `provision_time`.
+        """Provision container that takes `provision_time`.
 
         :param container: container to provision.
         :return: None.
@@ -91,3 +100,20 @@ class VM:
 
         # TODO: do something with time
         self.containers.add(container)
+
+    def get_state(self) -> State:
+        """Return current VM state.
+
+        :return: state.
+        """
+
+        return self.state
+
+    def provision(self, start_time: datetime) -> None:
+        """Provision current VM.
+
+        :return: None.
+        """
+
+        self.start_time = start_time
+        self.state = State.PROVISIONED

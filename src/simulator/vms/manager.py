@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import typing as tp
 
@@ -94,3 +95,26 @@ class Manager:
                 idle_vms.append(idle_vm)
 
         return set(idle_vms)
+
+    def init_vm(self, vm_type: vms.VMType) -> vms.VM:
+        """Initialize VM object of given type. It should be then
+        provisioned for usage.
+
+        :param vm_type: type of VM to init.
+        :return: VM instance.
+        """
+
+        vm = vms.VM(vm_type=vm_type)
+        self.vms.append(vm)
+        return vm
+
+    def provision_vm(self, vm: vms.VM, start_time: datetime) -> None:
+        """Provisions given VM.
+
+        :param vm: VM to provision.
+        :param start_time: virtual time when VM starts.
+        :return: None.
+        """
+
+        vm.provision(start_time=start_time)
+        self.idle_vms.append(vm)

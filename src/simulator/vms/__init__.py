@@ -1,2 +1,2 @@
-from .instance import VM, VMType
+from .instance import VM, VMType, State
 from .manager import Manager
