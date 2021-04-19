@@ -316,8 +316,16 @@ class EPSMScheduler(SchedulerInterface):
 
         # If no VM found, it is possible to postpone task scheduling.
         if vm is None:
-            # TODO: schedule on next cycle.
-            # i.e. put in event loop after `scheduling_interval`.
+            scheduling_time = current_time + timedelta(
+                seconds=self.settings.scheduling_interval
+            )
+
+            self.event_loop.add_event(event=Event(
+                start_time=scheduling_time,
+                event_type=EventType.SCHEDULE_TASK,
+                task=task,
+            ))
+
             return
 
         # If VM was found, calculate execution time and schedule task.
