@@ -214,6 +214,44 @@ class EPSMScheduler(SchedulerInterface):
 
         return best_vm
 
+    def _find_cheapest_vm_type_for_task(
+            self,
+            task: Task,
+            vm_types: list[vms.VMType],
+    ) -> vms.VMType:
+        """Find cheapest VM type for given task that can finish it
+        according to its deadline. If there is no such VM type,
+        faster VM type is chosen. Moreover, cheapest VM type equals to
+        slowest VM type.
+        Time consumption estimations include VM and container provisioning
+        delay.
+
+        :param task: task to execute.
+        :param vm_types: list of possible VM types.
+        :return: cheapest VM type.
+        """
+
+        current_time = self.event_loop.get_current_time()
+        vm_prov = self.settings.vm_provision_delay
+        container_prov = task.container.provision_time
+
+        for vm_type in vm_types:
+            task_execution_time = tep.io_consumption(
+                task=task,
+                vm_type=vm_type,
+                storage=self.storage_manager.get_storage(),
+            )
+
+            possible_finish_time = (current_time
+                                    + timedelta(seconds=task_execution_time)
+                                    + timedelta(seconds=vm_prov)
+                                    + timedelta(seconds=container_prov))
+
+            if possible_finish_time < task.deadline:
+                return vm_type
+
+        return vm_types[-1]
+
     def schedule_task(self, workflow_uuid: str, task_id: int) -> None:
         workflow = self.workflows[workflow_uuid]
         task = workflow.tasks[task_id]
