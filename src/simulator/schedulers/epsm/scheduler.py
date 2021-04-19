@@ -357,7 +357,6 @@ class EPSMScheduler(SchedulerInterface):
             self.event_loop.add_event(event=Event(
                 start_time=finish_time,
                 event_type=EventType.FINISH_TASK,
-                workflow=workflow,
                 task=task,
                 vm=vm,
             ))
