@@ -67,21 +67,30 @@ class Manager:
     def get_idle_vms(
             self,
             task: tp.Optional[wfs.Task] = None,
+            container: tp.Optional[wfs.Container] = None,
     ) -> set[vms.VM]:
         """Return list of idle VMs. If `task` was passed, filter idle
         VMs on corresponding input files of task, so only VMs with
-        task.input_files will be returned.
+        task.input_files will be returned. If `container` was passed,
+        filter idle VMs on provisioned containers.
 
         :param task: task to filter on.
+        :param container: container to filter on.
         :return: list of idle VMs.
         """
 
-        if task is None:
+        if task is None and container is None:
             return set(self.idle_vms)
 
-        idle_vms_input: list[vms.VM] = []
-        for idle_vm in self.idle_vms:
-            if idle_vm.check_if_files_present(task.input_files):
-                idle_vms_input.append(idle_vm)
+        idle_vms: list[vms.VM] = []
 
-        return set(idle_vms_input)
+        for idle_vm in self.idle_vms:
+            if (task is not None
+                    and idle_vm.check_if_files_present(task.input_files)):
+                idle_vms.append(idle_vm)
+
+            if (container is not None
+                    and idle_vm.check_if_container_provisioned(container)):
+                idle_vms.append(idle_vm)
+
+        return set(idle_vms)
