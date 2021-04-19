@@ -38,3 +38,12 @@ class EventLoop:
                     workflow_uuid=event.task.workflow_uuid,
                     task_id=event.task.id,
                 )
+                continue
+
+            if event.type == sch.EventType.FINISH_TASK:
+                scheduler.finish_task(
+                    workflow_uuid=event.task.workflow_uuid,
+                    task_id=event.task.id,
+                    vm=event.vm,
+                )
+                continue

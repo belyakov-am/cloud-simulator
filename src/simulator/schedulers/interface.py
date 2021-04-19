@@ -55,6 +55,29 @@ class SchedulerInterface(ABC):
 
     @abstractmethod
     def schedule_task(self, workflow_uuid: str, task_id: int) -> None:
+        """TODO
+
+        :param workflow_uuid:
+        :param task_id:
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def finish_task(
+            self,
+            workflow_uuid: str,
+            task_id: int,
+            vm: vms.VM,
+    ) -> None:
+        """TODO
+
+        :param workflow_uuid:
+        :param task_id:
+        :param vm:
+        :return:
+        """
+
         pass
 
     # TODO: add method(s) for getting workflow status

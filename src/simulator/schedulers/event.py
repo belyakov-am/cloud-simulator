@@ -2,6 +2,7 @@ from datetime import datetime
 import enum
 import typing as tp
 
+import simulator.vms as vms
 import simulator.workflows as wfs
 
 
@@ -28,6 +29,7 @@ class Event:
 
         self.workflow: tp.Optional[wfs.Workflow] = kwargs.get("workflow", None)
         self.task: tp.Optional[wfs.Task] = kwargs.get("task", None)
+        self.vm: tp.Optional[vms.VM] = kwargs.get("vm", None)
 
     def __lt__(self, other: "Event") -> bool:
         return self.start_time < other.start_time
