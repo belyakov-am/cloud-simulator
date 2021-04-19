@@ -131,6 +131,17 @@ class Manager:
 
         assert vm.get_state() == vms.State.PROVISIONED
 
+        vm.reserve()
+        self.idle_vms.remove(vm)
 
     def release_vm(self, vm: vms.VM) -> None:
-        pass
+        """Releases early reserved VM. Now everyone can use it.
+
+        :param vm: VM to release.
+        :return: None.
+        """
+
+        assert vm in self.vms
+
+        vm.release()
+        self.idle_vms.add(vm)

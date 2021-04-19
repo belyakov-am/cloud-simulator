@@ -58,6 +58,8 @@ class VM:
 
         self.state: State = State.NOT_PROVISIONED
 
+    # FIXME: implement __hash__()
+
     def __str__(self) -> str:
         return (f"<VM "
                 f"uuid = {self.uuid}, "
@@ -116,4 +118,24 @@ class VM:
         """
 
         self.start_time = start_time
+        self.state = State.PROVISIONED
+
+    def reserve(self) -> None:
+        """Mark VM as busy.
+
+        :return: None.
+        """
+
+        assert self.state == State.PROVISIONED
+
+        self.state = State.BUSY
+
+    def release(self) -> None:
+        """Mark VM as provisioned.
+
+        :return:
+        """
+
+        assert self.state == State.BUSY
+
         self.state = State.PROVISIONED
