@@ -18,10 +18,10 @@ class Manager:
         # List of VM types. Sorted by price in ascending order.
         self.vm_types: list[vms.VMType] = []
 
-        self.vms: list[vms.VM] = []
+        self.vms: set[vms.VM] = set()
 
-        # List of idle (i.e. provisioned but not busy) VMs
-        self.idle_vms: list[vms.VM] = []
+        # Set of idle (i.e. provisioned but not busy) VMs
+        self.idle_vms: set[vms.VM] = set()
 
         self._get_vm_types_from_json(config.VM_TYPES)
 
@@ -81,20 +81,20 @@ class Manager:
         """
 
         if task is None and container is None:
-            return set(self.idle_vms)
+            return self.idle_vms
 
-        idle_vms: list[vms.VM] = []
+        idle_vms: set[vms.VM] = set()
 
         for idle_vm in self.idle_vms:
             if (task is not None
                     and idle_vm.check_if_files_present(task.input_files)):
-                idle_vms.append(idle_vm)
+                idle_vms.add(idle_vm)
 
             if (container is not None
                     and idle_vm.check_if_container_provisioned(container)):
-                idle_vms.append(idle_vm)
+                idle_vms.add(idle_vm)
 
-        return set(idle_vms)
+        return idle_vms
 
     def init_vm(self, vm_type: vms.VMType) -> vms.VM:
         """Initialize VM object of given type. It should be then
@@ -105,16 +105,32 @@ class Manager:
         """
 
         vm = vms.VM(vm_type=vm_type)
-        self.vms.append(vm)
+        self.vms.add(vm)
         return vm
 
     def provision_vm(self, vm: vms.VM, start_time: datetime) -> None:
-        """Provisions given VM.
+        """Provisions given VM. It should not be provisioned or busy.
 
         :param vm: VM to provision.
         :param start_time: virtual time when VM starts.
         :return: None.
         """
 
+        assert vm.get_state() == vms.State.NOT_PROVISIONED
+
         vm.provision(start_time=start_time)
-        self.idle_vms.append(vm)
+        self.idle_vms.add(vm)
+
+    def reserve_vm(self, vm: vms.VM) -> None:
+        """Reserve given VM. No one else can use it until it is
+        released. It should be provisioned and not busy.
+
+        :param vm: VM to reserve.
+        :return: None.
+        """
+
+        assert vm.get_state() == vms.State.PROVISIONED
+
+
+    def release_vm(self, vm: vms.VM) -> None:
+        pass
