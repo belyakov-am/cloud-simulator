@@ -159,9 +159,8 @@ class EPSMScheduler(SchedulerInterface):
 
         for task in workflow.tasks:
             if not task.parents:
-                # TODO: replace datetime.now()
                 self.event_loop.add_event(event=Event(
-                    start_time=datetime.now(),
+                    start_time=self.event_loop.get_current_time(),
                     event_type=EventType.SCHEDULE_TASK,
                     task=task,
                 ))
