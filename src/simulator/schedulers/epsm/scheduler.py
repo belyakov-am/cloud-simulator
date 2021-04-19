@@ -192,7 +192,7 @@ class EPSMScheduler(SchedulerInterface):
             possible_finish_time = (current_time
                                     + timedelta(seconds=total_exec_time))
 
-            # doesn't fit deadline, so skip it
+            # Doesn't fit deadline, so skip it.
             if possible_finish_time > task.deadline:
                 continue
 
