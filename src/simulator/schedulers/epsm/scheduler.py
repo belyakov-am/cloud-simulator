@@ -98,6 +98,13 @@ class EPSMScheduler(SchedulerInterface):
         self.workflows[epsm_workflow.uuid] = epsm_workflow
 
     def _calculate_efts_and_makespan(self, workflow_uuid: str) -> None:
+        """Calculate EFTs (Earliest Finish Time) for each task and
+        workflow makespan.
+
+        :param workflow_uuid: UUID of workflow that is processed.
+        :return: None.
+        """
+
         # WARNING!
         # Assumed that every parent task is listed before its child.
 
@@ -113,6 +120,14 @@ class EPSMScheduler(SchedulerInterface):
                 workflow.makespan = current_eft
 
     def _calculate_eft(self, task: Task) -> float:
+        """Calculate eft for given task. That is just maximum among
+        parents' efts plus task execution time prediction on slowest
+        VM type.
+        Used for scheduling and assigning appropriate VM types.
+
+        :param task: task for eft calculation.
+        :return: eft.
+        """
         max_parent_eft = (max(parent.eft for parent in task.parents)
                           if task.parents
                           else 0)
@@ -129,6 +144,11 @@ class EPSMScheduler(SchedulerInterface):
         return task.eft
 
     def _calculate_total_spare_time(self, workflow_uuid: str) -> None:
+        """Calculate total spare time for workflow.
+
+        :param workflow_uuid: UUID of workflow that is processed.
+        :return: None.
+        """
         current_time = self.event_loop.get_current_time()
         workflow = self.workflows[workflow_uuid]
         available_time = (workflow.deadline - current_time).total_seconds()
