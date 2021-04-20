@@ -254,7 +254,7 @@ class EPSMScheduler(SchedulerInterface):
     def schedule_task(self, workflow_uuid: str, task_id: int) -> None:
         """Schedule task according to EPSM algorithm.
 
-        :param workflow_uuid: uuid of workflow from which pick task.
+        :param workflow_uuid: UUID of workflow from which pick task.
         :param task_id: task ID inside workflow.
         :return: None.
         """
