@@ -254,8 +254,8 @@ class EPSMScheduler(SchedulerInterface):
     def schedule_task(self, workflow_uuid: str, task_id: int) -> None:
         """Schedule task according to EPSM algorithm.
 
-        :param workflow_uuid: UUID of workflow from which pick task.
-        :param task_id: task ID inside workflow.
+        :param workflow_uuid: UUID of workflow that is scheduled.
+        :param task_id: task ID to schedule.
         :return: None.
         """
 
@@ -367,12 +367,13 @@ class EPSMScheduler(SchedulerInterface):
             task_id: int,
             vm: vms.VM,
     ) -> None:
-        """TODO
+        """Update unscheduled tasks' deadlines if current task was
+        finished earlier or later.
 
-        :param workflow_uuid:
-        :param task_id:
-        :param vm:
-        :return:
+        :param workflow_uuid: UUID of workflow that is scheduled.
+        :param task_id: task ID that was finished.
+        :param vm: VM that executed task.
+        :return: None.
         """
 
         pass
