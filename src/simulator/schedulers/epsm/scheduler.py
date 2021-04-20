@@ -49,7 +49,7 @@ class EPSMScheduler(SchedulerInterface):
         # Add to event loop.
         epsm_workflow = self.workflows[workflow.uuid]
         self.event_loop.add_event(event=Event(
-            start_time=epsm_workflow.start_time,
+            start_time=epsm_workflow.submit_time,
             event_type=EventType.SCHEDULE_WORKFLOW,
             workflow=epsm_workflow,
         ))
@@ -128,7 +128,6 @@ class EPSMScheduler(SchedulerInterface):
         available_time = (workflow.deadline - current_time).total_seconds()
 
         workflow.spare_time = available_time - workflow.makespan
-        workflow.start_time = current_time
 
     def _distribute_spare_time_among_tasks(self, workflow_uuid: str) -> None:
         # Spare time should be distributed proportionally to tasks
@@ -145,7 +144,7 @@ class EPSMScheduler(SchedulerInterface):
         workflow = self.workflows[workflow_uuid]
 
         for task in workflow.tasks:
-            task.deadline = (workflow.start_time
+            task.deadline = (workflow.submit_time
                              + timedelta(seconds=task.eft)
                              + timedelta(seconds=task.spare_time))
 
