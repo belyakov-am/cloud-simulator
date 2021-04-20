@@ -46,7 +46,7 @@ class Manager:
 
         self.vm_types = sorted(
             self.vm_types,
-            key=lambda v: v.price_per_hour,
+            key=lambda v: v.price,
         )
 
     def get_slowest_vm_type(self) -> vms.VMType:
