@@ -19,10 +19,10 @@ class Workflow:
         self.unscheduled_tasks: list[wfs.Task] = []
 
         # Time to submit workflow to event loop. Should be set by user.
-        self.submit_time: datetime = datetime.now()
+        self.submit_time: datetime
 
         # Soft deadline for executing all tasks. Should be set by user.
-        self.deadline: datetime = datetime.now()
+        self.deadline: datetime
 
         # Directed Acyclic Graph.
         self.dag: nx.DiGraph = nx.DiGraph()
