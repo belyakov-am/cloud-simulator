@@ -50,7 +50,9 @@ class Task:
                 f"name = {self.name}, "
                 f"input_files = {self.input_files}, "
                 f"output_files = {self.output_files}, "
-                f"parents = {self.parents}>")
+                f"parents = {self.parents}, "
+                f"container = {self.container}, "
+                f"state = {self.state}>")
 
     def __repr__(self) -> str:
         return (f"Task("
@@ -61,3 +63,23 @@ class Task:
                 f"input_files = {self.input_files}, "
                 f"output_files = {self.output_files}, "
                 f"parents = {self.parents})")
+
+    def mark_scheduled(self) -> None:
+        """Mark current task as scheduled.
+
+        :return: None
+        """
+
+        assert self.state == State.CREATED
+
+        self.state = State.SCHEDULED
+
+    def mark_finished(self) -> None:
+        """Mark current task as finished.
+
+        :return: None.
+        """
+
+        assert self.state == State.SCHEDULED
+
+        self.state = State.FINISHED
