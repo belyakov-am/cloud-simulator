@@ -43,8 +43,14 @@ class EPSMScheduler(SchedulerInterface):
         self._convert_to_epsm_instances(workflow=workflow)
         self._calculate_efts_and_makespan(workflow_uuid=workflow.uuid)
         self._calculate_total_spare_time(workflow_uuid=workflow.uuid)
-        self._distribute_spare_time_among_tasks(workflow_uuid=workflow.uuid)
-        self._calculate_tasks_deadlines(workflow_uuid=workflow.uuid)
+        self._distribute_spare_time_among_tasks(
+            workflow_uuid=workflow.uuid,
+            tasks=workflow.tasks,
+        )
+        self._calculate_tasks_deadlines(
+            workflow_uuid=workflow.uuid,
+            tasks=workflow.tasks,
+        )
 
         # Add to event loop.
         epsm_workflow = self.workflows[workflow.uuid]
@@ -129,21 +135,40 @@ class EPSMScheduler(SchedulerInterface):
 
         workflow.spare_time = available_time - workflow.makespan
 
-    def _distribute_spare_time_among_tasks(self, workflow_uuid: str) -> None:
-        # Spare time should be distributed proportionally to tasks
-        # runtime.
+    def _distribute_spare_time_among_tasks(
+            self,
+            workflow_uuid: str,
+            tasks: list[Task],
+    ) -> None:
+        """Distribute spare time proportionally to given tasks
+        depending on their execution time.
+
+        :param workflow_uuid: UUID of workflow that is processed.
+        :param tasks: tasks that get spare time.
+        :return: None.
+        """
 
         workflow = self.workflows[workflow_uuid]
         spare_to_makespan_proportion = workflow.spare_time / workflow.makespan
 
-        for task in workflow.tasks:
+        for task in tasks:
             task.spare_time = (task.execution_time_prediction
                                * spare_to_makespan_proportion)
 
-    def _calculate_tasks_deadlines(self, workflow_uuid: str) -> None:
+    def _calculate_tasks_deadlines(
+            self,
+            workflow_uuid: str,
+            tasks: list[Task],
+    ) -> None:
+        """Calculate tasks' deadlines based on eft and spare time.
+
+        :param workflow_uuid: UUID of workflow that is processed.
+        :param tasks: tasks that need deadlines.
+        :return: None.
+        """
         workflow = self.workflows[workflow_uuid]
 
-        for task in workflow.tasks:
+        for task in tasks:
             task.deadline = (workflow.submit_time
                              + timedelta(seconds=task.eft)
                              + timedelta(seconds=task.spare_time))
