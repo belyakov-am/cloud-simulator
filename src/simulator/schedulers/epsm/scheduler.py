@@ -427,6 +427,34 @@ class EPSMScheduler(SchedulerInterface):
         current_time = self.event_loop.get_current_time()
 
         workflow = self.workflows[workflow_uuid]
-        unscheduled_tasks = workflow.unscheduled_tasks
+        task = workflow.tasks[task_id]
 
+        # Mark task as finished.
+        task.mark_finished(time=current_time)
 
+        # Find task's extra time. It is:
+        # positive - if task finished earlier,
+        # negative - if task finished later,
+        # zero - if task finished on time.
+        task_extra_time = (task.deadline - current_time).total_seconds()
+
+        # If finished on time, nothing to update.
+        if task_extra_time == 0:
+            return
+
+        task_execution_time = (task.finish_time
+                               - task.start_time).total_seconds()
+
+        # Update workflow total spare time and makespan.
+        workflow.spare_time += task_extra_time
+        workflow.makespan -= task_execution_time
+
+        # Update spare time and deadlines for tasks.
+        self._distribute_spare_time_among_tasks(
+            workflow_uuid=workflow_uuid,
+            tasks=workflow.unscheduled_tasks,
+        )
+        self._calculate_tasks_deadlines(
+            workflow_uuid=workflow_uuid,
+            tasks=workflow.unscheduled_tasks,
+        )

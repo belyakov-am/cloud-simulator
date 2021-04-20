@@ -60,3 +60,5 @@ class EventLoop:
                     vm=event.vm,
                 )
                 continue
+
+            # TODO: manage `MANAGE_RESOURCES` event
