@@ -351,7 +351,7 @@ class EPSMScheduler(SchedulerInterface):
             )
 
             # Update task state.
-            task.mark_scheduled()
+            task.mark_scheduled(time=current_time)
 
             # Reserve VM and submit event to event loop.
             self.vm_manager.reserve_vm(vm)
