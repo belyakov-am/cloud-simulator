@@ -47,7 +47,7 @@ class SchedulerInterface(ABC):
     def schedule_workflow(self, workflow_uuid: str) -> None:
         """Schedules given workflow according to algorithm's policy.
 
-        :param workflow_uuid: UUID of a workflow to schedule.
+        :param workflow_uuid: UUID of workflow to schedule.
         :return: None.
         """
 
@@ -55,11 +55,13 @@ class SchedulerInterface(ABC):
 
     @abstractmethod
     def schedule_task(self, workflow_uuid: str, task_id: int) -> None:
-        """TODO
+        """This method should be used for scheduling every task from
+        workflow according to algorithm's policy. It is called each time
+        when event of type `SCHEDULE_TASK` appears in event loop.
 
-        :param workflow_uuid:
-        :param task_id:
-        :return:
+        :param workflow_uuid: UUID of workflow that is scheduled.
+        :param task_id: ID of task to schedule.
+        :return: None.
         """
         pass
 
@@ -70,12 +72,15 @@ class SchedulerInterface(ABC):
             task_id: int,
             vm: vms.VM,
     ) -> None:
-        """TODO
+        """This method is called each time when event of type
+        `FINISH_TASK` appears in event loop. It can be used for any
+        postprocessing required by algorithm. One can put event
+        `FINISH_TASK` in `schedule_task` method.
 
-        :param workflow_uuid:
-        :param task_id:
-        :param vm:
-        :return:
+        :param workflow_uuid: UUID of workflow that is scheduled.
+        :param task_id: ID of task that was scheduled.
+        :param vm: VM that executed task.
+        :return: None.
         """
 
         pass
