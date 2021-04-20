@@ -15,6 +15,7 @@ class Task(wfs.Task):
         self.execution_time_prediction: float = 0.0  # in seconds
         self.spare_time: float = 0.0  # in seconds
 
-        self.deadline: datetime
+        # now() only for initialization purpose
+        self.deadline: datetime = datetime.now()
 
         self.parents: list[Task] = self.parents

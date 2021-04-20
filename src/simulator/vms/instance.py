@@ -48,7 +48,7 @@ class VM:
 
         # Used for calculating price based on billing periods.
         # datetime.now only for init purpose.
-        self.start_time: datetime
+        self.start_time: datetime = datetime.now()
 
         # Set of present files on VM. They can appear as task output
         # or can be delivered over network.

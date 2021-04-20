@@ -15,3 +15,6 @@ class Workflow(wfs.Workflow):
 
         self.makespan: float = 0.0  # in seconds
         self.spare_time: float = 0.0  # in seconds
+
+        # now() only for initialization purpose
+        self.start_time: datetime = datetime.now()
