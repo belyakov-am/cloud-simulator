@@ -15,12 +15,21 @@ class Task:
             container: wfs.Container,
 
     ) -> None:
+        # UUID of workflow that holds task
         self.workflow_uuid = workflow_uuid
+        # Task ID in workflow
         self.id = task_id
         self.name = name
+
+        # List of parents as `Task` objects
         self.parents = parents
+
+        # Files that are required by task
         self.input_files = input_files
+        # Files that task produces
         self.output_files = output_files
+
+        # Container that simulates required libraries and software.
         self.container = container
 
     def __str__(self) -> str:
