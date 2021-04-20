@@ -90,7 +90,7 @@ class PegasusTraceParser:
             )
 
             tasks[task.name] = task
-            self.workflow.tasks.append(task)
+            self.workflow.add_task(task=task)
 
     def get_workflow(self) -> wfs.Workflow:
         return self.workflow
