@@ -27,9 +27,11 @@ class Simulator:
     def submit_workflow(self, workflow: wfs.Workflow, time: datetime) -> None:
         self.workflows[workflow.uuid] = workflow
 
-        # TODO: use different logic in order to calculate virtual time
-        # with respect to preprocessing stage
-        self.scheduler.submit_workflow(workflow=workflow, time=time)
+        self.scheduler.event_loop.add_event(event=sch.Event(
+            start_time=time,
+            event_type=sch.EventType.SUBMIT_WORKFLOW,
+            workflow=workflow,
+        ))
 
     def run_simulation(self):
         self.scheduler.run_event_loop()

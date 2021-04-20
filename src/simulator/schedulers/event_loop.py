@@ -29,6 +29,12 @@ class EventLoop:
             # Update current time.
             self.current_time = event.start_time
 
+            if event.type == sch.EventType.SUBMIT_WORKFLOW:
+                assert event.workflow is not None
+
+                scheduler.submit_workflow(workflow=event.workflow)
+                continue
+
             if event.type == sch.EventType.SCHEDULE_WORKFLOW:
                 assert event.workflow is not None
 

@@ -36,7 +36,7 @@ class EPSMScheduler(SchedulerInterface):
 
         self.settings: Settings = Settings()
 
-    def submit_workflow(self, workflow: wfs.Workflow, time: datetime) -> None:
+    def submit_workflow(self, workflow: wfs.Workflow) -> None:
         logger.debug(f"Got new workflow {workflow.uuid}")
 
         # Preprocess.
@@ -111,6 +111,7 @@ class EPSMScheduler(SchedulerInterface):
                           if task.parents
                           else 0)
 
+        # TODO: include VM and container provision in calculation (?)
         task_execution_time = tep.io_consumption(
             task=task,
             vm_type=self.vm_manager.get_slowest_vm_type(),

@@ -28,7 +28,6 @@ class SchedulerInterface(ABC):
     def submit_workflow(
             self,
             workflow: wfs.Workflow,
-            time: datetime,
     ) -> None:
         """This method can be used for any preprocessing required by
         algorithm. If algorithm doesn't require any initial setup,
@@ -37,7 +36,6 @@ class SchedulerInterface(ABC):
         time.
 
         :param workflow: workflow for saving and preprocessing.
-        :param time: virtual time to submit and process workflow.
         :return: None.
         """
 
