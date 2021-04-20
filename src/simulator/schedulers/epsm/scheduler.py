@@ -87,6 +87,7 @@ class EPSMScheduler(SchedulerInterface):
                 parents=parents,
                 input_files=task.input_files,
                 output_files=task.output_files,
+                container=task.container,
             )
 
             epsm_tasks.append(epsm_task)
