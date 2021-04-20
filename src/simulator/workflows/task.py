@@ -1,7 +1,8 @@
 from datetime import datetime
 import enum
 
-import simulator.workflows as wfs
+from .container import Container
+from .file import File
 
 
 class State(enum.Enum):
@@ -19,9 +20,9 @@ class Task:
             task_id: int,
             name: str,
             parents: list["Task"],
-            input_files: list[wfs.File],
-            output_files: list[wfs.File],
-            container: wfs.Container,
+            input_files: list[File],
+            output_files: list[File],
+            container: Container,
 
     ) -> None:
         # UUID of workflow that holds task

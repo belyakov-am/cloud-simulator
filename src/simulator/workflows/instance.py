@@ -3,7 +3,8 @@ import uuid
 
 import networkx as nx
 
-import simulator.workflows as wfs
+from .container import Container
+from .task import Task
 
 
 class Workflow:
@@ -15,8 +16,8 @@ class Workflow:
         self.uuid = str(uuid.uuid4())
         self.name = name
         self.description = description
-        self.tasks: list[wfs.Task] = []
-        self.unscheduled_tasks: list[wfs.Task] = []
+        self.tasks: list[Task] = []
+        self.unscheduled_tasks: list[Task] = []
 
         # Time to submit workflow to event loop. Should be set by user.
         self.submit_time: datetime = datetime.now()
@@ -29,7 +30,7 @@ class Workflow:
 
         # Container that simulates required libraries and software.
         # Should be set by user.
-        self.container: wfs.Container = wfs.Container(
+        self.container: Container = Container(
             workflow_uuid=self.uuid,
             provision_time=0,
         )
@@ -55,9 +56,9 @@ class Workflow:
     def set_deadline(self, time: datetime) -> None:
         self.deadline = time
 
-    def set_container(self, container: wfs.Container) -> None:
+    def set_container(self, container: Container) -> None:
         self.container = container
 
-    def add_task(self, task: wfs.Task) -> None:
+    def add_task(self, task: Task) -> None:
         self.tasks.append(task)
         self.unscheduled_tasks.append(task)
