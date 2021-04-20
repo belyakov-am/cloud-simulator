@@ -17,16 +17,16 @@ class Workflow:
         self.description = description
         self.tasks: list[wfs.Task] = []
 
-        # Time to submit workflow to event loop. Should be set by user
+        # Time to submit workflow to event loop. Should be set by user.
         self.submit_time: datetime = datetime.now()
 
-        # Soft deadline for executing all tasks. Should be set by user
+        # Soft deadline for executing all tasks. Should be set by user.
         self.deadline: datetime = datetime.now()
 
-        # Directed Acyclic Graph
+        # Directed Acyclic Graph.
         self.dag: nx.DiGraph = nx.DiGraph()
 
-        # Container that simulates required libraries and software
+        # Container that simulates required libraries and software.
         self.container: wfs.Container = wfs.Container(
             workflow_uuid=self.uuid,
             provision_time=0,
@@ -44,6 +44,7 @@ class Workflow:
                 f"name = {self.name}, "
                 f"description = {self.description}, "
                 f"deadline = {self.deadline}, "
+                f"container = {self.container}, "
                 f"tasks = {self.tasks}>")
 
     def __repr__(self) -> str:
