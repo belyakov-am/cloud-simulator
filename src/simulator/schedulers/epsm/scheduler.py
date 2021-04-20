@@ -45,11 +45,11 @@ class EPSMScheduler(SchedulerInterface):
         self._calculate_total_spare_time(workflow_uuid=workflow.uuid)
         self._distribute_spare_time_among_tasks(
             workflow_uuid=workflow.uuid,
-            tasks=workflow.tasks,
+            tasks=self.workflows[workflow.uuid].tasks,
         )
         self._calculate_tasks_deadlines(
             workflow_uuid=workflow.uuid,
-            tasks=workflow.tasks,
+            tasks=self.workflows[workflow.uuid].tasks,
         )
 
         # Add to event loop.
