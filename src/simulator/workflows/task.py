@@ -1,4 +1,12 @@
+import enum
+
 import simulator.workflows as wfs
+
+
+class State(enum.Enum):
+    CREATED = enum.auto()
+    SCHEDULED = enum.auto()
+    FINISHED = enum.auto()
 
 
 class Task:
@@ -31,6 +39,9 @@ class Task:
 
         # Container that simulates required libraries and software.
         self.container = container
+
+        # Current state of task.
+        self.state: State = State.CREATED
 
     def __str__(self) -> str:
         return (f"<Task "
