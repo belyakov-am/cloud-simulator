@@ -41,7 +41,7 @@ class PegasusTraceParser:
             workflow_uuid=self.workflow.uuid,
             provision_time=provision_time,
         )
-        self.workflow.container = container
+        self.workflow.set_container(container=container)
 
         # Will be used for filling Task's `parents` variable with
         # Task instance. In file they are listed as parent names,
