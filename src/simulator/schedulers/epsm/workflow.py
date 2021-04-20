@@ -10,7 +10,7 @@ class Workflow(wfs.Workflow):
     """
 
     def __init__(self, *args, **kwargs) -> None:
-        super(Workflow, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.tasks: list[epsm.Task] = []
 
         self.makespan: float = 0.0  # in seconds

@@ -9,7 +9,7 @@ class Task(wfs.Task):
     """
 
     def __init__(self, *args, **kwargs) -> None:
-        super(Task, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.eft: float = 0.0  # in seconds
         self.execution_time_prediction: float = 0.0  # in seconds
