@@ -21,6 +21,7 @@ class Simulator:
         self.collector: mc.MetricCollector = mc.MetricCollector()
 
         self._init_logger()
+        self.scheduler.set_metric_collector(collector=self.collector)
 
     def _init_logger(self) -> None:
         logger.add(
