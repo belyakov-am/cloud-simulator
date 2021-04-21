@@ -1,8 +1,13 @@
+from collections import defaultdict
+
+import simulator.vms as vms
+
+
 class Stats:
     """Holds various statistics for workflow."""
 
-    def __init__(self):
-        pass
+    def __init__(self) -> None:
+        self.vms: list[vms.VM] = []
 
 
 class MetricCollector:
@@ -12,4 +17,7 @@ class MetricCollector:
     """
 
     def __init__(self) -> None:
-        self.workflows: dict[str, Stats] = dict()
+        # Map from workflow UUID to Stats instance.
+        self.workflows: dict[str, Stats] = defaultdict(Stats)
+
+        self.cost = 0.0
