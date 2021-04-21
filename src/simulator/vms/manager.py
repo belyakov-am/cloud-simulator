@@ -116,7 +116,7 @@ class Manager:
         return vm
 
     def provision_vm(self, vm: vms.VM, start_time: datetime) -> None:
-        """Provisions given VM. It should not be provisioned or busy.
+        """Provision given VM. It should not be provisioned or busy.
 
         :param vm: VM to provision.
         :param start_time: virtual time when VM starts.
@@ -142,7 +142,7 @@ class Manager:
         self.idle_vms.remove(vm)
 
     def release_vm(self, vm: vms.VM) -> None:
-        """Releases early reserved VM. Now everyone can use it.
+        """Release early reserved VM. Now everyone can use it.
 
         :param vm: VM to release.
         :return: None.
