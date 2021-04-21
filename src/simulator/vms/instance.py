@@ -73,7 +73,7 @@ class VM:
 
     def __repr__(self) -> str:
         return (f"VM("
-                f"type = {self.type}"
+                f"type = {self.type}, "
                 f"start_time = {self.start_time})")
 
     def check_if_files_present(self, files: list[wfs.File]) -> bool:
