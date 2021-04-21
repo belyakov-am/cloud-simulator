@@ -35,9 +35,11 @@ class EPSMScheduler(SchedulerInterface):
         # Map from workflow UUID to workflow instance.
         self.workflows: dict[str, Workflow] = dict()
 
-        # Settings of scheduler. Slightly controls is behaviour.
-        # TODO: add method for setting settings from simulation.
+        # Settings of scheduler. Slightly control its behaviour.
         self.settings: Settings = Settings()
+
+    def set_settings(self, settings: Settings) -> None:
+        self.settings = settings
 
     def submit_workflow(self, workflow: wfs.Workflow) -> None:
         logger.debug(f"Got new workflow {workflow.uuid}")

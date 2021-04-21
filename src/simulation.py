@@ -3,6 +3,7 @@ import pathlib
 
 import simulator as sm
 import simulator.schedulers as sch
+import simulator.schedulers.epsm as epsm
 import simulator.workflows as wf
 
 
@@ -19,6 +20,9 @@ def main() -> None:
     workflow.set_deadline(datetime.now() + timedelta(hours=8))
 
     scheduler = sch.EPSMScheduler()
+    settings = epsm.Settings()
+    scheduler.set_settings(settings=settings)
+
     simulator = sm.Simulator(scheduler=scheduler)
 
     simulator.submit_workflow(workflow=workflow, time=datetime.now())
