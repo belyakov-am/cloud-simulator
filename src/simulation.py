@@ -6,7 +6,7 @@ from loguru import logger
 import simulator as sm
 import simulator.schedulers as sch
 import simulator.schedulers.epsm as epsm
-import simulator.workflows as wf
+import simulator.workflows as wfs
 
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent
@@ -17,19 +17,28 @@ TRACE_FILENAME = "pegasus/1000genome-chameleon-10ch-100k-001.json"
 def main() -> None:
     trace_path = str(ROOT_DIR / WORKFLOW_PATH / TRACE_FILENAME)
 
-    parser = wf.PegasusTraceParser(trace_path)
+    # Init workflows.
+    workflows: list[wfs.Workflow] = []
+
+    parser = wfs.PegasusTraceParser(trace_path)
     workflow = parser.get_workflow()
     workflow.set_deadline(datetime.now() + timedelta(hours=8))
+    workflows.append(workflow)
 
+    # Choose scheduler.
     scheduler = sch.EPSMScheduler()
     settings = epsm.Settings()
     scheduler.set_settings(settings=settings)
 
+    # Create simulator, submit workflows and run simulation.
     simulator = sm.Simulator(scheduler=scheduler)
 
-    simulator.submit_workflow(workflow=workflow, time=datetime.now())
+    for workflow in workflows:
+        simulator.submit_workflow(workflow=workflow, time=datetime.now())
+
     simulator.run_simulation()
 
+    # Get simulation metrics.
     metric_collector = simulator.get_metric_collector()
 
     logger.info(f"Total cost = {metric_collector.cost}")
