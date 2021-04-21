@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+import typing as tp
 
+import simulator.metric_collector as mc
 import simulator.schedulers as sch
 import simulator.storages as sts
 import simulator.vms as vms
@@ -18,10 +20,16 @@ class SchedulerInterface(ABC):
         self.storage_manager: sts.Manager = sts.Manager()
         self.vm_manager: vms.Manager = vms.Manager()
 
+        # Collector for metrics. Should be set by simulator.
+        self.collector: tp.Optional[mc.MetricCollector] = None
+
         self.event_loop: sch.EventLoop = sch.EventLoop()
 
     def run_event_loop(self) -> None:
         self.event_loop.run(scheduler=self)
+
+    def set_metric_collector(self, collector: mc.MetricCollector) -> None:
+        self.collector = collector
 
     @abstractmethod
     def submit_workflow(
