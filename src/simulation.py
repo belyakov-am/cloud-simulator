@@ -40,7 +40,8 @@ def main() -> None:
             f"Workflow {workflow_uuid} statistics \n"
             f"Start time = {stats.start_time} \n"
             f"Finish time = {stats.finish_time} \n"
-            f"Execution time (seconds) = {total_seconds}"
+            f"Execution time (seconds) = {total_seconds} \n"
+            f"Number of VMs = {len(stats.vms)}"
         )
 
 
