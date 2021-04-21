@@ -33,3 +33,16 @@ class Event:
 
     def __lt__(self, other: "Event") -> bool:
         return self.start_time < other.start_time
+
+    def __str__(self) -> str:
+        return (f"<Event "
+                f"start_time = {self.start_time}, "
+                f"type = {self.type}, "
+                f"workflow = {self.workflow}, "
+                f"task = {self.task}, "
+                f"vm = {self.vm}>")
+
+    def __repr__(self) -> str:
+        return (f"Event("
+                f"start_time = {self.start_time}, "
+                f"event_type = {self.type})")
