@@ -18,12 +18,12 @@ def main() -> None:
     trace_path = str(ROOT_DIR / WORKFLOW_PATH / TRACE_FILENAME)
 
     # Init workflows.
-    workflows: list[wfs.Workflow] = []
+    workflows: dict[str, wfs.Workflow] = dict()
 
     parser = wfs.PegasusTraceParser(trace_path)
     workflow = parser.get_workflow()
     workflow.set_deadline(datetime.now() + timedelta(hours=8))
-    workflows.append(workflow)
+    workflows[workflow.uuid] = workflow
 
     # Choose scheduler.
     scheduler = sch.EPSMScheduler()
@@ -33,7 +33,7 @@ def main() -> None:
     # Create simulator, submit workflows and run simulation.
     simulator = sm.Simulator(scheduler=scheduler)
 
-    for workflow in workflows:
+    for _, workflow in workflows.items():
         simulator.submit_workflow(workflow=workflow, time=datetime.now())
 
     simulator.run_simulation()
@@ -44,11 +44,15 @@ def main() -> None:
     logger.info(f"Total cost = {metric_collector.cost}")
 
     for workflow_uuid, stats in metric_collector.workflows.items():
+        workflow = workflows[workflow_uuid]
+
         total_seconds = (stats.finish_time - stats.start_time).total_seconds()
+
         logger.info(
             f"Workflow {workflow_uuid} statistics \n"
             f"Start time = {stats.start_time} \n"
             f"Finish time = {stats.finish_time} \n"
+            f"Deadline = {workflow.deadline} \n"
             f"Execution time (seconds) = {total_seconds} \n"
             f"Number of VMs = {len(stats.vms)}"
         )
