@@ -152,3 +152,23 @@ class Manager:
 
         vm.release()
         self.idle_vms.add(vm)
+
+    def shutdown_vms(
+            self,
+            time: datetime,
+            vm_list: tp.Optional[list[vms.VM]] = None,
+    ) -> None:
+        """Shutdown VMs. If it is None, shutdowns all active VMs.
+        Basically used when simulation is over and all tasks have
+        finished.
+
+        :param time: virtual time when VMs are finished.
+        :param vm_list: list of VMs to shutdown.
+        :return: None
+        """
+
+        for vm in self.vms:
+            if vm.get_state() != vms.State.SHUTDOWN:
+                vm.shutdown(time=time)
+
+            self.collector.cost += vm.calculate_cost()

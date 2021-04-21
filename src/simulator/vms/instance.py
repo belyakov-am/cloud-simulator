@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 import enum
+import typing as tp
 import uuid
 
 import simulator.workflows as wfs
@@ -34,6 +35,7 @@ class State(enum.Enum):
     NOT_PROVISIONED = enum.auto()
     PROVISIONED = enum.auto()
     BUSY = enum.auto()
+    SHUTDOWN = enum.auto()
 
 
 class VM:
@@ -49,6 +51,7 @@ class VM:
         # Used for calculating price based on billing periods.
         # datetime.now only for init purpose.
         self.start_time: datetime = datetime.now()
+        self.finish_time: datetime = datetime.now()
 
         # Set of present files on VM. They can appear as task output
         # or can be delivered over network.
@@ -139,3 +142,32 @@ class VM:
         assert self.state == State.BUSY
 
         self.state = State.PROVISIONED
+
+    def calculate_cost(self, time: tp.Optional[datetime] = None) -> float:
+        """Calculate cost of using VM. By default use `finish_time`.
+
+        :param time: time until cost is calculated.
+        :return: cost.
+        """
+
+        assert time is not None or self.finish_time is not None
+
+        finish_time = time if time is not None else self.finish_time
+
+        total_seconds = (finish_time - self.start_time).total_seconds()
+        billing_periods = (total_seconds // self.type.billing_period
+                           + (total_seconds % self.type.billing_period) > 0)
+
+        return billing_periods * self.type.price
+
+    def shutdown(self, time: datetime) -> None:
+        """Shutdown VM.
+
+        :param time: time of shutting down.
+        :return: None.
+        """
+
+        assert self.state not in [State.NOT_PROVISIONED, State.SHUTDOWN]
+
+        self.finish_time = time
+        self.state = State.SHUTDOWN
