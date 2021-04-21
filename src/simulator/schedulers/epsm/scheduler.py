@@ -142,7 +142,10 @@ class EPSMScheduler(SchedulerInterface):
         task_execution_time = tep.io_consumption(
             task=task,
             vm_type=self.vm_manager.get_slowest_vm_type(),
-            storage=self.storage_manager.get_storage())
+            storage=self.storage_manager.get_storage(),
+            container_prov=task.container.provision_time,
+            vm_prov=self.settings.vm_provision_delay,
+        )
 
         task.eft = max_parent_eft + task_execution_time
         task.execution_time_prediction = task_execution_time
@@ -290,6 +293,8 @@ class EPSMScheduler(SchedulerInterface):
                 task=task,
                 vm_type=vm_type,
                 storage=self.storage_manager.get_storage(),
+                container_prov=container_prov,
+                vm_prov=vm_prov,
             )
 
             possible_finish_time = (current_time
