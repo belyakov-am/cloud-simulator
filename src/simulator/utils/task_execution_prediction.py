@@ -13,12 +13,28 @@ def io_consumption(
         vm_type: vms.VMType,
         storage: sts.Storage,
         vm: tp.Optional[vms.VM] = None,
+        container_prov: int = 0,
+        vm_prov: int = 0,
 ) -> float:
     """Return prediction for time execution based on IO consumption.
     It includes time for process data over network and disk.
     Calculations are made in seconds.
+
+    If `vm` is passed, input files are checked for existence.
+    If `container_prov` is passed, it is added to total time.
+    If `vm_prov` is passed, it is added to total time.
+
+    :param task: task for prediction.
+    :param vm_type: VM type where task is executed.
+    :param storage: storage that is used in simulation.
+    :param vm: VM instance where task is executed.
+    :param container_prov: container provisioning delay.
+    :param vm_prov: VM provisioning delay.
+    :return:
     """
     total_time = 0.0
+    total_time += container_prov
+    total_time += vm_prov
 
     for input_file in task.input_files:
         # Time for VM to read file.
