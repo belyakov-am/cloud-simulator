@@ -111,13 +111,13 @@ class VM:
 
         return self.state
 
-    def provision(self, start_time: datetime) -> None:
+    def provision(self, time: datetime) -> None:
         """Provision current VM.
 
         :return: None.
         """
 
-        self.start_time = start_time
+        self.start_time = time
         self.state = State.PROVISIONED
 
     def reserve(self) -> None:

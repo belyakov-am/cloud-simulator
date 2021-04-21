@@ -115,17 +115,17 @@ class Manager:
         self.vms.add(vm)
         return vm
 
-    def provision_vm(self, vm: vms.VM, start_time: datetime) -> None:
+    def provision_vm(self, vm: vms.VM, time: datetime) -> None:
         """Provision given VM. It should not be provisioned or busy.
 
         :param vm: VM to provision.
-        :param start_time: virtual time when VM starts.
+        :param time: virtual time when VM starts.
         :return: None.
         """
 
         assert vm.get_state() == vms.State.NOT_PROVISIONED
 
-        vm.provision(start_time=start_time)
+        vm.provision(time=time)
         self.idle_vms.add(vm)
 
     def reserve_vm(self, vm: vms.VM) -> None:

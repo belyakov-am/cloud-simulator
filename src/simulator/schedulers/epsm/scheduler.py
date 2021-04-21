@@ -385,7 +385,7 @@ class EPSMScheduler(SchedulerInterface):
 
             # Provision VM if required.
             if vm.get_state() == vms.State.NOT_PROVISIONED:
-                self.vm_manager.provision_vm(vm=vm, start_time=current_time)
+                self.vm_manager.provision_vm(vm=vm, time=current_time)
                 total_exec_time += self.settings.vm_provision_delay
 
             # Provision container if required.
