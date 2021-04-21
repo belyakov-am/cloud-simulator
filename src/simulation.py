@@ -28,6 +28,8 @@ def main() -> None:
     simulator.submit_workflow(workflow=workflow, time=datetime.now())
     simulator.run_simulation()
 
+    metric_collector = simulator.get_metric_collector()
+
 
 if __name__ == '__main__':
     main()

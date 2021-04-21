@@ -43,3 +43,6 @@ class Simulator:
 
     def run_simulation(self):
         self.scheduler.run_event_loop()
+
+    def get_metric_collector(self) -> mc.MetricCollector:
+        return self.collector
