@@ -3,6 +3,7 @@ import json
 import typing as tp
 
 import simulator.config as config
+import simulator.metric_collector as mc
 import simulator.vms as vms
 import simulator.workflows as wfs
 
@@ -22,6 +23,9 @@ class Manager:
 
         # Set of idle (i.e. provisioned but not busy) VMs
         self.idle_vms: set[vms.VM] = set()
+
+        # Collector for metrics. Should be set by scheduler.
+        self.collector: tp.Optional[mc.MetricCollector] = None
 
         self._get_vm_types_from_json(config.VM_TYPES)
 
@@ -48,6 +52,9 @@ class Manager:
             self.vm_types,
             key=lambda v: v.price,
         )
+
+    def set_metric_collector(self, collector: mc.MetricCollector) -> None:
+        self.collector = collector
 
     def get_slowest_vm_type(self) -> vms.VMType:
         """Return slowest VM which is defined by its CPU.

@@ -1,3 +1,6 @@
+import typing as tp
+
+import simulator.metric_collector as mc
 import simulator.storages as sts
 
 
@@ -6,6 +9,12 @@ class Manager:
 
     def __init__(self) -> None:
         self.storages: list[sts.Storage] = []
+
+        # Collector for metrics. Should be set by scheduler.
+        self.collector: tp.Optional[mc.MetricCollector] = None
+
+    def set_metric_collector(self, collector: mc.MetricCollector) -> None:
+        self.collector = collector
 
     # TODO: implement
     def get_storage(self) -> sts.Storage:

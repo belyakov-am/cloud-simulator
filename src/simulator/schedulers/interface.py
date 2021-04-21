@@ -30,6 +30,8 @@ class SchedulerInterface(ABC):
 
     def set_metric_collector(self, collector: mc.MetricCollector) -> None:
         self.collector = collector
+        self.storage_manager.set_metric_collector(collector=collector)
+        self.vm_manager.set_metric_collector(collector=collector)
 
     @abstractmethod
     def submit_workflow(
