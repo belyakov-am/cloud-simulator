@@ -33,7 +33,10 @@ class EventLoop:
             if event.type == EventType.SUBMIT_WORKFLOW:
                 assert event.workflow is not None
 
-                scheduler.submit_workflow(workflow=event.workflow)
+                workflow = event.workflow
+                scheduler.submit_workflow(workflow=workflow)
+                scheduler.collector.workflows[workflow.uuid].start_time = \
+                    self.current_time
                 continue
 
             if event.type == EventType.SCHEDULE_WORKFLOW:
@@ -55,11 +58,16 @@ class EventLoop:
                 assert event.task is not None
                 assert event.vm is not None
 
+                workflow_uuid = event.task.workflow_uuid
                 scheduler.finish_task(
-                    workflow_uuid=event.task.workflow_uuid,
+                    workflow_uuid=workflow_uuid,
                     task_id=event.task.id,
                     vm=event.vm,
                 )
+                scheduler.collector.workflows[workflow_uuid].finish_time = \
+                    self.current_time
                 continue
 
             # TODO: manage `MANAGE_RESOURCES` event
+
+        scheduler.vm_manager.shutdown_vms(time=self.current_time)

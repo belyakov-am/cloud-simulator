@@ -1,4 +1,6 @@
 from collections import defaultdict
+from datetime import datetime
+import typing as tp
 
 import simulator.vms as vms
 
@@ -7,6 +9,9 @@ class Stats:
     """Holds various statistics for workflow."""
 
     def __init__(self) -> None:
+        self.start_time: tp.Optional[datetime] = None
+        self.finish_time: tp.Optional[datetime] = None
+
         self.vms: list[vms.VM] = []
 
 

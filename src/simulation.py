@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 import pathlib
 
+from loguru import logger
+
 import simulator as sm
 import simulator.schedulers as sch
 import simulator.schedulers.epsm as epsm
@@ -29,6 +31,17 @@ def main() -> None:
     simulator.run_simulation()
 
     metric_collector = simulator.get_metric_collector()
+
+    logger.info(f"Total cost = {metric_collector.cost}")
+
+    for workflow_uuid, stats in metric_collector.workflows.items():
+        total_seconds = (stats.finish_time - stats.start_time).total_seconds()
+        logger.info(
+            f"Workflow {workflow_uuid} statistics \n"
+            f"Start time = {stats.start_time} \n"
+            f"Finish time = {stats.finish_time} \n"
+            f"Execution time (seconds) = {total_seconds}"
+        )
 
 
 if __name__ == '__main__':
