@@ -28,6 +28,11 @@ class Settings:
     # Declared in seconds.
     vm_provision_delay: int = 120
 
+    # Indicates resource provisioning interval. During this stage
+    # idle VMs can be shutdown.
+    # Declared in seconds.
+    provisioning_interval: int = 600
+
 
 class EPSMScheduler(SchedulerInterface):
     def __init__(self):
