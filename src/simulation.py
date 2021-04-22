@@ -69,7 +69,8 @@ def main() -> None:
             f"Finish time = {stats.finish_time} \n"
             f"Deadline = {workflow.deadline} \n"
             f"Execution time (seconds) = {total_seconds} \n"
-            f"Number of VMs = {len(stats.vms)}"
+            f"Number of initialized VMs = {len(stats.initialized_vms)} \n"
+            f"Number of used VMs = {len(stats.used_vms)} \n"
         )
 
 

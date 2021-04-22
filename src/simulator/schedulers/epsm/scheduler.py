@@ -380,7 +380,10 @@ class EPSMScheduler(SchedulerInterface):
                         )
 
                         vm = self.vm_manager.init_vm(vm_type=cheapest_vmt)
-                        self.collector.workflows[workflow_uuid].vms.append(vm)
+
+                        # Save info to metric collector.
+                        self.collector.workflows[
+                            workflow_uuid].initialized_vms.append(vm)
 
         # If no VM found, it is possible to postpone task scheduling.
         if vm is None:
@@ -431,6 +434,9 @@ class EPSMScheduler(SchedulerInterface):
                 task=task,
                 vm=vm,
             ))
+
+            # Save info to metric collector.
+            self.collector.workflows[workflow_uuid].used_vms.add(vm)
 
     def finish_task(
             self,

@@ -12,7 +12,8 @@ class Stats:
         self.start_time: tp.Optional[datetime] = None
         self.finish_time: tp.Optional[datetime] = None
 
-        self.vms: list[vms.VM] = []
+        self.initialized_vms: list[vms.VM] = []
+        self.used_vms: set[vms.VM] = set()
 
 
 class MetricCollector:
