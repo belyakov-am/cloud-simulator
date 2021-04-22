@@ -298,9 +298,7 @@ class EPSMScheduler(SchedulerInterface):
             )
 
             possible_finish_time = (current_time
-                                    + timedelta(seconds=task_execution_time)
-                                    + timedelta(seconds=vm_prov)
-                                    + timedelta(seconds=container_prov))
+                                    + timedelta(seconds=task_execution_time))
 
             if possible_finish_time < task.deadline:
                 return vm_type
