@@ -10,20 +10,35 @@ import simulator.workflows as wfs
 
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent
-WORKFLOW_PATH = "workflow-traces"
-TRACE_FILENAME = "pegasus/1000genome-chameleon-10ch-100k-001.json"
+WORKFLOW_PATH = "workflow-traces/pegasus"
+TRACE_TYPES = [
+    "genome",
+    "montage",
+]
+
+
+def parse_workflows() -> dict[str, wfs.Workflow]:
+    """Parse workflows from directories.
+
+    :return: dict from workflow UUID to workflow object.
+    """
+
+    workflows: dict[str, wfs.Workflow] = dict()
+
+    for trace_type in TRACE_TYPES:
+        trace_type_dir = str(ROOT_DIR / WORKFLOW_PATH / trace_type)
+        for trace_path in pathlib.Path(trace_type_dir).glob("**/*"):
+            parser = wfs.PegasusTraceParser(str(trace_path))
+            workflow = parser.get_workflow()
+            workflow.set_deadline(time=datetime.now() + timedelta(hours=16))
+            workflows[workflow.uuid] = workflow
+
+    return workflows
 
 
 def main() -> None:
-    trace_path = str(ROOT_DIR / WORKFLOW_PATH / TRACE_FILENAME)
-
     # Init workflows.
-    workflows: dict[str, wfs.Workflow] = dict()
-
-    parser = wfs.PegasusTraceParser(trace_path)
-    workflow = parser.get_workflow()
-    workflow.set_deadline(datetime.now() + timedelta(hours=8))
-    workflows[workflow.uuid] = workflow
+    workflows = parse_workflows()
 
     # Choose scheduler.
     scheduler = sch.EPSMScheduler()
