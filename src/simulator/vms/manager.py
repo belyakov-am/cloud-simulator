@@ -165,6 +165,7 @@ class Manager:
 
         vm.shutdown(time=time)
         self.idle_vms.remove(vm)
+        self.collector.cost += vm.calculate_cost()
 
     def shutdown_vms(
             self,
