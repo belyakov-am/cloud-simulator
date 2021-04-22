@@ -86,4 +86,5 @@ class EventLoop:
                 )
                 continue
 
+        # No events left, so shutdown all VMs to calculate total cost.
         scheduler.vm_manager.shutdown_vms(time=self.current_time)
