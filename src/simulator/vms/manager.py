@@ -153,6 +153,19 @@ class Manager:
         vm.release()
         self.idle_vms.add(vm)
 
+    def shutdown_vm(self, time: datetime, vm: vms.VM) -> None:
+        """Shutdown given VM. It will be not available anymore.
+
+        :param time: virtual time when VM is finished.
+        :param vm: VM to shutdown.
+        :return: None.
+        """
+
+        assert vm.state == vms.State.PROVISIONED
+
+        vm.shutdown(time=time)
+        self.idle_vms.remove(vm)
+
     def shutdown_vms(
             self,
             time: datetime,
