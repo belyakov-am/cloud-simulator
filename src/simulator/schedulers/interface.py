@@ -7,6 +7,8 @@ import simulator.storages as sts
 import simulator.vms as vms
 import simulator.workflows as wfs
 
+from .event import Event
+
 
 class SchedulerInterface(ABC):
     """Interface for implementing scheduling algorithms"""
@@ -90,6 +92,18 @@ class SchedulerInterface(ABC):
         :return: None.
         """
 
+        pass
+
+    @abstractmethod
+    def manage_resources(self, next_event: tp.Optional[Event]) -> None:
+        """This method is called for `MANAGE_RESOURCES` event. It can be
+        used for any manipulations with cloud resources.
+        `next_event` parameter can be used for decisions of scheduling
+        next `MANAGE_RESOURCES` event.
+
+        :param next_event: next event in event loop.
+        :return: None.
+        """
         pass
 
     # TODO: add method(s) for getting workflow status

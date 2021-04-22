@@ -1,5 +1,8 @@
 from datetime import datetime
 import heapq as hq
+import typing as tp
+
+from loguru import logger
 
 from .event import Event, EventType
 from .interface import SchedulerInterface
@@ -19,6 +22,15 @@ class EventLoop:
 
     def add_event(self, event: Event) -> None:
         hq.heappush(self.event_queue, event)
+
+    def peek_closest_event(self) -> tp.Optional[Event]:
+        if not len(self.event_queue):
+            return None
+
+        return self.event_queue[0]
+
+    def get_event_count(self) -> int:
+        return len(self.event_queue)
 
     def get_current_time(self) -> datetime:
         return self.current_time
@@ -68,6 +80,10 @@ class EventLoop:
                     self.current_time
                 continue
 
-            # TODO: manage `MANAGE_RESOURCES` event
+            if event.type == EventType.MANAGE_RESOURCES:
+                scheduler.manage_resources(
+                    next_event=self.peek_closest_event(),
+                )
+                continue
 
         scheduler.vm_manager.shutdown_vms(time=self.current_time)

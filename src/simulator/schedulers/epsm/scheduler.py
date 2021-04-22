@@ -70,6 +70,14 @@ class EPSMScheduler(SchedulerInterface):
             workflow=epsm_workflow,
         ))
 
+        # Init `MANAGE_RESOURCES` event
+        current_time = self.event_loop.get_current_time()
+        provisioning_interval = self.settings.provisioning_interval
+        self.event_loop.add_event(event=Event(
+            start_time=current_time + timedelta(seconds=provisioning_interval),
+            event_type=EventType.MANAGE_RESOURCES,
+        ))
+
     def _convert_to_epsm_instances(self, workflow: wfs.Workflow) -> None:
         # Create EPSM workflow from basic.
         epsm_workflow = Workflow(
@@ -473,3 +481,37 @@ class EPSMScheduler(SchedulerInterface):
             workflow_uuid=workflow_uuid,
             tasks=workflow.unscheduled_tasks,
         )
+
+    def manage_resources(self, next_event: tp.Optional[Event]) -> None:
+        current_time = self.event_loop.get_current_time()
+        idle_vms = self.vm_manager.get_idle_vms()
+
+        # Shutdown VMs.
+        for vm in idle_vms:
+            # TODO: add deprovisioning delay (?)
+            time_until_next_period = cst.time_until_next_billing_period(
+                current_time=current_time,
+                vm=vm,
+            )
+
+            if time_until_next_period < self.settings.provisioning_interval:
+                self.vm_manager.shutdown_vm(
+                    time=current_time,
+                    vm=vm,
+                )
+
+        # Add next deprovisioning stage to event loop.
+        # If there is no event in event loop, simulation is over.
+        if next_event is None:
+            return
+
+        # If next event is `MANAGE_RESOURCE`, no need to place one more
+        # in order to avoid infinite loop.
+        if next_event.type == EventType.MANAGE_RESOURCES:
+            return
+
+        provisioning_interval = self.settings.provisioning_interval
+        self.event_loop.add_event(event=Event(
+            start_time=current_time + timedelta(seconds=provisioning_interval),
+            event_type=EventType.MANAGE_RESOURCES,
+        ))
