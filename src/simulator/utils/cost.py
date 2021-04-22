@@ -30,3 +30,19 @@ def calculate_price_for_vm(
     # Find how many billing periods should be paid for use_time left.
     return (use_time_left // vm.type.billing_period
             + (use_time_left % vm.type.billing_period) > 0)
+
+
+def time_until_next_billing_period(
+        current_time: datetime,
+        vm: vms.VM,
+) -> float:
+    """Calculate how much time left until next billing period.
+
+    :param current_time: current virtual time.
+    :param vm: VM for calculation.
+    :return: time until next billing period.
+    """
+
+    vm_awake_time = (current_time - vm.start_time).total_seconds()
+    time_passed_in_current_period = vm_awake_time % vm.type.billing_period
+    return vm.type.billing_period - time_passed_in_current_period
