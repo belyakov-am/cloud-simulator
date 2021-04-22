@@ -167,7 +167,11 @@ class Manager:
         :return: None
         """
 
-        for vm in self.vms:
+        vms_to_shutdown = self.vms
+        if vm_list is not None:
+            vms_to_shutdown = vm_list
+
+        for vm in vms_to_shutdown:
             if vm.get_state() != vms.State.SHUTDOWN:
                 vm.shutdown(time=time)
 
