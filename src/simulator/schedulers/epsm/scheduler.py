@@ -222,15 +222,18 @@ class EPSMScheduler(SchedulerInterface):
         :return: None.
         """
 
+        current_time = self.event_loop.get_current_time()
         workflow = self.workflows[workflow_uuid]
 
         for task in workflow.tasks:
             if not task.parents:
                 self.event_loop.add_event(event=Event(
-                    start_time=self.event_loop.get_current_time(),
+                    start_time=current_time,
                     event_type=EventType.SCHEDULE_TASK,
                     task=task,
                 ))
+
+                workflow.mark_task_scheduled(time=current_time, task=task)
 
     def _find_cheapest_vm_for_task(
             self,
@@ -421,9 +424,6 @@ class EPSMScheduler(SchedulerInterface):
                 vm=vm,
             )
 
-            # Update task state.
-            task.mark_scheduled(time=current_time)
-
             # Reserve VM and submit event to event loop.
             self.vm_manager.reserve_vm(vm)
 
@@ -467,25 +467,41 @@ class EPSMScheduler(SchedulerInterface):
         # zero - if task finished on time.
         task_extra_time = (task.deadline - current_time).total_seconds()
 
-        # If finished on time, nothing to update.
-        if task_extra_time == 0:
-            return
+        if task_extra_time != 0:
+            # Update workflow total spare time and makespan.
+            time_passed = (current_time - workflow.submit_time).total_seconds()
+            workflow.makespan = workflow.orig_makespan - time_passed
+            available_time = (workflow.deadline - current_time).total_seconds()
+            workflow.spare_time = available_time - workflow.makespan
 
-        # Update workflow total spare time and makespan.
-        time_passed = (current_time - workflow.submit_time).total_seconds()
-        workflow.makespan = workflow.orig_makespan - time_passed
-        available_time = (workflow.deadline - current_time).total_seconds()
-        workflow.spare_time = available_time - workflow.makespan
+            # Update spare time and deadlines for tasks.
+            self._distribute_spare_time_among_tasks(
+                workflow_uuid=workflow_uuid,
+                tasks=workflow.unscheduled_tasks,
+            )
+            self._calculate_tasks_deadlines(
+                workflow_uuid=workflow_uuid,
+                tasks=workflow.unscheduled_tasks,
+            )
 
-        # Update spare time and deadlines for tasks.
-        self._distribute_spare_time_among_tasks(
-            workflow_uuid=workflow_uuid,
-            tasks=workflow.unscheduled_tasks,
-        )
-        self._calculate_tasks_deadlines(
-            workflow_uuid=workflow_uuid,
-            tasks=workflow.unscheduled_tasks,
-        )
+        # Add new tasks to event loop.
+        for t in workflow.unscheduled_tasks:
+            # Task can be scheduled if all parents have finished.
+            can_be_scheduled = all([
+                parent.state == wfs.State.FINISHED
+                for parent in t.parents
+            ])
+
+            if not can_be_scheduled:
+                continue
+
+            self.event_loop.add_event(event=Event(
+                start_time=current_time,
+                event_type=EventType.SCHEDULE_TASK,
+                task=t,
+            ))
+
+            workflow.mark_task_scheduled(time=current_time, task=t)
 
     def manage_resources(self, next_event: tp.Optional[Event]) -> None:
         current_time = self.event_loop.get_current_time()
