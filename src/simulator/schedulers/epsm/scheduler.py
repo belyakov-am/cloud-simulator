@@ -174,7 +174,8 @@ class EPSMScheduler(SchedulerInterface):
         workflow = self.workflows[workflow_uuid]
         available_time = (workflow.deadline - current_time).total_seconds()
 
-        workflow.spare_time = available_time - workflow.makespan
+        spare_time = available_time - workflow.makespan
+        workflow.spare_time = spare_time if spare_time >= 0 else 0
 
     def _distribute_spare_time_among_tasks(
             self,
