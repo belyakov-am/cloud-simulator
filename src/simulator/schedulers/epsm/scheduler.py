@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import timedelta
 import typing as tp
 
 from loguru import logger

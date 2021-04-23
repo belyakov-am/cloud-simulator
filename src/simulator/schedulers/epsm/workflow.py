@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import simulator.schedulers.epsm as epsm
 import simulator.workflows as wfs
 
