@@ -458,8 +458,9 @@ class EPSMScheduler(SchedulerInterface):
         workflow = self.workflows[workflow_uuid]
         task = workflow.tasks[task_id]
 
-        # Mark task as finished.
+        # Mark task as finished and release VM.
         workflow.mark_task_finished(time=current_time, task=task)
+        self.vm_manager.release_vm(vm=vm)
 
         # Find task's extra time. It is:
         # positive - if task finished earlier,
