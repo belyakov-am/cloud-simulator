@@ -25,6 +25,9 @@ class Workflow:
         # Soft deadline for executing all tasks. Should be set by user.
         self.deadline: datetime = datetime.now()
 
+        # Soft budget for executing all tasks. Should be set by user.
+        self.budget: float = 0.0
+
         # Directed Acyclic Graph.
         self.dag: nx.DiGraph = nx.DiGraph()
 
@@ -55,6 +58,9 @@ class Workflow:
 
     def set_deadline(self, time: datetime) -> None:
         self.deadline = time
+
+    def set_budget(self, budget: float) -> None:
+        self.budget = budget
 
     def set_container(self, container: Container) -> None:
         self.container = container
