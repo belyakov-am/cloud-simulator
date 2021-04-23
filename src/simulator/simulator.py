@@ -1,4 +1,5 @@
 from datetime import datetime
+import sys
 
 from loguru import logger
 
@@ -25,8 +26,25 @@ class Simulator:
 
     def _init_logger(self) -> None:
         logger.add(
-            sink=config.LOGS_DIR + "/debug.txt",
+            sink=sys.stdout,
+            level="INFO",
+        )
+
+        logger.add(
+            sink=sys.stderr,
+            level="INFO",
+        )
+
+        logger.add(
+            sink=config.LOGS_DIR + "/info/info.txt",
+            level="INFO",
+            rotation="10MB",
+        )
+
+        logger.add(
+            sink=config.LOGS_DIR + "/debug/debug.txt",
             level="DEBUG",
+            rotation="10MB",
         )
 
     def _init_scheduler_collector(self) -> None:
