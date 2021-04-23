@@ -71,9 +71,26 @@ class Workflow:
         self.tasks.append(task)
         self.unscheduled_tasks.append(task)
 
-    def mark_task_finished(self, time: datetime, task: Task) -> None:
+    def mark_task_scheduled(self, time: datetime, task: Task) -> None:
         """Remove given task from unscheduled list and mark it as
-        finished.
+        scheduled.
+
+        :param time:
+        :param task:
+        :return:
+        """
+
+        assert task in self.tasks
+
+        task.mark_scheduled(time=time)
+
+        for ind, t in enumerate(self.unscheduled_tasks):
+            if t == task:
+                self.unscheduled_tasks.pop(ind)
+                break
+
+    def mark_task_finished(self, time: datetime, task: Task) -> None:
+        """Mark task as finished.
 
         :param time: time of finishing.
         :param task: task to finish.
@@ -83,7 +100,3 @@ class Workflow:
         assert task in self.tasks
 
         task.mark_finished(time=time)
-        for ind, t in enumerate(self.unscheduled_tasks):
-            if t == task:
-                self.unscheduled_tasks.pop(ind)
-                break
