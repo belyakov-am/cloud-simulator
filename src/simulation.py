@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import pathlib
+import typing as tp
 
 from loguru import logger
 
@@ -17,6 +18,32 @@ TRACE_TYPES = [
 ]
 
 
+def parse_single_workflow(
+        path: str,
+        deadline: tp.Optional[datetime] = None,
+        budget: tp.Optional[float] = None,
+) -> wfs.Workflow:
+    """Parse single workflow. If deadline or budget were given, set
+    them.
+
+    :param path: path to json file with workflow's description.
+    :param deadline: deadline for workflow.
+    :param budget: budget for workflow.
+    :return: workflow instance.
+    """
+
+    parser = wfs.PegasusTraceParser(path)
+    workflow = parser.get_workflow()
+
+    if deadline is not None:
+        workflow.set_deadline(time=deadline)
+
+    if budget is not None:
+        workflow.set_budget(budget=budget)
+
+    return workflow
+
+
 def parse_workflows() -> dict[str, wfs.Workflow]:
     """Parse workflows from directories.
 
@@ -28,9 +55,10 @@ def parse_workflows() -> dict[str, wfs.Workflow]:
     for trace_type in TRACE_TYPES:
         trace_type_dir = str(ROOT_DIR / WORKFLOW_PATH / trace_type)
         for trace_path in pathlib.Path(trace_type_dir).glob("**/*"):
-            parser = wfs.PegasusTraceParser(str(trace_path))
-            workflow = parser.get_workflow()
-            workflow.set_deadline(time=datetime.now() + timedelta(hours=16))
+            workflow = parse_single_workflow(
+                path=str(trace_path),
+                deadline=datetime.now() + timedelta(hours=12),
+            )
             workflows[workflow.uuid] = workflow
 
     return workflows
