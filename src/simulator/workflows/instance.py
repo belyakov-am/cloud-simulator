@@ -66,7 +66,7 @@ class Workflow:
         self.container = container
 
     def add_task(self, task: Task) -> None:
-        assert task in self.tasks
+        assert task not in self.tasks
 
         self.tasks.append(task)
         self.unscheduled_tasks.append(task)
