@@ -12,4 +12,5 @@ class Workflow(wfs.Workflow):
         self.tasks: list[epsm.Task] = []
 
         self.makespan: float = 0.0  # in seconds
+        self.orig_makespan: float = 0.0  # in seconds
         self.spare_time: float = 0.0  # in seconds

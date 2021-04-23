@@ -136,6 +136,8 @@ class EPSMScheduler(SchedulerInterface):
             if current_eft > workflow.makespan:
                 workflow.makespan = current_eft
 
+        workflow.orig_makespan = workflow.makespan
+
     def _calculate_eft(self, task: Task) -> float:
         """Calculate eft for given task. That is just maximum among
         parents' efts plus task execution time prediction on slowest
@@ -149,7 +151,6 @@ class EPSMScheduler(SchedulerInterface):
                           if task.parents
                           else 0)
 
-        # TODO: include VM and container provision in calculation (?)
         task_execution_time = tep.io_consumption(
             task=task,
             vm_type=self.vm_manager.get_slowest_vm_type(),
@@ -457,7 +458,7 @@ class EPSMScheduler(SchedulerInterface):
         task = workflow.tasks[task_id]
 
         # Mark task as finished.
-        task.mark_finished(time=current_time)
+        workflow.mark_task_finished(time=current_time, task=task)
 
         # Find task's extra time. It is:
         # positive - if task finished earlier,
@@ -469,12 +470,11 @@ class EPSMScheduler(SchedulerInterface):
         if task_extra_time == 0:
             return
 
-        task_execution_time = (task.finish_time
-                               - task.start_time).total_seconds()
-
         # Update workflow total spare time and makespan.
-        workflow.spare_time += task_extra_time
-        workflow.makespan -= task_execution_time
+        time_passed = (current_time - workflow.submit_time).total_seconds()
+        workflow.makespan = workflow.orig_makespan - time_passed
+        available_time = (workflow.deadline - current_time).total_seconds()
+        workflow.spare_time = available_time - workflow.makespan
 
         # Update spare time and deadlines for tasks.
         self._distribute_spare_time_among_tasks(
