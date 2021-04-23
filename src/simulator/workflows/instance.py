@@ -75,9 +75,9 @@ class Workflow:
         """Remove given task from unscheduled list and mark it as
         scheduled.
 
-        :param time:
-        :param task:
-        :return:
+        :param time: time of scheduling.
+        :param task: task that is scheduled.
+        :return: None.
         """
 
         assert task in self.tasks
