@@ -68,3 +68,18 @@ class Workflow:
     def add_task(self, task: Task) -> None:
         self.tasks.append(task)
         self.unscheduled_tasks.append(task)
+
+    def mark_task_finished(self, time: datetime, task: Task) -> None:
+        """Remove given task from unscheduled list and mark it as
+        finished.
+
+        :param time: time of finishing.
+        :param task: task to finish.
+        :return: None.
+        """
+
+        task.mark_finished(time=time)
+        for ind, t in enumerate(self.unscheduled_tasks):
+            if t == task:
+                self.unscheduled_tasks.pop(ind)
+                break
