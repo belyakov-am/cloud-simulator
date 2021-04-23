@@ -66,6 +66,8 @@ class Workflow:
         self.container = container
 
     def add_task(self, task: Task) -> None:
+        assert task in self.tasks
+
         self.tasks.append(task)
         self.unscheduled_tasks.append(task)
 
@@ -77,6 +79,8 @@ class Workflow:
         :param task: task to finish.
         :return: None.
         """
+
+        assert task in self.tasks
 
         task.mark_finished(time=time)
         for ind, t in enumerate(self.unscheduled_tasks):
