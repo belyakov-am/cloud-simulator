@@ -108,10 +108,8 @@ class EPSMScheduler(SchedulerInterface):
                 container=task.container,
             )
 
-            epsm_tasks.append(epsm_task)
+            epsm_workflow.add_task(task=epsm_task)
             tasks_dict[epsm_task.name] = epsm_task
-
-        epsm_workflow.tasks = epsm_tasks
 
         # Save in scheduler dict.
         self.workflows[epsm_workflow.uuid] = epsm_workflow
