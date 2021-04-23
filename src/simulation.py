@@ -92,13 +92,13 @@ def main() -> None:
         total_seconds = (stats.finish_time - stats.start_time).total_seconds()
 
         logger.info(
-            f"Workflow {workflow_uuid} statistics \n"
-            f"Start time = {stats.start_time} \n"
-            f"Finish time = {stats.finish_time} \n"
-            f"Deadline = {workflow.deadline} \n"
-            f"Execution time (seconds) = {total_seconds} \n"
-            f"Number of initialized VMs = {len(stats.initialized_vms)} \n"
-            f"Number of used VMs = {len(stats.used_vms)} \n"
+            f"Workflow {workflow_uuid} statistics\n"
+            f"Start time = {stats.start_time}\n"
+            f"Finish time = {stats.finish_time}\n"
+            f"Deadline = {workflow.deadline}\n"
+            f"Execution time (seconds) = {total_seconds}\n"
+            f"Number of initialized VMs = {len(stats.initialized_vms)}\n"
+            f"Number of used VMs = {len(stats.used_vms)}\n"
         )
 
 
