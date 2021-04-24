@@ -513,7 +513,9 @@ class EPSMScheduler(SchedulerInterface):
             workflow.mark_task_scheduled(time=current_time, task=t)
 
     def manage_resources(self, next_event: tp.Optional[Event]) -> None:
-        """Shutdown idle VMs according to EPSM policy.
+        """Shutdown idle VMs according to EPSM policy. VM is terminated
+        if time until next billing period is less than provisioning
+        interval.
 
         :param next_event: next possible event in event loop.
         :return: None.
