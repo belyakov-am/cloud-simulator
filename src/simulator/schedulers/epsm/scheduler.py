@@ -89,7 +89,6 @@ class EPSMScheduler(SchedulerInterface):
         epsm_workflow.set_submit_time(time=workflow.submit_time)
 
         # Create EPSM tasks from basic.
-        epsm_tasks: list[Task] = []
         tasks_dict: dict[str, Task] = dict()
 
         for task in workflow.tasks:
