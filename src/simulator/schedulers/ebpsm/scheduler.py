@@ -148,11 +148,11 @@ class EBPSMScheduler(SchedulerInterface):
         """
 
         # WARNING!
-        # Assumed that every parent task is listed before its child.
+        #   Assumed that every parent task is listed before its child.
 
         # TODO: check that makespan is within a deadline.
-        # Otherwise iterate over VM types until OK. If impossible - set
-        # proper status for this workflow (i.e. rejected).
+        #   Otherwise iterate over VM types until OK. If impossible - set
+        #   proper status for this workflow (i.e. rejected).
         workflow = self.workflows[workflow_uuid]
         for task in workflow.tasks:
             current_eft = self._calculate_eft(task)
@@ -236,9 +236,9 @@ class EBPSMScheduler(SchedulerInterface):
             )
 
             # WARNING!
-            # remove this (?)
-            # It can be more useful in future as it more real.
-            # Previously it is set in eft calculation.
+            #   remove this (?)
+            #   It can be more useful in future as it more real.
+            #   Previously it is set in eft calculation.
             task.execution_time_prediction = task_execution_time
 
             price = cst.estimate_price_for_vm_type(
@@ -286,7 +286,7 @@ class EBPSMScheduler(SchedulerInterface):
                 task_budget = fastest_vm_type.price
 
             # TODO: check that budget appears in other methods.
-            # Otherwise use workflow.tasks[task.id].budget
+            #   Otherwise use workflow.tasks[task.id].budget
             task.budget = task_budget
             budget -= task_budget
 
@@ -301,7 +301,7 @@ class EBPSMScheduler(SchedulerInterface):
         workflow = self.workflows[workflow_uuid]
 
         # IMPORTANT: tasks are not scheduled by eft because they will
-        # be automatically sorted in event loop.
+        #   be automatically sorted in event loop.
         for task in workflow.tasks:
             if not task.parents:
                 self.event_loop.add_event(event=Event(
@@ -362,9 +362,14 @@ class EBPSMScheduler(SchedulerInterface):
                 budget=task.budget,
             )
 
+            logger.info(
+                f"Task ID = {task.id}\n"
+                f""
+            )
+
             # TODO: do something if it happens (EBPSM doesn't mention
-            # what actually).
-            # Maybe postpone scheduling.
+            #   what actually).
+            #   Maybe postpone scheduling.
             assert fastest_vmt is not None
 
             vm = self.vm_manager.init_vm(vm_type=fastest_vmt.vm_type)

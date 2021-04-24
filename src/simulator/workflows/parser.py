@@ -46,8 +46,8 @@ class PegasusTraceParser:
         # Will be used for filling Task's `parents` variable with
         # Task instance. In file they are listed as parent names,
         # however current architecture requires Task instances.
-        # Warning: works only in assumption that in trace file each task
-        # is listed only after all its predecessors (if exists).
+        # WARNING: works only in assumption that in trace file each task
+        #   is listed only after all its predecessors (if exists).
         tasks: dict[str, wfs.Task] = dict()
 
         # Parse tasks

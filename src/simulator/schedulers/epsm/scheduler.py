@@ -129,11 +129,11 @@ class EPSMScheduler(SchedulerInterface):
         """
 
         # WARNING!
-        # Assumed that every parent task is listed before its child.
+        #   Assumed that every parent task is listed before its child.
 
         # TODO: check that makespan is within a deadline.
-        # Otherwise iterate over VM types until OK. If impossible - set
-        # proper status for this workflow (i.e. rejected).
+        #   Otherwise iterate over VM types until OK. If impossible - set
+        #   proper status for this workflow (i.e. rejected).
         workflow = self.workflows[workflow_uuid]
         for task in workflow.tasks:
             current_eft = self._calculate_eft(task)
@@ -232,7 +232,7 @@ class EPSMScheduler(SchedulerInterface):
         workflow = self.workflows[workflow_uuid]
 
         # IMPORTANT: tasks are not scheduled by eft because they will
-        # be automatically sorted in event loop.
+        #   be automatically sorted in event loop.
         for task in workflow.tasks:
             if not task.parents:
                 self.event_loop.add_event(event=Event(
