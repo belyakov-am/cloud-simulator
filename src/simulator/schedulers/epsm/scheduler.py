@@ -4,10 +4,10 @@ import typing as tp
 
 from loguru import logger
 
-import simulator.workflows as wfs
 import simulator.utils.cost as cst
 import simulator.utils.task_execution_prediction as tep
 import simulator.vms as vms
+import simulator.workflows as wfs
 
 from ..event import Event, EventType
 from ..interface import SchedulerInterface
