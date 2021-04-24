@@ -362,15 +362,14 @@ class EBPSMScheduler(SchedulerInterface):
                 budget=task.budget,
             )
 
-            logger.info(
-                f"Task ID = {task.id}\n"
-                f""
-            )
-
             # TODO: do something if it happens (EBPSM doesn't mention
             #   what actually).
             #   Maybe postpone scheduling.
-            assert fastest_vmt is not None
+            # assert fastest_vmt is not None
+            if fastest_vmt is None:
+                vm_type = self.vm_manager.get_slowest_vm_type()
+            else:
+                vm_type = fastest_vmt.vm_type
 
             vm = self.vm_manager.init_vm(vm_type=fastest_vmt.vm_type)
             execution_price = fastest_vmt.price
