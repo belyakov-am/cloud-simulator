@@ -298,7 +298,94 @@ class EBPSMScheduler(SchedulerInterface):
                 workflow.mark_task_scheduled(time=current_time, task=task)
 
     def schedule_task(self, workflow_uuid: str, task_id: int) -> None:
-        pass
+        """Schedule task according to EBPSM algorithm.
+
+        :param workflow_uuid: UUID of workflow that is scheduled.
+        :param task_id: task ID to schedule.
+        :return: None.
+        """
+
+        current_time = self.event_loop.get_current_time()
+
+        workflow = self.workflows[workflow_uuid]
+        task = workflow.tasks[task_id]
+        vm: tp.Optional[vms.VM] = None
+
+        idle_vms = self.vm_manager.get_idle_vms()
+
+        if idle_vms:
+            # If there are idle VMs, try to reuse the fastest one within
+            # task's budget.
+            best_time: tp.Optional[float] = None
+
+            for vm_ in idle_vms:
+                exec_time = tep.io_consumption(
+                    task=task,
+                    vm_type=vm.type,
+                    storage=self.storage_manager.get_storage(),
+                    vm=vm_,
+                    container_prov=task.container.provision_time,
+                    vm_prov=self.settings.vm_provision_delay,
+                )
+                possible_finish_time = (current_time
+                                        + timedelta(seconds=exec_time))
+                cost = vm_.calculate_cost(time=possible_finish_time)
+
+                if cost >= task.budget:
+                    continue
+
+                if best_time is None or exec_time < best_time:
+                    best_time = exec_time
+                    vm = vm_
+        else:
+            # If there is no idle VMs, find fastest VM type withing
+            # task's budget and provision VM with this type.
+            fastest_vmt = self._find_fastest_vm_type_within_budget(
+                task=task,
+                budget=task.budget,
+            )
+
+            # TODO: do something if it happens (EBPSM doesn't mention
+            # what actually).
+            # Maybe postpone scheduling.
+            assert fastest_vmt is not None
+
+            vm = self.vm_manager.init_vm(vm_type=fastest_vmt.vm_type)
+
+        # Schedule task.
+        total_exec_time = 0.0
+
+        # Provision VM if required.
+        if vm.get_state() == vms.State.NOT_PROVISIONED:
+            self.vm_manager.provision_vm(vm=vm, time=current_time)
+            total_exec_time += self.settings.vm_provision_delay
+
+        # Provision container if required.
+        if not vm.check_if_container_provisioned(container=task.container):
+            vm.provision_container(container=task.container)
+            total_exec_time += task.container.provision_time
+
+        # Get task execution time.
+        total_exec_time += tep.io_consumption(
+            task=task,
+            vm_type=vm.type,
+            storage=self.storage_manager.get_storage(),
+            vm=vm,
+        )
+
+        # Reserve VM and submit event to event loop.
+        self.vm_manager.reserve_vm(vm)
+
+        finish_time = current_time + timedelta(seconds=total_exec_time)
+        self.event_loop.add_event(event=Event(
+            start_time=finish_time,
+            event_type=EventType.FINISH_TASK,
+            task=task,
+            vm=vm,
+        ))
+
+        # Save info to metric collector.
+        self.collector.workflows[workflow_uuid].used_vms.add(vm)
 
     def finish_task(self, workflow_uuid: str, task_id: int,
                     vm: vms.VM) -> None:
