@@ -263,7 +263,25 @@ class EBPSMScheduler(SchedulerInterface):
             total_budget -= task_budget
 
     def schedule_workflow(self, workflow_uuid: str) -> None:
-        pass
+        """Schedule all entry tasks (i.e. put them into event loop).
+
+        :param workflow_uuid: UUID of workflow to schedule.
+        :return: None.
+        """
+
+        current_time = self.event_loop.get_current_time()
+        workflow = self.workflows[workflow_uuid]
+
+        # TODO: sort root tasks by eft (?)
+        for task in workflow.tasks:
+            if not task.parents:
+                self.event_loop.add_event(event=Event(
+                    start_time=current_time,
+                    event_type=EventType.SCHEDULE_TASK,
+                    task=task,
+                ))
+
+                workflow.mark_task_scheduled(time=current_time, task=task)
 
     def schedule_task(self, workflow_uuid: str, task_id: int) -> None:
         pass
