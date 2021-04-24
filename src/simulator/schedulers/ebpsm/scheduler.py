@@ -352,9 +352,9 @@ class EBPSMScheduler(SchedulerInterface):
 
                 if best_time is None or exec_time < best_time:
                     best_time = exec_time
-                    vm = vm_
-                    execution_price = cost
-        else:
+                    vm = v
+
+        if vm is None:
             # If there is no idle VMs, find fastest VM type withing
             # task's budget and provision VM with this type.
             fastest_vmt = self._find_fastest_vm_type_within_budget(
