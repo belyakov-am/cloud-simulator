@@ -12,6 +12,7 @@ class Workflow(wfs.Workflow):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.tasks: list[ebpsm.Task] = []
+        self.unscheduled_tasks: list[ebpsm.Task] = []
 
         # Map from level in DAG to set of tasks on that level.
         self.levels: dict[int, set[ebpsm.Task]] = defaultdict(set)
@@ -21,3 +22,5 @@ class Workflow(wfs.Workflow):
 
         # Estimated execution order queue.
         self.eeoq: list[ebpsm.Task] = []
+
+        self.spare_budget: float = 0.0

@@ -10,6 +10,7 @@ class Task(wfs.Task):
         super().__init__(*args, **kwargs)
 
         self.budget: float = 0.0
+        self.execution_price: float = 0.0
 
         self.eft: float = 0.0  # in seconds
         self.execution_time_prediction: float = 0.0  # in seconds

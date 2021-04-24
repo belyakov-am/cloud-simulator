@@ -1,4 +1,5 @@
 from collections import namedtuple
+from copy import deepcopy
 from dataclasses import dataclass
 from datetime import timedelta
 import typing as tp
@@ -52,7 +53,10 @@ class EBPSMScheduler(SchedulerInterface):
         self._allocate_levels(workflow_uuid=workflow.uuid)
         self._calculate_efts(workflow_uuid=workflow.uuid)
         self._fill_eeoq(workflow_uuid=workflow.uuid)
-        self._distribute_budget(workflow_uuid=workflow.uuid)
+        self._distribute_budget(
+            workflow_uuid=workflow.uuid,
+            budget=workflow.budget,
+        )
 
         # Add to event loop.
         ebpsm_workflow = self.workflows[workflow.uuid]
@@ -241,39 +245,44 @@ class EBPSMScheduler(SchedulerInterface):
 
         return None
 
-    def _distribute_budget(self, workflow_uuid: str) -> None:
+    def _distribute_budget(self, workflow_uuid: str, budget: float) -> None:
         """Distribute budget among tasks. Currently it works under
         FFTD policy (Fastest-First Task-based budget Distribution).
         It chooses fastest VM type that is affordable within current
         budget.
 
         :param workflow_uuid: UUID of workflow that is processed.
+        :param budget: budget to distribute.
         :return: None.
         """
 
         workflow = self.workflows[workflow_uuid]
-        total_budget = workflow.budget
+        eeoq = deepcopy(workflow.eeoq)
 
-        while total_budget > 0:
+        while budget > 0 and eeoq:
             # Take first task from queue.
-            task = workflow.eeoq.pop(0)
+            task = eeoq.pop(0)
+
+            # If it was scheduled or finished, does not need budget.
+            if task.state in [wfs.State.SCHEDULED, wfs.State.FINISHED]:
+                continue
 
             fastest_vm_type = self._find_fastest_vm_type_within_budget(
                 task=task,
-                budget=total_budget,
+                budget=budget,
             )
 
             # No VM type available for that budget left, so assign
             # all budget to stop cycle.
             if fastest_vm_type is None:
-                task_budget = total_budget
+                task_budget = budget
             else:
                 task_budget = fastest_vm_type.price
 
             # TODO: check that budget appears in other methods.
             # Otherwise use workflow.tasks[task.id].budget
             task.budget = task_budget
-            total_budget -= task_budget
+            budget -= task_budget
 
     def schedule_workflow(self, workflow_uuid: str) -> None:
         """Schedule all entry tasks (i.e. put them into event loop).
@@ -310,6 +319,7 @@ class EBPSMScheduler(SchedulerInterface):
         workflow = self.workflows[workflow_uuid]
         task = workflow.tasks[task_id]
         vm: tp.Optional[vms.VM] = None
+        execution_price: float = 0.0
 
         idle_vms = self.vm_manager.get_idle_vms()
 
@@ -337,6 +347,7 @@ class EBPSMScheduler(SchedulerInterface):
                 if best_time is None or exec_time < best_time:
                     best_time = exec_time
                     vm = vm_
+                    execution_price = cost
         else:
             # If there is no idle VMs, find fastest VM type withing
             # task's budget and provision VM with this type.
@@ -351,6 +362,7 @@ class EBPSMScheduler(SchedulerInterface):
             assert fastest_vmt is not None
 
             vm = self.vm_manager.init_vm(vm_type=fastest_vmt.vm_type)
+            execution_price = fastest_vmt.price
 
         # Schedule task.
         total_exec_time = 0.0
@@ -373,6 +385,9 @@ class EBPSMScheduler(SchedulerInterface):
             vm=vm,
         )
 
+        # Set task's execution price.
+        task.execution_price = execution_price
+
         # Reserve VM and submit event to event loop.
         self.vm_manager.reserve_vm(vm)
 
@@ -387,9 +402,44 @@ class EBPSMScheduler(SchedulerInterface):
         # Save info to metric collector.
         self.collector.workflows[workflow_uuid].used_vms.add(vm)
 
-    def finish_task(self, workflow_uuid: str, task_id: int,
-                    vm: vms.VM) -> None:
-        pass
+    def finish_task(
+            self,
+            workflow_uuid: str,
+            task_id: int,
+            vm: vms.VM
+    ) -> None:
+        """Update unscheduled tasks' budgets according to EBPSM policy.
+
+        :param workflow_uuid: UUID of workflow that is scheduled.
+        :param task_id: task ID that was finished.
+        :param vm: VM that executed task.
+        :return: None.
+        """
+
+        current_time = self.event_loop.get_current_time()
+
+        workflow = self.workflows[workflow_uuid]
+        task = workflow.tasks[task_id]
+
+        # Mark task as finished and release VM.
+        workflow.mark_task_finished(time=current_time, task=task)
+        self.vm_manager.release_vm(vm=vm)
+
+        unscheduled_budget = sum([
+            task.budget for task in workflow.unscheduled_tasks
+        ])
+
+        if task.execution_price < task.budget + workflow.spare_budget:
+            workflow.spare_budget += task.budget - task.execution_price
+            unscheduled_budget += workflow.spare_budget
+        else:
+            debt = task.execution_price - (task.budget + workflow.spare_budget)
+            unscheduled_budget -= debt
+
+        self._distribute_budget(
+            workflow_uuid=workflow_uuid,
+            budget=unscheduled_budget,
+        )
 
     def manage_resources(self, next_event: tp.Optional[Event]) -> None:
         pass
