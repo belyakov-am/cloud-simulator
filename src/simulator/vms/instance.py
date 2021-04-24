@@ -53,6 +53,10 @@ class VM:
         self.start_time: datetime = datetime.now()
         self.finish_time: datetime = datetime.now()
 
+        # Used for calculating idle time.
+        # datetime.now only for init purpose.
+        self.last_release_time: tp.Optional[datetime] = None
+
         # Set of present files on VM. They can appear as task output
         # or can be delivered over network.
         # TODO: clean up old files
@@ -61,7 +65,7 @@ class VM:
 
         self.state: State = State.NOT_PROVISIONED
 
-    # FIXME: implement __hash__()
+    # FIXME: implement __hash__() (?)
 
     def __str__(self) -> str:
         return (f"<VM "
@@ -171,3 +175,17 @@ class VM:
 
         self.finish_time = time
         self.state = State.SHUTDOWN
+
+    def idle_time(self, time: datetime) -> float:
+        """Return idle time of VM in seconds.
+
+        :param time: time from counting idle time.
+        :return: idle time.
+        """
+
+        assert self.state == State.PROVISIONED
+
+        if self.last_release_time is None:
+            return 0
+
+        return (self.last_release_time - time).total_seconds()
