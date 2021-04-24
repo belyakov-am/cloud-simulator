@@ -224,7 +224,7 @@ class EPSMScheduler(SchedulerInterface):
     def schedule_workflow(self, workflow_uuid: str) -> None:
         """Schedule all entry tasks (i.e. put them into event loop).
 
-        :param workflow_uuid: uuid of workflow to schedule.
+        :param workflow_uuid: UUID of workflow to schedule.
         :return: None.
         """
 
