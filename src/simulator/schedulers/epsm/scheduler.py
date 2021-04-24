@@ -79,6 +79,13 @@ class EPSMScheduler(SchedulerInterface):
         ))
 
     def _convert_to_epsm_instances(self, workflow: wfs.Workflow) -> None:
+        """Convert basic workflow instance to EPSM workflow instance
+        (including tasks).
+
+        :param workflow: workflow that is processed.
+        :return: None.
+        """
+
         # Create EPSM workflow from basic.
         epsm_workflow = Workflow(
             name=workflow.name,
