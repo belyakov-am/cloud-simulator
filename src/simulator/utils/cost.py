@@ -46,3 +46,19 @@ def time_until_next_billing_period(
     vm_awake_time = (current_time - vm.start_time).total_seconds()
     time_passed_in_current_period = vm_awake_time % vm.type.billing_period
     return vm.type.billing_period - time_passed_in_current_period
+
+
+def estimate_price_for_vm_type(
+        use_time: float,
+        vm_type: vms.VMType,
+) -> float:
+    """Estimate use price for giving time for VM type.
+
+    :param use_time: time of using VM type in seconds.
+    :param vm_type: VM type.
+    :return: estimated price.
+    """
+    billing_periods = (use_time // vm_type.billing_period
+                       + (use_time % vm_type.billing_period) > 0)
+
+    return billing_periods * vm_type.price
