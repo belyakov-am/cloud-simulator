@@ -288,6 +288,8 @@ class EBPSMScheduler(SchedulerInterface):
             workflow.tasks[task.id].budget = task_budget
             budget -= task_budget
 
+        workflow.spare_budget = budget
+
     def schedule_workflow(self, workflow_uuid: str) -> None:
         """Schedule all entry tasks (i.e. put them into event loop).
 
