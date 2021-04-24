@@ -1,4 +1,6 @@
+from collections import namedtuple
 from dataclasses import dataclass
+from datetime import timedelta
 import typing as tp
 
 import networkx as nx
@@ -21,6 +23,15 @@ class Settings:
     # be provisioned.
     # Declared in seconds.
     vm_provision_delay: int = 120
+
+
+FastestVMType = namedtuple(
+    typename="FastestVMType",
+    field_names=[
+        "price",
+        "vm_type",
+    ]
+)
 
 
 class EBPSMScheduler(SchedulerInterface):
@@ -181,19 +192,19 @@ class EBPSMScheduler(SchedulerInterface):
             )
             workflow.eeoq.extend(eft_sorted_tasks)
 
-    def _estimate_budget(
+    def _find_fastest_vm_type_within_budget(
             self,
             task: Task,
-            budget: float
-    ) -> tp.Optional[float]:
-        """Estimate budget for given task. Iterate over available VM
-        types in descending by price (i.e. power) order and choose best
-        according to budget. If budget not enough for any type, return
-        None.
+            budget: float,
+    ) -> tp.Optional[FastestVMType]:
+        """Find fastest VM type for task withing budget. Iterate over
+        available VM types in descending by price (i.e. power) order and
+        choose best according to budget. If budget not enough for any type,
+        return None.
 
         :param task: task for estimating budget.
         :param budget: total budget to spend.
-        :return: estimated budget or None.
+        :return: estimated budget with VM type or None.
         """
 
         vm_types = self.vm_manager.get_vm_types()
@@ -226,7 +237,7 @@ class EBPSMScheduler(SchedulerInterface):
             )
 
             if price <= budget:
-                return price
+                return FastestVMType(price=price, vm_type=vm_type)
 
         return None
 
@@ -247,15 +258,17 @@ class EBPSMScheduler(SchedulerInterface):
             # Take first task from queue.
             task = workflow.eeoq.pop(0)
 
-            task_budget = self._estimate_budget(
+            fastest_vm_type = self._find_fastest_vm_type_within_budget(
                 task=task,
-                budget=workflow.budget,
+                budget=total_budget,
             )
 
             # No VM type available for that budget left, so assign
             # all budget to stop cycle.
-            if task_budget is None:
+            if fastest_vm_type is None:
                 task_budget = total_budget
+            else:
+                task_budget = fastest_vm_type.price
 
             # TODO: check that budget appears in other methods.
             # Otherwise use workflow.tasks[task.id].budget
