@@ -347,7 +347,7 @@ class EBPSMScheduler(SchedulerInterface):
                                         + timedelta(seconds=exec_time))
                 cost = v.calculate_cost(time=possible_finish_time)
 
-                if cost >= task.budget:
+                if cost > task.budget:
                     continue
 
                 if best_time is None or exec_time < best_time:
