@@ -285,9 +285,7 @@ class EBPSMScheduler(SchedulerInterface):
             else:
                 task_budget = fastest_vm_type.price
 
-            # TODO: check that budget appears in other methods.
-            #   Otherwise use workflow.tasks[task.id].budget
-            task.budget = task_budget
+            workflow.tasks[task.id].budget = task_budget
             budget -= task_budget
 
     def schedule_workflow(self, workflow_uuid: str) -> None:
