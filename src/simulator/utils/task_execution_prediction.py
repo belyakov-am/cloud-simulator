@@ -32,9 +32,19 @@ def io_consumption(
     :param vm_prov: VM provisioning delay.
     :return:
     """
+
     total_time = 0.0
-    total_time += container_prov
-    total_time += vm_prov
+
+    if vm is not None:
+        # Check if VM and container already provisioned.
+        if vm.get_state() == vms.State.NOT_PROVISIONED:
+            total_time += vm_prov
+
+        if not vm.check_if_container_provisioned(container=task.container):
+            total_time += container_prov
+    else:
+        total_time += container_prov
+        total_time += vm_prov
 
     for input_file in task.input_files:
         # Time for VM to read file.
