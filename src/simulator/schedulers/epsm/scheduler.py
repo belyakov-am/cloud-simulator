@@ -231,6 +231,7 @@ class EPSMScheduler(SchedulerInterface):
         current_time = self.event_loop.get_current_time()
         workflow = self.workflows[workflow_uuid]
 
+        # TODO: sort parent tasks by eft (?)
         for task in workflow.tasks:
             if not task.parents:
                 self.event_loop.add_event(event=Event(
