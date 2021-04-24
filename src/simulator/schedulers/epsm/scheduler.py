@@ -513,6 +513,12 @@ class EPSMScheduler(SchedulerInterface):
             workflow.mark_task_scheduled(time=current_time, task=t)
 
     def manage_resources(self, next_event: tp.Optional[Event]) -> None:
+        """Shutdown idle VMs according to EPSM policy.
+
+        :param next_event: next possible event in event loop.
+        :return: None.
+        """
+
         current_time = self.event_loop.get_current_time()
         idle_vms = self.vm_manager.get_idle_vms()
 
