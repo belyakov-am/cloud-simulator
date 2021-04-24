@@ -334,18 +334,18 @@ class EBPSMScheduler(SchedulerInterface):
             # task's budget.
             best_time: tp.Optional[float] = None
 
-            for vm_ in idle_vms:
+            for v in idle_vms:
                 exec_time = tep.io_consumption(
                     task=task,
-                    vm_type=vm.type,
+                    vm_type=v.type,
                     storage=self.storage_manager.get_storage(),
-                    vm=vm_,
+                    vm=v,
                     container_prov=task.container.provision_time,
                     vm_prov=self.settings.vm_provision_delay,
                 )
                 possible_finish_time = (current_time
                                         + timedelta(seconds=exec_time))
-                cost = vm_.calculate_cost(time=possible_finish_time)
+                cost = v.calculate_cost(time=possible_finish_time)
 
                 if cost >= task.budget:
                     continue
