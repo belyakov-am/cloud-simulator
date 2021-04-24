@@ -8,7 +8,7 @@ import simulator.utils.task_execution_prediction as tep
 import simulator.workflows as wfs
 import simulator.vms as vms
 
-from ..event import Event
+from ..event import Event, EventType
 from ..interface import SchedulerInterface
 from .task import Task
 from .workflow import Workflow
@@ -42,6 +42,14 @@ class EBPSMScheduler(SchedulerInterface):
         self._calculate_efts(workflow_uuid=workflow.uuid)
         self._fill_eeoq(workflow_uuid=workflow.uuid)
         self._distribute_budget(workflow_uuid=workflow.uuid)
+
+        # Add to event loop.
+        ebpsm_workflow = self.workflows[workflow.uuid]
+        self.event_loop.add_event(event=Event(
+            start_time=ebpsm_workflow.submit_time,
+            event_type=EventType.SCHEDULE_WORKFLOW,
+            workflow=ebpsm_workflow,
+        ))
 
     def _convert_to_ebpsm_instances(self, workflow: wfs.Workflow) -> None:
         """Convert basic workflow instance to EPSM workflow instance
