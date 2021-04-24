@@ -325,7 +325,6 @@ class EBPSMScheduler(SchedulerInterface):
         workflow = self.workflows[workflow_uuid]
         task = workflow.tasks[task_id]
         vm: tp.Optional[vms.VM] = None
-        execution_price: float = 0.0
 
         idle_vms = self.vm_manager.get_idle_vms()
 
@@ -371,8 +370,7 @@ class EBPSMScheduler(SchedulerInterface):
             else:
                 vm_type = fastest_vmt.vm_type
 
-            vm = self.vm_manager.init_vm(vm_type=fastest_vmt.vm_type)
-            execution_price = fastest_vmt.price
+            vm = self.vm_manager.init_vm(vm_type=vm_type)
 
         # Schedule task.
         total_exec_time = 0.0
@@ -396,12 +394,12 @@ class EBPSMScheduler(SchedulerInterface):
         )
 
         # Set task's execution price.
-        task.execution_price = execution_price
+        finish_time = current_time + timedelta(seconds=total_exec_time)
+        task.execution_price = vm.calculate_cost(time=finish_time)
 
         # Reserve VM and submit event to event loop.
         self.vm_manager.reserve_vm(vm)
 
-        finish_time = current_time + timedelta(seconds=total_exec_time)
         self.event_loop.add_event(event=Event(
             start_time=finish_time,
             event_type=EventType.FINISH_TASK,
