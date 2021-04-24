@@ -1,5 +1,6 @@
 import simulator.schedulers.epsm
 
+from .ebpsm import EBPSMScheduler
 from .epsm import EPSMScheduler, Settings
 
 from .event import Event, EventType
