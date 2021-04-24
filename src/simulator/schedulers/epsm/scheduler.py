@@ -496,10 +496,10 @@ class EPSMScheduler(SchedulerInterface):
         # Add new tasks to event loop.
         for t in workflow.unscheduled_tasks:
             # Task can be scheduled if all parents have finished.
-            can_be_scheduled = all([
+            can_be_scheduled = all(
                 parent.state == wfs.State.FINISHED
                 for parent in t.parents
-            ])
+            )
 
             if not can_be_scheduled:
                 continue
