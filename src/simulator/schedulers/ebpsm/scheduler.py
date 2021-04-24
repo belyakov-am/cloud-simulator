@@ -441,5 +441,24 @@ class EBPSMScheduler(SchedulerInterface):
             budget=unscheduled_budget,
         )
 
+        # Add new tasks to event loop.
+        for t in workflow.unscheduled_tasks:
+            # Task can be scheduled if all parents have finished.
+            can_be_scheduled = all([
+                parent.state == wfs.State.FINISHED
+                for parent in t.parents
+            ])
+
+            if not can_be_scheduled:
+                continue
+
+            self.event_loop.add_event(event=Event(
+                start_time=current_time,
+                event_type=EventType.SCHEDULE_TASK,
+                task=t,
+            ))
+
+            workflow.mark_task_scheduled(time=current_time, task=t)
+
     def manage_resources(self, next_event: tp.Optional[Event]) -> None:
         pass
