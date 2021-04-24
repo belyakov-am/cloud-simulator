@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 import typing as tp
 
+from loguru import logger
 import networkx as nx
 
 import simulator.utils.cost as cst
@@ -24,6 +25,11 @@ class Settings:
     # be provisioned.
     # Declared in seconds.
     vm_provision_delay: int = 120
+
+    # After this time idle VMs will be terminated during
+    # `MANAGE_RESOURCES` event.
+    # Declared in seconds.
+    idle_vm_threshold: int = 3000
 
 
 FastestVMType = namedtuple(
@@ -444,10 +450,10 @@ class EBPSMScheduler(SchedulerInterface):
         # Add new tasks to event loop.
         for t in workflow.unscheduled_tasks:
             # Task can be scheduled if all parents have finished.
-            can_be_scheduled = all([
+            can_be_scheduled = all(
                 parent.state == wfs.State.FINISHED
                 for parent in t.parents
-            ])
+            )
 
             if not can_be_scheduled:
                 continue
@@ -461,4 +467,20 @@ class EBPSMScheduler(SchedulerInterface):
             workflow.mark_task_scheduled(time=current_time, task=t)
 
     def manage_resources(self, next_event: tp.Optional[Event]) -> None:
-        pass
+        """Shutdown all idle VMs according to EBPSM policy. VM is
+        terminated if it is idle for more than `idle_vm_threshold`.
+
+        :param next_event: next possible event in event loop.
+        :return: None.
+        """
+
+        current_time = self.event_loop.get_current_time()
+        idle_vms = self.vm_manager.get_idle_vms()
+
+        for vm in idle_vms:
+            vm_idle_time = vm.idle_time(current_time)
+            if vm_idle_time > self.settings.idle_vm_threshold:
+                self.vm_manager.shutdown_vm(
+                    time=current_time,
+                    vm=vm,
+                )
