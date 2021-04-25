@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import timedelta
+from copy import deepcopy
 import typing as tp
 
 from loguru import logger
@@ -524,7 +525,7 @@ class EPSMScheduler(SchedulerInterface):
         """
 
         current_time = self.event_loop.get_current_time()
-        idle_vms = self.vm_manager.get_idle_vms()
+        idle_vms = deepcopy(self.vm_manager.get_idle_vms())
 
         # Shutdown VMs.
         for vm in idle_vms:

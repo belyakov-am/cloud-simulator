@@ -486,7 +486,7 @@ class EBPSMScheduler(SchedulerInterface):
         """
 
         current_time = self.event_loop.get_current_time()
-        idle_vms = self.vm_manager.get_idle_vms()
+        idle_vms = deepcopy(self.vm_manager.get_idle_vms())
 
         for vm in idle_vms:
             vm_idle_time = vm.idle_time(current_time)
