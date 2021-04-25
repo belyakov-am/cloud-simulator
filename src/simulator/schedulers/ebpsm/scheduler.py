@@ -55,6 +55,8 @@ class EBPSMScheduler(SchedulerInterface):
         # Settings of scheduler. Slightly control its behaviour.
         self.settings: Settings = Settings()
 
+        self.name = "EBPSM"
+
     def submit_workflow(
             self,
             workflow: wfs.Workflow,

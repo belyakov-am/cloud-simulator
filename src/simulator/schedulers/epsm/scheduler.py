@@ -43,6 +43,8 @@ class EPSMScheduler(SchedulerInterface):
         # Settings of scheduler. Slightly control its behaviour.
         self.settings: Settings = Settings()
 
+        self.name = "EPSM"
+
     def set_settings(self, settings: Settings) -> None:
         self.settings = settings
 
