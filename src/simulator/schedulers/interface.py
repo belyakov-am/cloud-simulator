@@ -27,6 +27,8 @@ class SchedulerInterface(ABC):
 
         self.event_loop: sch.EventLoop = sch.EventLoop()
 
+        self.name = ""
+
     def run_event_loop(self) -> None:
         self.event_loop.run(scheduler=self)
 
