@@ -72,6 +72,7 @@ class VM:
                 f"uuid = {self.uuid}, "
                 f"type = {self.type}, "
                 f"start_time = {self.start_time}, "
+                f"state = {self.state}, "
                 f"files = {self.files}, "
                 f"containers = {self.containers}>")
 
