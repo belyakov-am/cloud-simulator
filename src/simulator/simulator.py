@@ -1,5 +1,9 @@
 from datetime import datetime
+import sys
 
+from loguru import logger
+
+import simulator.config as config
 import simulator.metric_collector as mc
 import simulator.schedulers as sch
 import simulator.workflows as wfs
@@ -10,14 +14,41 @@ class Simulator:
     and passes them to scheduler.
     """
 
-    def __init__(self, scheduler: sch.SchedulerInterface) -> None:
+    def __init__(
+            self,
+            scheduler: sch.SchedulerInterface,
+            logger_flag: bool = False,
+    ) -> None:
         self.scheduler: sch.SchedulerInterface = scheduler
         self.workflows: dict[str, wfs.Workflow] = dict()
+
+        if logger_flag:
+            self._init_logger()
 
         # Collector for metrics.
         self.collector: mc.MetricCollector = mc.MetricCollector()
 
         self.scheduler.set_metric_collector(collector=self.collector)
+
+    def _init_logger(self) -> None:
+        logger.remove(0)
+
+        logger.add(
+            sink=sys.stdout,
+            level="INFO",
+        )
+
+        logger.add(
+            sink=config.LOGS_DIR + "/info/info.txt",
+            level="INFO",
+            rotation="50MB",
+        )
+
+        logger.add(
+            sink=config.LOGS_DIR + "/debug/debug-1.txt",
+            level="DEBUG",
+            rotation="50MB",
+        )
 
     def _init_scheduler_collector(self) -> None:
         self.scheduler.set_metric_collector(collector=self.collector)

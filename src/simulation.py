@@ -1,7 +1,7 @@
 from collections import defaultdict
+from copy import deepcopy
 from datetime import datetime, timedelta
 import pathlib
-import sys
 import typing as tp
 
 from loguru import logger
@@ -23,27 +23,6 @@ CONTAINER_PROV_DELAY: dict[str, int] = {
     "Genome": 600,
     "Cycles": 400,
 }
-
-
-def init_logger() -> None:
-    logger.remove(0)
-
-    logger.add(
-        sink=sys.stdout,
-        level="INFO",
-    )
-
-    logger.add(
-        sink=sm.LOGS_DIR + "/info/info.txt",
-        level="INFO",
-        rotation="10MB",
-    )
-
-    logger.add(
-        sink=sm.LOGS_DIR + "/debug/debug.txt",
-        level="DEBUG",
-        rotation="10MB",
-    )
 
 
 def generate_workflows(
@@ -129,9 +108,17 @@ def main() -> None:
     schedulers = [sch.EPSMScheduler(), sch.EBPSMScheduler()]
     total_stats: dict[int, dict[str, sm.MetricCollector]] = defaultdict(dict)
 
+    logger_flag = True
     for scheduler in schedulers:
         for num_tasks, workflows in workflow_sets.items():
-            simulator = sm.Simulator(scheduler=scheduler)
+            current_scheduler = deepcopy(scheduler)
+            simulator = sm.Simulator(
+                scheduler=current_scheduler,
+                logger_flag=logger_flag
+            )
+
+            if logger_flag:
+                logger_flag = False
 
             for _, workflow in workflows.items():
                 simulator.submit_workflow(
