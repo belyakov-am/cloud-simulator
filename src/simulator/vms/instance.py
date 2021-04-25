@@ -73,14 +73,20 @@ class VM:
                 f"uuid = {self.uuid}, "
                 f"type = {self.type}, "
                 f"start_time = {self.start_time}, "
+                f"finish_time = {self.finish_time}, "
                 f"state = {self.state}, "
                 f"files = {self.files}, "
                 f"containers = {self.containers}>")
 
     def __repr__(self) -> str:
-        return (f"VM("
+        return (f"(VM "
+                f"uuid = {self.uuid}, "
                 f"type = {self.type}, "
-                f"start_time = {self.start_time})")
+                f"start_time = {self.start_time}, "
+                f"finish_time = {self.finish_time}, "
+                f"state = {self.state}, "
+                f"files = {self.files}, "
+                f"containers = {self.containers})")
 
     def check_if_files_present(self, files: list[wfs.File]) -> bool:
         """Check if all incoming files are present on VM.
