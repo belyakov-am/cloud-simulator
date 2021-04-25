@@ -49,7 +49,7 @@ class EPSMScheduler(SchedulerInterface):
         self.settings = settings
 
     def submit_workflow(self, workflow: wfs.Workflow) -> None:
-        logger.debug(f"Got new workflow {workflow.uuid}")
+        logger.debug(f"Got new workflow {workflow.uuid} {workflow.name}")
 
         # Preprocess.
         self._convert_to_epsm_instances(workflow=workflow)

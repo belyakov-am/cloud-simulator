@@ -61,6 +61,8 @@ class EBPSMScheduler(SchedulerInterface):
             self,
             workflow: wfs.Workflow,
     ) -> None:
+        logger.debug(f"Got new workflow {workflow.uuid} {workflow.name}")
+
         # Preprocess.
         self._convert_to_ebpsm_instances(workflow=workflow)
         self._allocate_levels(workflow_uuid=workflow.uuid)
