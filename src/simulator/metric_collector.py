@@ -31,3 +31,7 @@ class MetricCollector:
         # Start and finish time of simulation.
         self.start_time: tp.Optional[datetime] = None
         self.finish_time: tp.Optional[datetime] = None
+
+        self.initialized_vms: int = 0
+        self.removed_vms: int = 0
+        self.vms_left: int = 0

@@ -21,7 +21,7 @@ DEFAULT_WORKFLOWS_PER_RECIPE = 10
 
 CONTAINER_PROV_DELAY: dict[str, int] = {
     "Genome": 600,
-    "Cycles": 400,
+    "Cycles": 600,
 }
 
 
@@ -142,6 +142,9 @@ def main() -> None:
                 f"Total exec time = {exec_time}\n"
                 f"Start time = {stats.start_time}\n"
                 f"Finish time = {stats.finish_time}\n"
+                f"Initialized VMs = {stats.initialized_vms}\n"
+                f"Removed VMs = {stats.removed_vms}\n"
+                f"VMs left = {stats.vms_left}\n"
             )
 
 

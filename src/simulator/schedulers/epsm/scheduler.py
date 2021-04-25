@@ -393,6 +393,9 @@ class EPSMScheduler(SchedulerInterface):
                         )
 
                         vm = self.vm_manager.init_vm(vm_type=cheapest_vmt)
+                        self.collector.initialized_vms += 1
+                        self.collector.workflows[
+                            workflow_uuid].initialized_vms.append(vm)
 
                         # Save info to metric collector.
                         self.collector.workflows[

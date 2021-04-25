@@ -380,6 +380,8 @@ class EBPSMScheduler(SchedulerInterface):
                 vm_type = fastest_vmt.vm_type
 
             vm = self.vm_manager.init_vm(vm_type=vm_type)
+            self.collector.initialized_vms += 1
+            self.collector.workflows[workflow_uuid].initialized_vms.append(vm)
 
         # Schedule task.
         total_exec_time = 0.0

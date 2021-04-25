@@ -2,6 +2,8 @@ from datetime import datetime
 import json
 import typing as tp
 
+from loguru import logger
+
 import simulator.config as config
 import simulator.metric_collector as mc
 import simulator.vms as vms
@@ -165,6 +167,8 @@ class Manager:
 
         vm.shutdown(time=time)
         self.idle_vms.remove(vm)
+
+        self.collector.removed_vms += 1
         self.collector.cost += vm.calculate_cost()
 
     def shutdown_vms(
@@ -189,4 +193,5 @@ class Manager:
             if vm.get_state() != vms.State.SHUTDOWN:
                 vm.shutdown(time=time)
 
+            self.collector.vms_left += 1
             self.collector.cost += vm.calculate_cost()
