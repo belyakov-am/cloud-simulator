@@ -42,6 +42,10 @@ class EventLoop:
             # Update current time.
             self.current_time = event.start_time
 
+            # Set start time of simulation in metric collector.
+            if scheduler.collector.start_time is None:
+                scheduler.collector.start_time = self.current_time
+
             if event.type == EventType.SUBMIT_WORKFLOW:
                 assert event.workflow is not None
 
@@ -88,3 +92,6 @@ class EventLoop:
 
         # No events left, so shutdown all VMs to calculate total cost.
         scheduler.vm_manager.shutdown_vms(time=self.current_time)
+
+        # Set finish time of simulation.
+        scheduler.collector.finish_time = self.current_time
