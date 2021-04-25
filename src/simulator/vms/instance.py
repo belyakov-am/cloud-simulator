@@ -65,7 +65,8 @@ class VM:
 
         self.state: State = State.NOT_PROVISIONED
 
-    # FIXME: implement __hash__() (?)
+    def __hash__(self):
+        return hash(self.uuid)
 
     def __str__(self) -> str:
         return (f"<VM "
