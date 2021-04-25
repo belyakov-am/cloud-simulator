@@ -31,6 +31,11 @@ class Settings:
     # Declared in seconds.
     idle_vm_threshold: int = 3000
 
+    # Indicates resource provisioning interval. During this stage
+    # idle VMs can be shutdown.
+    # Declared in seconds.
+    provisioning_interval: int = 600
+
 
 FastestVMType = namedtuple(
     typename="FastestVMType",
@@ -486,3 +491,19 @@ class EBPSMScheduler(SchedulerInterface):
                     time=current_time,
                     vm=vm,
                 )
+
+        # Add next deprovisioning stage to event loop.
+        # If there is no event in event loop, simulation is over.
+        if next_event is None:
+            return
+
+        # If next event is `MANAGE_RESOURCE`, no need to place one more
+        # in order to avoid infinite loop.
+        if next_event.type == EventType.MANAGE_RESOURCES:
+            return
+
+        provisioning_interval = self.settings.provisioning_interval
+        self.event_loop.add_event(event=Event(
+            start_time=current_time + timedelta(seconds=provisioning_interval),
+            event_type=EventType.MANAGE_RESOURCES,
+        ))
