@@ -25,7 +25,10 @@ class Simulator:
         self.scheduler.set_metric_collector(collector=self.collector)
 
     def _init_logger(self) -> None:
-        logger.remove(0)
+        try:
+            logger.remove(0)
+        except ValueError:
+            pass
 
         logger.add(
             sink=sys.stdout,
