@@ -1,4 +1,5 @@
 import json
+import typing as tp
 
 import simulator.workflows as wfs
 
@@ -11,18 +12,28 @@ class PegasusTraceParser:
     here: https://github.com/wfcommons/workflow-schema/blob/master/wfcommons-schema.json
     """
 
-    def __init__(self, filename: str) -> None:
-        """Accepts json file with a trace and parses it into a Workflow
+    def __init__(
+            self,
+            filename: str,
+            container_prov: tp.Optional[int] = None,
+    ) -> None:
+        """Accept json file with a trace and parses it into a Workflow
         instance.
 
-        :param filename: json file with a trace
+        :param filename: json file with a trace.
+        :param container_prov: container provisioning delay.
         """
+
         self.filename = filename
+        self.container_prov = container_prov
+
         self._parse_json()
 
     def _parse_json(self) -> None:
-        """Parses json from `filename` and saves it to `workflow`
+        """Parse json from `filename` and save it to `workflow`
         variable.
+
+        :return: None.
         """
 
         with open(self.filename) as f:
@@ -36,7 +47,11 @@ class PegasusTraceParser:
         workflow_json = self._data["workflow"]
 
         # Parse container
-        provision_time = workflow_json["container"]["provision_time"]
+        if self.container_prov is not None:
+            provision_time = self.container_prov
+        else:
+            provision_time = workflow_json["container"]["provision_time"]
+
         container = wfs.Container(
             workflow_uuid=self.workflow.uuid,
             provision_time=provision_time,
