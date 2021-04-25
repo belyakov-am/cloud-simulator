@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from datetime import timedelta
-from copy import deepcopy
 import typing as tp
 
 from loguru import logger
@@ -525,7 +524,9 @@ class EPSMScheduler(SchedulerInterface):
         """
 
         current_time = self.event_loop.get_current_time()
-        idle_vms = deepcopy(self.vm_manager.get_idle_vms())
+        idle_vms = self.vm_manager.get_idle_vms()
+
+        vms_to_remove: list[vms.VM] = []
 
         # Shutdown VMs.
         for vm in idle_vms:
@@ -536,10 +537,13 @@ class EPSMScheduler(SchedulerInterface):
             )
 
             if time_until_next_period < self.settings.provisioning_interval:
-                self.vm_manager.shutdown_vm(
-                    time=current_time,
-                    vm=vm,
-                )
+                vms_to_remove.append(vm)
+
+        for vm in vms_to_remove:
+            self.vm_manager.shutdown_vm(
+                time=current_time,
+                vm=vm,
+            )
 
         # Add next deprovisioning stage to event loop.
         # If there is no event in event loop, simulation is over.
