@@ -1,6 +1,7 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
 import pathlib
+import sys
 import typing as tp
 
 from loguru import logger
@@ -22,6 +23,27 @@ CONTAINER_PROV_DELAY: dict[str, int] = {
     "Genome": 600,
     "Cycles": 400,
 }
+
+
+def init_logger() -> None:
+    logger.remove(0)
+
+    logger.add(
+        sink=sys.stdout,
+        level="INFO",
+    )
+
+    logger.add(
+        sink=sm.LOGS_DIR + "/info/info.txt",
+        level="INFO",
+        rotation="10MB",
+    )
+
+    logger.add(
+        sink=sm.LOGS_DIR + "/debug/debug.txt",
+        level="DEBUG",
+        rotation="10MB",
+    )
 
 
 def generate_workflows(

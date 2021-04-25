@@ -1,10 +1,6 @@
 from datetime import datetime
-import sys
-
-from loguru import logger
 
 import simulator.metric_collector as mc
-import simulator.config as config
 import simulator.schedulers as sch
 import simulator.workflows as wfs
 
@@ -21,31 +17,7 @@ class Simulator:
         # Collector for metrics.
         self.collector: mc.MetricCollector = mc.MetricCollector()
 
-        self._init_logger()
         self.scheduler.set_metric_collector(collector=self.collector)
-
-    def _init_logger(self) -> None:
-        try:
-            logger.remove(0)
-        except ValueError:
-            pass
-
-        logger.add(
-            sink=sys.stdout,
-            level="INFO",
-        )
-
-        logger.add(
-            sink=config.LOGS_DIR + "/info/info.txt",
-            level="INFO",
-            rotation="10MB",
-        )
-
-        logger.add(
-            sink=config.LOGS_DIR + "/debug/debug.txt",
-            level="DEBUG",
-            rotation="10MB",
-        )
 
     def _init_scheduler_collector(self) -> None:
         self.scheduler.set_metric_collector(collector=self.collector)
