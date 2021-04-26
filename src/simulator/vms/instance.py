@@ -11,11 +11,11 @@ import simulator.workflows as wfs
 class VMType:
     name: str
 
-    # Amount of RAM memory. Measures in gigabytes (GB)
-    cpu: int
-
     # Number of virtual processor cores in VM. Each
     # core has power of `mips` (it is assumed that cores are equal).
+    cpu: int
+
+    # Amount of RAM memory. Measures in gigabytes (GB)
     memory: int
 
     # Price of leasing VM for one billing period.
