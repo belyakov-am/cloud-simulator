@@ -5,6 +5,7 @@ from datetime import datetime
 from loguru import logger
 from wfcommons.generator import GenomeRecipe, CyclesRecipe
 
+import simulation.config as config
 import simulation.utils as utils
 import simulator as sm
 import simulator.schedulers as sch
@@ -22,6 +23,9 @@ def main() -> None:
     logger_flag = True
     for scheduler in schedulers:
         for num_tasks, workflows in workflow_sets.items():
+            if num_tasks not in config.NUM_TASKS_EXECUTION:
+                continue
+
             current_scheduler = deepcopy(scheduler)
             simulator = sm.Simulator(
                 scheduler=current_scheduler,

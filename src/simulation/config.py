@@ -6,6 +6,8 @@ WORKFLOW_DIR = (ROOT_DIR / "workflow-traces/pegasus/generated")
 
 # List of num_tasks for workflow generation.
 DEFAULT_NUM_TASKS: list[int] = [20, 100, 300, 600]
+# List of num_tasks for execution.
+NUM_TASKS_EXECUTION: list[int] = [20, 100, 300]
 # Number of workflows to generate from each recipe.
 DEFAULT_WORKFLOWS_PER_RECIPE = 10
 
