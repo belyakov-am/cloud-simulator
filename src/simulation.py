@@ -16,12 +16,34 @@ import simulator.workflows as wfs
 ROOT_DIR = pathlib.Path(__file__).parent.parent
 WORKFLOW_DIR = (ROOT_DIR / "workflow-traces/pegasus/generated")
 
-DEFAULT_NUM_TASKS: list[int] = [20, 100, 500]
+# List of num_tasks for workflow generation.
+DEFAULT_NUM_TASKS: list[int] = [20, 100, 300, 600]
+# Number of workflows to generate from each recipe.
 DEFAULT_WORKFLOWS_PER_RECIPE = 10
 
+# Container provisioning delay for different types of workflows.
+# Declared in seconds.
 CONTAINER_PROV_DELAY: dict[str, int] = {
     "Genome": 600,
-    "Cycles": 600,
+    "Cycles": 300,
+}
+
+# Deadlines for different sets based on workflows' sizes.
+# Declared in hours.
+DEADLINES = {
+    20: 1,
+    100: 4,
+    300: 5,
+    600: 7,
+}
+
+# Budgets for different sets based on workflows' sizes.
+# Declared in dollars.
+BUDGETS = {
+    20: 10,
+    100: 40,
+    300: 100,
+    600: 150,
 }
 
 
@@ -90,10 +112,10 @@ def parse_workflows() -> dict[int, dict[str, wfs.Workflow]]:
         workflow = parser.get_workflow()
         num_tasks = int(trace_path.parent.name)
 
-        deadline = datetime.now() + timedelta(hours=num_tasks // 10)
+        deadline = datetime.now() + timedelta(hours=DEADLINES[num_tasks])
         workflow.set_deadline(time=deadline)
 
-        budget = num_tasks
+        budget = BUDGETS[num_tasks]
         workflow.set_budget(budget=budget)
 
         workflow_sets[num_tasks][workflow.uuid] = workflow
@@ -102,10 +124,12 @@ def parse_workflows() -> dict[int, dict[str, wfs.Workflow]]:
 
 
 def main() -> None:
-    # generate_workflows(recipes=[GenomeRecipe, CyclesRecipe])
+    generate_workflows(recipes=[GenomeRecipe, CyclesRecipe])
     workflow_sets = parse_workflows()
 
     schedulers = [sch.EPSMScheduler(), sch.EBPSMScheduler()]
+
+    # Map from num_tasks to map for workflow UUID to its metric collector
     total_stats: dict[int, dict[str, sm.MetricCollector]] = defaultdict(dict)
 
     logger_flag = True
@@ -133,6 +157,14 @@ def main() -> None:
 
     for num_tasks, scheduler_stats in total_stats.items():
         for scheduler_name, stats in scheduler_stats.items():
+            deadlines = set()
+            budgets = set()
+
+            workflows = workflow_sets[num_tasks]
+            for workflow_uuid, workflow in workflows.items():
+                deadlines.add(workflow.deadline)
+                budgets.add(workflow.budget)
+
             exec_time = (stats.finish_time - stats.start_time).total_seconds()
 
             logger.info(
@@ -145,6 +177,11 @@ def main() -> None:
                 f"Initialized VMs = {stats.initialized_vms}\n"
                 f"Removed VMs = {stats.removed_vms}\n"
                 f"VMs left = {stats.vms_left}\n"
+                f"Total tasks = {stats.workflows_total_tasks}\n"
+                f"Scheduled tasks = {stats.scheduled_tasks}\n"
+                f"Finished tasks = {stats.finished_tasks}\n"
+                f"Deadlines = {deadlines}\n"
+                f"Budgets = {budgets}\n"
             )
 
 
