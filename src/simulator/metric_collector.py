@@ -35,3 +35,7 @@ class MetricCollector:
         self.initialized_vms: int = 0
         self.removed_vms: int = 0
         self.vms_left: int = 0
+
+        self.workflows_total_tasks: int = 0
+        self.scheduled_tasks: int = 0
+        self.finished_tasks: int = 0

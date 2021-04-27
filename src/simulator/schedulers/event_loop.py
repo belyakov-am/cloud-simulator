@@ -53,6 +53,9 @@ class EventLoop:
                 scheduler.submit_workflow(workflow=workflow)
                 scheduler.collector.workflows[workflow.uuid].start_time = \
                     self.current_time
+
+                scheduler.collector.workflows_total_tasks += len(
+                    workflow.tasks)
                 continue
 
             if event.type == EventType.SCHEDULE_WORKFLOW:
@@ -64,6 +67,8 @@ class EventLoop:
             if event.type == EventType.SCHEDULE_TASK:
                 assert event.task is not None
 
+                scheduler.collector.scheduled_tasks += 1
+
                 scheduler.schedule_task(
                     workflow_uuid=event.task.workflow_uuid,
                     task_id=event.task.id,
@@ -73,6 +78,8 @@ class EventLoop:
             if event.type == EventType.FINISH_TASK:
                 assert event.task is not None
                 assert event.vm is not None
+
+                scheduler.collector.finished_tasks += 1
 
                 workflow_uuid = event.task.workflow_uuid
                 scheduler.finish_task(
