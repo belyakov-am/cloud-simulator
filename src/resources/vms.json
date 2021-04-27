@@ -6,7 +6,7 @@
       "memory": 2,
       "price": 0.0168,
       "billingPeriod": 3600,
-      "IOBandwidth": 100000,
+      "IOBandwidth": 70000,
       "enable": true
     },
     {
@@ -15,7 +15,7 @@
       "memory": 4,
       "price": 0.0336,
       "billingPeriod": 3600,
-      "IOBandwidth": 100000,
+      "IOBandwidth": 80000,
       "enable": true
     },
     {
@@ -24,7 +24,7 @@
       "memory": 8,
       "price": 0.0672,
       "billingPeriod": 3600,
-      "IOBandwidth": 100000,
+      "IOBandwidth": 90000,
       "enable": true
     },
     {
