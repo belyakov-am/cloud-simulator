@@ -31,6 +31,8 @@ class Simulator:
         self.scheduler.set_metric_collector(collector=self.collector)
 
     def _init_logger(self) -> None:
+        iter_num = config.ITER_NUMBER
+
         logger.remove(0)
 
         logger.add(
@@ -39,13 +41,13 @@ class Simulator:
         )
 
         logger.add(
-            sink=config.LOGS_DIR + "/info/info.txt",
+            sink=config.LOGS_DIR + "/info/info-{:03d}.txt".format(iter_num),
             level="INFO",
             rotation="50MB",
         )
 
         logger.add(
-            sink=config.LOGS_DIR + "/debug/debug-1.txt",
+            sink=config.LOGS_DIR + "/debug/debug-{:03d}.txt".format(iter_num),
             level="DEBUG",
             rotation="50MB",
         )
