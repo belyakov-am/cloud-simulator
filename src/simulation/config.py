@@ -1,8 +1,8 @@
 import pathlib
 
 
-ROOT_DIR = pathlib.Path(__file__).parent.parent
-WORKFLOW_DIR = (ROOT_DIR / "workflow-traces/pegasus/generated")
+ROOT_DIR = pathlib.Path(__file__).parent.parent.parent
+WORKFLOW_DIR = ROOT_DIR / "workflow-traces" / "pegasus" / "generated"
 
 # List of num_tasks for workflow generation.
 DEFAULT_NUM_TASKS: list[int] = [20, 100, 300, 600]
