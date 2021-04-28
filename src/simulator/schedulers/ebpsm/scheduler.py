@@ -47,7 +47,7 @@ FastestVMType = namedtuple(
 
 
 class EBPSMScheduler(SchedulerInterface):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         # Map from workflow UUID to workflow instance.
         self.workflows: dict[str, Workflow] = dict()
