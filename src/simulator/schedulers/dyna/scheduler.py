@@ -11,7 +11,7 @@ import simulator.vms as vms
 import simulator.workflows as wfs
 
 from .configuration import ConfigurationPlan
-from ..event import Event
+from ..event import Event, EventType
 from ..interface import SchedulerInterface
 from .task import Task
 from .workflow import Workflow
@@ -50,6 +50,14 @@ class DynaScheduler(SchedulerInterface):
         # Preprocess.
         self._convert_to_dyna_instances(workflow=workflow)
         self._on_demand_configuration(workflow_uuid=workflow.uuid)
+
+        # Add to event loop.
+        dyna_workflow = self.workflows[workflow.uuid]
+        self.event_loop.add_event(event=Event(
+            start_time=dyna_workflow.submit_time,
+            event_type=EventType.SCHEDULE_WORKFLOW,
+            workflow=dyna_workflow,
+        ))
 
     def _convert_to_dyna_instances(self, workflow: wfs.Workflow) -> None:
         """Convert basic workflow instance to Dyna workflow instance
