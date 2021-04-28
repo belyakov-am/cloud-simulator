@@ -7,7 +7,7 @@ import uuid
 import simulator.workflows as wfs
 
 
-@dataclass
+@dataclass(eq=True)
 class VMType:
     name: str
 
