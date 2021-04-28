@@ -69,10 +69,24 @@ class Manager:
 
         return self.vm_types[0]
 
-    def get_vm_types(self) -> list[vms.VMType]:
-        """Return list of all available VM types."""
+    def get_vm_types(
+            self,
+            faster_than: tp.Optional[vms.VMType],
+    ) -> list[vms.VMType]:
+        """Return list of all available VM types. If `faster_than` type
+        is given, return list of all VM types that are faster than
+        given.
 
-        return self.vm_types
+        :param faster_than: VM type for comparing.
+        :return: list of VM types.
+        """
+
+        if faster_than is None:
+            return self.vm_types
+
+        for ind, vm_type in enumerate(self.vm_types):
+            if vm_type == faster_than:
+                return self.vm_types[ind+1:]
 
     def get_idle_vms(
             self,
