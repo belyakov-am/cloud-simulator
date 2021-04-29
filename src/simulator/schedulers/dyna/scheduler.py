@@ -29,6 +29,11 @@ class Settings:
     # Declared in seconds.
     vm_provision_delay: int = 120
 
+    # Indicates amount of time for VM to be shut down. If time until
+    # next billing period for idle VM is less than this variable, it
+    # should be removed.
+    time_to_shutdown_vm: int = 600
+
 
 class DynaScheduler(SchedulerInterface):
     def __init__(self) -> None:
@@ -374,7 +379,61 @@ class DynaScheduler(SchedulerInterface):
             task_id: int,
             vm: vms.VM,
     ) -> None:
-        pass
+        """Shutdown idle VMs if they are approaching next billing
+        periods.
+
+        :param workflow_uuid: UUID of workflow that is scheduled.
+        :param task_id: task ID that was finished.
+        :param vm: VM that executed task.
+        :return: None.
+        """
+
+        current_time = self.event_loop.get_current_time()
+
+        workflow = self.workflows[workflow_uuid]
+        task = workflow.tasks[task_id]
+
+        # Mark task as finished and release VM.
+        workflow.mark_task_finished(time=current_time, task=task)
+        self.vm_manager.release_vm(vm=vm)
+
+        # Remove idle VMs if they are approaching next billing periods.
+        idle_vms = self.vm_manager.get_idle_vms()
+        vms_to_remove: list[vms.VM] = []
+
+        for idle_vm in idle_vms:
+            time_until_next_period = cst.time_until_next_billing_period(
+                current_time=current_time,
+                vm=vm,
+            )
+
+            if time_until_next_period < self.settings.time_to_shutdown_vm:
+                vms_to_remove.append(idle_vm)
+
+        for vm in vms_to_remove:
+            self.vm_manager.shutdown_vm(
+                time=current_time,
+                vm=vm,
+            )
+
+        # Add new tasks to event loop.
+        for t in workflow.unscheduled_tasks:
+            # Task can be scheduled if all parents have finished.
+            can_be_scheduled = all(
+                parent.state == wfs.State.FINISHED
+                for parent in t.parents
+            )
+
+            if not can_be_scheduled:
+                continue
+
+            self.event_loop.add_event(event=Event(
+                start_time=current_time,
+                event_type=EventType.SCHEDULE_TASK,
+                task=t,
+            ))
+
+            workflow.mark_task_scheduled(time=current_time, task=t)
 
     def manage_resources(self, next_event: tp.Optional[Event]) -> None:
         pass
