@@ -13,4 +13,7 @@ class Task(wfs.Task):
         # on-demand configuration search.
         self.estimated_time: float = 0.0  # in seconds
 
+        # Earliest finish time.
+        self.eft: float = 0.0  # in seconds
+
         self.parents: list[Task] = self.parents
