@@ -398,8 +398,6 @@ class EPSMScheduler(SchedulerInterface):
                         self.collector.initialized_vms += 1
                         self.collector.workflows[
                             workflow_uuid].initialized_vms.append(vm)
-                        self.collector.workflows[
-                            workflow_uuid].initialized_vms.append(vm)
 
         # If no VM found, it is possible to postpone task scheduling.
         if vm is None:
