@@ -10,11 +10,10 @@ import simulator.utils.task_execution_prediction as tep
 import simulator.vms as vms
 import simulator.workflows as wfs
 
-from .configuration import ConfigurationPlan
 from ..event import Event, EventType
 from ..interface import SchedulerInterface
 from .task import Task
-from .workflow import Workflow
+from .workflow import ConfigurationPlan, Workflow
 
 
 @dataclass
