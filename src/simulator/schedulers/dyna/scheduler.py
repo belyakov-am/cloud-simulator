@@ -41,10 +41,7 @@ class DynaScheduler(SchedulerInterface):
 
         self.name = "Dyna"
 
-    def submit_workflow(
-            self,
-            workflow: wfs.Workflow,
-    ) -> None:
+    def submit_workflow(self, workflow: wfs.Workflow) -> None:
         logger.debug(f"Got new workflow {workflow.uuid} {workflow.name}")
 
         # Preprocess.
