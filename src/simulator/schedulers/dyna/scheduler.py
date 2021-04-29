@@ -303,7 +303,70 @@ class DynaScheduler(SchedulerInterface):
                 workflow.mark_task_scheduled(time=current_time, task=task)
 
     def schedule_task(self, workflow_uuid: str, task_id: int) -> None:
-        pass
+        """Schedule task according to Dyna algorithm.
+
+        :param workflow_uuid: UUID of workflow that is scheduled.
+        :param task_id: task ID to schedule.
+        :return: None.
+        """
+
+        current_time = self.event_loop.get_current_time()
+
+        workflow = self.workflows[workflow_uuid]
+        task = workflow.tasks[task_id]
+        required_vm_type = workflow.configuration_plan.plan[task_id]
+
+        idle_vms = self.vm_manager.get_idle_vms()
+        vm: tp.Optional[vms.VM] = None
+
+        # Find idle_vm with VM type from configuration plan.
+        for idle_vm in idle_vms:
+            if idle_vm.type == required_vm_type:
+                vm = idle_vm
+                break
+
+        # If no VM was found -- init new one.
+        if vm is None:
+            vm = self.vm_manager.init_vm(vm_type=required_vm_type)
+
+            # Save info to metric collector.
+            self.collector.initialized_vms += 1
+            self.collector.workflows[workflow_uuid].initialized_vms.append(vm)
+
+        # Schedule task.
+        total_exec_time = 0.0
+
+        # Provision VM if required.
+        if vm.get_state() == vms.State.NOT_PROVISIONED:
+            self.vm_manager.provision_vm(vm=vm, time=current_time)
+            total_exec_time += self.settings.vm_provision_delay
+
+        # Provision container if required.
+        if not vm.check_if_container_provisioned(container=task.container):
+            vm.provision_container(container=task.container)
+            total_exec_time += task.container.provision_time
+
+        # Get task execution time.
+        total_exec_time += tep.io_consumption(
+            task=task,
+            vm_type=vm.type,
+            storage=self.storage_manager.get_storage(),
+            vm=vm,
+        )
+
+        # Reserve VM and submit event to event loop.
+        self.vm_manager.reserve_vm(vm)
+
+        finish_time = current_time + timedelta(seconds=total_exec_time)
+        self.event_loop.add_event(event=Event(
+            start_time=finish_time,
+            event_type=EventType.FINISH_TASK,
+            task=task,
+            vm=vm,
+        ))
+
+        # Save info to metric collector.
+        self.collector.workflows[workflow_uuid].used_vms.add(vm)
 
     def finish_task(
             self,
