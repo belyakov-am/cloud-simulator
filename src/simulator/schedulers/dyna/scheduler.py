@@ -284,7 +284,7 @@ class DynaScheduler(SchedulerInterface):
                 if neighbor not in opened:
                     hq.heappush(opened, neighbor)
 
-        return best_plan
+        workflow.configuration_plan = best_plan
 
     def schedule_workflow(self, workflow_uuid: str) -> None:
         """Schedule all entry tasks (i.e. put them into event loop).
