@@ -71,7 +71,7 @@ class Manager:
 
     def get_vm_types(
             self,
-            faster_than: tp.Optional[vms.VMType],
+            faster_than: tp.Optional[vms.VMType] = None,
     ) -> list[vms.VMType]:
         """Return list of all available VM types. If `faster_than` type
         is given, return list of all VM types that are faster than
