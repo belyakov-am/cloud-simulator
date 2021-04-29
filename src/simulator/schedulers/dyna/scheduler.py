@@ -244,9 +244,10 @@ class DynaScheduler(SchedulerInterface):
             # Get new plan with lowest f_metric value.
             current_plan = hq.heappop(opened)
             perf = self._estimate_performance(workflow_uuid=workflow_uuid)
+            finish_time = current_time + timedelta(seconds=perf)
 
             # If it does not fit deadline, discard it.
-            if current_time + timedelta(seconds=perf) < workflow.deadline:
+            if upper_bound is None or finish_time < workflow.deadline:
                 estimated_plan_cost = self._estimate_cost(
                     workflow_uuid=workflow_uuid,
                     configuration_plan=current_plan,
