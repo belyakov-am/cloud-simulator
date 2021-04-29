@@ -284,6 +284,8 @@ class DynaScheduler(SchedulerInterface):
                 if neighbor not in opened:
                     hq.heappush(opened, neighbor)
 
+            current_iter += 1
+
         workflow.configuration_plan = best_plan
 
     def schedule_workflow(self, workflow_uuid: str) -> None:
