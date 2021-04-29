@@ -44,7 +44,7 @@ class DynaScheduler(SchedulerInterface):
         # Settings of scheduler. Slightly control its behaviour.
         self.settings: Settings = Settings()
 
-        self.name = "Dyna"
+        self.name = "DynaNS"
 
     def submit_workflow(self, workflow: wfs.Workflow) -> None:
         logger.debug(f"Got new workflow {workflow.uuid} {workflow.name}")
