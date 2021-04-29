@@ -1,6 +1,5 @@
 import uuid
 
-import simulator.storages as sts
 import simulator.vms as vms
 
 from .workflow import Workflow
