@@ -69,6 +69,17 @@ class Manager:
 
         return self.vm_types[0]
 
+    def get_fastest_vm_type(self) -> vms.VMType:
+        """Return fastest VM which is defined by its CPU.
+
+        WARNING!
+        In default setup fastest VM is the most expensive one.
+        One my change possible VM types and maybe need to change this
+        logic.
+        """
+
+        return self.vm_types[-1]
+
     def get_vm_types(
             self,
             faster_than: tp.Optional[vms.VMType] = None,
