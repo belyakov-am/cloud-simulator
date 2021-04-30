@@ -1,3 +1,8 @@
+from collections import defaultdict
+import typing as tp
+
+import networkx as nx
+
 import simulator.storages as sts
 import simulator.utils.task_execution_prediction as tep
 import simulator.vms as vms
@@ -12,6 +17,11 @@ class InspectedWorkflow:
         # on slowest and fastest VM types.
         self.exec_time_slowest_vm: float = 0.0  # in seconds
         self.exec_time_fastest_vm: float = 0.0  # in seconds
+
+        # Number of levels in DAG.
+        self.levels: int = 0
+        # Map from level to number of tasks on it.
+        self.levels_tasks: dict[int, int] = dict()
 
 
 def calculate_exec_time(
@@ -54,6 +64,42 @@ def calculate_exec_time(
     return makespan
 
 
+def parse_dag_levels(workflow: wfs.Workflow) -> tp.Tuple[int, dict[int, int]]:
+    """Parse DAG of workflow and return number of levels with number
+    of tasks on each level.
+
+    :param workflow: workflow to parse.
+    :return: tuple[levels, map from level to number of tasks on it].
+    """
+
+    # Map from level to set of task IDs.
+    levels: dict[int, set[int]] = defaultdict(set)
+
+    # List of root task IDs.
+    roots: list[int] = [
+        node for node in workflow.dag.nodes
+        if len(list(workflow.dag.predecessors(node))) == 0
+    ]
+
+    for root in roots:
+        # Map from task to shortest path length from root (level).
+        shortest_paths = nx.single_source_shortest_path_length(
+            G=workflow.dag,
+            source=root,
+        )
+
+        for task_id, level in shortest_paths.items():
+            levels[level].add(task_id)
+
+    # Map from level to number of tasks.
+    levels_tasks: dict[int, int] = dict()
+
+    for level, tasks in levels.items():
+        levels_tasks[level] = len(tasks)
+
+    return len(levels.keys()), levels_tasks
+
+
 def inspect_workflow(
         workflow: wfs.Workflow,
         vm_prov: int = 0,
@@ -79,5 +125,9 @@ def inspect_workflow(
         vm_type=vm_manager.get_fastest_vm_type(),
         vm_prov=vm_prov,
     )
+
+    levels, levels_tasks = parse_dag_levels(workflow=workflow)
+    inspected.levels = levels
+    inspected.levels_tasks = levels_tasks
 
     return inspected
