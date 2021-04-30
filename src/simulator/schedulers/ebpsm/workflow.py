@@ -17,8 +17,8 @@ class Workflow(wfs.Workflow):
         # Map from level in DAG to set of tasks on that level.
         self.levels: dict[int, set[ebpsm.Task]] = defaultdict(set)
 
-        # List of root tasks.
-        self.roots: list[ebpsm.Task] = []
+        # List of root task IDs.
+        self.roots: list[int] = []
 
         # Estimated execution order queue.
         self.eeoq: list[ebpsm.Task] = []
