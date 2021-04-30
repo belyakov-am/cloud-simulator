@@ -37,6 +37,8 @@ def main() -> None:
                 f"Exec time on fastest VM = {inspected.exec_time_fastest_vm}\n"
                 f"Number of levels = {inspected.levels}\n"
                 f"Tasks on levels = {inspected.levels_tasks}\n"
+                f"Total files = {inspected.total_files}\n"
+                f"Total size = {inspected.total_size}\n"
             )
 
         logger.info("=" * 80)

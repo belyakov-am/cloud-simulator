@@ -23,6 +23,16 @@ class InspectedWorkflow:
         # Map from level to number of tasks on it.
         self.levels_tasks: dict[int, int] = dict()
 
+        # Number of files.
+        self.input_files: int = 0
+        self.output_files: int = 0
+        self.total_files: int = 0
+
+        # Size of files (in KB).
+        self.input_size: int = 0
+        self.output_size: int = 0
+        self.total_size: int = 0
+
 
 def calculate_exec_time(
         workflow: wfs.Workflow,
@@ -129,5 +139,15 @@ def inspect_workflow(
     levels, levels_tasks = parse_dag_levels(workflow=workflow)
     inspected.levels = levels
     inspected.levels_tasks = levels_tasks
+
+    for task in workflow.tasks:
+        inspected.input_files += len(task.input_files)
+        inspected.output_size += len(task.output_files)
+
+        inspected.input_size += sum(f.size for f in task.input_files)
+        inspected.output_size += sum(f.size for f in task.output_files)
+
+    inspected.total_files = inspected.input_files + inspected.output_files
+    inspected.total_size = inspected.input_size + inspected.output_size
 
     return inspected
