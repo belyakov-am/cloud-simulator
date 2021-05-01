@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+from statistics import mean
 import typing as tp
 
 from loguru import logger
@@ -79,6 +80,21 @@ class Manager:
         """
 
         return self.vm_types[-1]
+
+    def get_average_vm_type(self) -> vms.VMType:
+        """Construct synthetic VM type with average values.
+
+        :return: average VM type.
+        """
+
+        return vms.VMType(
+            name="synthetic",
+            cpu=mean(v.cpu for v in self.vm_types),
+            memory=mean(v.memory for v in self.vm_types),
+            price=mean(v.price for v in self.vm_types),
+            billing_period=mean(v.billing_period for v in self.vm_types),
+            io_bandwidth=mean(v.io_bandwidth for v in self.vm_types),
+        )
 
     def get_vm_types(
             self,
