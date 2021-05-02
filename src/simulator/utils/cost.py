@@ -28,8 +28,10 @@ def calculate_price_for_vm(
     use_time_left = use_time - time_left_in_last_period
 
     # Find how many billing periods should be paid for use_time left.
-    return (use_time_left // vm.type.billing_period
+    billing_periods = (use_time_left // vm.type.billing_period
             + (use_time_left % vm.type.billing_period) > 0)
+
+    return billing_periods * vm.type.price
 
 
 def time_until_next_billing_period(
