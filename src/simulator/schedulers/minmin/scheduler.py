@@ -301,7 +301,37 @@ class MinMinScheduler(SchedulerInterface):
             task_id: int,
             vm: vms.VM,
     ) -> None:
-        pass
+        """Min-MinBUDG algorithm does not have any postprocessing. So
+        it just schedules to available tasks.
+
+        :param workflow_uuid: UUID of workflow that is scheduled.
+        :param task_id: task ID that was finished.
+        :param vm: VM that executed task.
+        :return: None.
+        """
+
+        current_time = self.event_loop.get_current_time()
+
+        workflow = self.workflows[workflow_uuid]
+
+        # Add new tasks to event loop.
+        for t in workflow.unscheduled_tasks:
+            # Task can be scheduled if all parents have finished.
+            can_be_scheduled = all(
+                parent.state == wfs.State.FINISHED
+                for parent in t.parents
+            )
+
+            if not can_be_scheduled:
+                continue
+
+            self.event_loop.add_event(event=Event(
+                start_time=current_time,
+                event_type=EventType.SCHEDULE_TASK,
+                task=t,
+            ))
+
+            workflow.mark_task_scheduled(time=current_time, task=t)
 
     def manage_resources(self, next_event: tp.Optional[Event]) -> None:
         pass
