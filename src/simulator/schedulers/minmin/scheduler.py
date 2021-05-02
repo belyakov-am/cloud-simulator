@@ -52,6 +52,7 @@ class MinMinScheduler(SchedulerInterface):
 
         # Preprocess.
         self._convert_to_minmin_instances(workflow=workflow)
+        self._estimate_makespan(workflow_uuid=workflow.uuid)
         self._divide_budget(workflow_uuid=workflow.uuid)
 
         # Add to event loop.
