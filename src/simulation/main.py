@@ -46,7 +46,10 @@ def main() -> None:
             collector = simulator.get_metric_collector()
             total_stats[num_tasks][scheduler.name] = collector
 
-    for num_tasks, scheduler_stats in total_stats.items():
+    for num_tasks, scheduler_stats in sorted(
+            total_stats.items(),
+            key=lambda it: it[0]
+    ):
         for scheduler_name, stats in scheduler_stats.items():
             deadlines = set()
             budgets = set()
