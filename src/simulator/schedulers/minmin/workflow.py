@@ -12,3 +12,6 @@ class Workflow(wfs.Workflow):
         self.tasks: list[minmin.Task] = []
 
         self.makespan: float = 0.0  # in seconds
+
+        # Budget leftovers after tasks scheduling.
+        self.pot: float = 0.0
