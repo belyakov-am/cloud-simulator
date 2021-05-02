@@ -1,8 +1,11 @@
 from dataclasses import dataclass
+from datetime import timedelta
+import enum
 import typing as tp
 
 from loguru import logger
 
+import simulator.utils.cost as cst
 import simulator.utils.task_execution_prediction as tep
 import simulator.vms as vms
 import simulator.workflows as wfs
@@ -20,6 +23,17 @@ class Settings:
     # be provisioned.
     # Declared in seconds.
     vm_provision_delay: int = 120
+
+
+class HostType(enum.Enum):
+    VMInstance = enum.auto()
+    VMType = enum.auto()
+
+
+@dataclass
+class Host:
+    type: HostType
+    host: tp.Union[vms.VM, vms.VMType]
 
 
 class MinMinScheduler(SchedulerInterface):
@@ -149,8 +163,137 @@ class MinMinScheduler(SchedulerInterface):
 
                 workflow.mark_task_scheduled(time=current_time, task=task)
 
+    def _get_best_host(
+            self,
+            task: Task,
+            pot: float,
+    ) -> tp.Tuple[Host, float, float]:
+        """Find best host for task and return it.
+        Host is either idle VM instance or VM type (so VM should be
+        provisioned).
+
+        :param task: task for finding host.
+        :param pot: total amount of money left from previous tasks.
+        :return: Tuple[host for task, new pot, execution time on host].
+        """
+
+        current_time = self.event_loop.get_current_time()
+
+        total_budget = task.budget + pot
+        new_pot = 0.0
+
+        # Initialize with cheapest VM type.
+        best_host = Host(
+            type=HostType.VMType,
+            host=self.vm_manager.get_slowest_vm_type()
+        )
+        best_finish_time = tep.io_consumption(
+            task=task,
+            vm_type=best_host.host,
+            storage=self.storage_manager.get_storage(),
+            container_prov=task.container.provision_time,
+            vm_prov=self.settings.vm_provision_delay,
+        )
+
+        # Find better host among all VM types.
+        for vm_type in self.vm_manager.get_vm_types():
+            execution_time = tep.io_consumption(
+                task=task,
+                vm_type=vm_type,
+                storage=self.storage_manager.get_storage(),
+                container_prov=task.container.provision_time,
+                vm_prov=self.settings.vm_provision_delay,
+            )
+            execution_price = cst.estimate_price_for_vm_type(
+                use_time=execution_time,
+                vm_type=vm_type,
+            )
+
+            # If current host can finish task faster within budget --
+            # select it.
+            if (execution_time < best_finish_time
+                    and execution_price <= total_budget):
+                best_finish_time = execution_time
+                new_pot = total_budget - execution_price
+                best_host = Host(type=HostType.VMType, host=vm_type)
+
+        # Find better host among idle VMs.
+        for vm in self.vm_manager.get_idle_vms():
+            execution_time = tep.io_consumption(
+                task=task,
+                vm_type=vm.type,
+                storage=self.storage_manager.get_storage(),
+                container_prov=task.container.provision_time,
+                vm_prov=self.settings.vm_provision_delay,
+                vm=vm,
+            )
+            execution_price = cst.calculate_price_for_vm(
+                current_time=current_time,
+                use_time=execution_time,
+                vm=vm,
+            )
+
+            # If current host can finish task faster within budget --
+            # select it.
+            if (execution_time < best_finish_time
+                    and execution_price <= total_budget):
+                best_finish_time = execution_time
+                new_pot = total_budget - execution_price
+                best_host = Host(type=HostType.VMInstance, host=vm)
+
+        return best_host, new_pot, best_finish_time
+
     def schedule_task(self, workflow_uuid: str, task_id: int) -> None:
-        pass
+        """Schedule task according to Min-MinBUDG algorithm.
+
+        :param workflow_uuid: UUID of workflow that is scheduled.
+        :param task_id: task ID to schedule.
+        :return: None.
+        """
+
+        current_time = self.event_loop.get_current_time()
+
+        workflow = self.workflows[workflow_uuid]
+        task = workflow.tasks[task_id]
+
+        # Find best host for task.
+        host, pot, exec_time = self._get_best_host(task=task, pot=workflow.pot)
+        workflow.pot = pot
+
+        # Get VM for task (or init new one).
+        vm = None
+        if host.type == HostType.VMType:
+            vm = self.vm_manager.init_vm(host.host)
+
+            # Save info to metric collector.
+            self.collector.initialized_vms += 1
+            self.collector.workflows[workflow_uuid].initialized_vms.append(vm)
+        elif host.type == HostType.VMInstance:
+            vm = host.host
+
+        # IMPORTANT: time for provisioning does not add up to exec time
+        #  as it has already been taken into account.
+        # Provision VM if required.
+        if vm.get_state() == vms.State.NOT_PROVISIONED:
+            self.vm_manager.provision_vm(vm=vm, time=current_time)
+
+        # Provision container if required.
+        if not vm.check_if_container_provisioned(container=task.container):
+            vm.provision_container(container=task.container)
+
+        # Reserve VM and submit event to event loop.
+        self.vm_manager.reserve_vm(vm)
+
+        finish_time = current_time + timedelta(seconds=exec_time)
+        self.event_loop.add_event(event=Event(
+            start_time=finish_time,
+            event_type=EventType.FINISH_TASK,
+            task=task,
+            vm=vm,
+        ))
+
+        # Save info to metric collector.
+        self.collector.workflows[workflow_uuid].used_vms.add(vm)
 
     def finish_task(
             self,
