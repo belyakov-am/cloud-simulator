@@ -28,8 +28,6 @@ class SchedulerInterface(ABC):
 
         self.event_loop: sch.EventLoop = sch.EventLoop()
 
-        self.vm_provision_delay: int = 0
-
         self.predict_func: tp.Optional[tep.PredictFunc] = None
 
         self.name = ""
