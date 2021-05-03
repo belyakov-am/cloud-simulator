@@ -58,7 +58,7 @@ def calculate_exec_time(
                           if task.parents
                           else 0)
 
-        task_exec_time = tep.io_consumption(
+        task_exec_time = tep.io_and_runtime(
             task=task,
             vm_type=vm_type,
             storage=storage_manager.get_storage(),
