@@ -1,6 +1,7 @@
 from collections import defaultdict
 import typing as tp
 
+from loguru import logger
 import networkx as nx
 
 import simulator.storages as sts
