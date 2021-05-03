@@ -77,7 +77,7 @@ class MinMinScheduler(SchedulerInterface):
             description=workflow.description,
         )
         minmin_workflow.uuid = workflow.uuid
-        minmin_workflow.set_deadline(time=workflow.deadline)
+        minmin_workflow.set_budget(budget=workflow.budget)
         minmin_workflow.set_submit_time(time=workflow.submit_time)
 
         # Create Min-Min tasks from basic.
