@@ -48,7 +48,7 @@ def main() -> None:
             collector = simulator.get_metric_collector()
             total_stats[num_tasks][scheduler.name] = collector
 
-    splitter = ("=" * 80 + "\n") * 3
+    splitter = ("=" * 79 + "\n") * 3
     logger.opt(raw=True).info(splitter)
 
     for num_tasks, scheduler_stats in sorted(
