@@ -6,7 +6,6 @@ import typing as tp
 from loguru import logger
 
 import simulator.utils.cost as cst
-import simulator.utils.task_execution_prediction as tep
 import simulator.vms as vms
 import simulator.workflows as wfs
 
@@ -115,7 +114,7 @@ class DynaScheduler(SchedulerInterface):
         estimated_cost = 0.0
 
         for i in range(len(workflow.tasks)):
-            estimated_time = tep.io_consumption(
+            estimated_time = self.predict_func(
                 task=workflow.tasks[i],
                 vm_type=configuration_plan.plan[i],
                 storage=self.storage_manager.get_storage(),
@@ -349,7 +348,7 @@ class DynaScheduler(SchedulerInterface):
             total_exec_time += task.container.provision_time
 
         # Get task execution time.
-        total_exec_time += tep.io_consumption(
+        total_exec_time += self.predict_func(
             task=task,
             vm_type=vm.type,
             storage=self.storage_manager.get_storage(),

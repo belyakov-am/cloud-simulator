@@ -6,7 +6,6 @@ import typing as tp
 from loguru import logger
 
 import simulator.utils.cost as cst
-import simulator.utils.task_execution_prediction as tep
 import simulator.vms as vms
 import simulator.workflows as wfs
 
@@ -107,7 +106,7 @@ class MinMinScheduler(SchedulerInterface):
         average_vm_type = self.vm_manager.get_average_vm_type()
 
         for task in workflow.tasks:
-            execution_time = tep.io_consumption(
+            execution_time = self.predict_func(
                 task=task,
                 vm_type=average_vm_type,
                 storage=self.storage_manager.get_storage(),
@@ -178,7 +177,7 @@ class MinMinScheduler(SchedulerInterface):
             type=HostType.VMType,
             host=self.vm_manager.get_slowest_vm_type()
         )
-        best_finish_time = tep.io_consumption(
+        best_finish_time = self.predict_func(
             task=task,
             vm_type=best_host.host,
             storage=self.storage_manager.get_storage(),
@@ -188,7 +187,7 @@ class MinMinScheduler(SchedulerInterface):
 
         # Find better host among all VM types.
         for vm_type in self.vm_manager.get_vm_types():
-            execution_time = tep.io_consumption(
+            execution_time = self.predict_func(
                 task=task,
                 vm_type=vm_type,
                 storage=self.storage_manager.get_storage(),
@@ -210,7 +209,7 @@ class MinMinScheduler(SchedulerInterface):
 
         # Find better host among idle VMs.
         for vm in self.vm_manager.get_idle_vms():
-            execution_time = tep.io_consumption(
+            execution_time = self.predict_func(
                 task=task,
                 vm_type=vm.type,
                 storage=self.storage_manager.get_storage(),

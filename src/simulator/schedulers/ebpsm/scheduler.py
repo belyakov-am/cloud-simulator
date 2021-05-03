@@ -8,7 +8,6 @@ from loguru import logger
 import networkx as nx
 
 import simulator.utils.cost as cst
-import simulator.utils.task_execution_prediction as tep
 import simulator.workflows as wfs
 import simulator.vms as vms
 
@@ -174,7 +173,7 @@ class EBPSMScheduler(SchedulerInterface):
                           if task.parents
                           else 0)
 
-        task_execution_time = tep.io_consumption(
+        task_execution_time = self.predict_func(
             task=task,
             vm_type=self.vm_manager.get_slowest_vm_type(),
             storage=self.storage_manager.get_storage(),
@@ -231,7 +230,7 @@ class EBPSMScheduler(SchedulerInterface):
         )
 
         for vm_type in vm_types:
-            task_execution_time = tep.io_consumption(
+            task_execution_time = self.predict_func(
                 task=task,
                 vm_type=vm_type,
                 storage=self.storage_manager.get_storage(),
@@ -338,7 +337,7 @@ class EBPSMScheduler(SchedulerInterface):
             best_time: tp.Optional[float] = None
 
             for v in idle_vms:
-                exec_time = tep.io_consumption(
+                exec_time = self.predict_func(
                     task=task,
                     vm_type=v.type,
                     storage=self.storage_manager.get_storage(),
@@ -392,7 +391,7 @@ class EBPSMScheduler(SchedulerInterface):
             total_exec_time += task.container.provision_time
 
         # Get task execution time.
-        total_exec_time += tep.io_consumption(
+        total_exec_time += self.predict_func(
             task=task,
             vm_type=vm.type,
             storage=self.storage_manager.get_storage(),

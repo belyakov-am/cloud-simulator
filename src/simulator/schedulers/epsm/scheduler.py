@@ -5,7 +5,6 @@ import typing as tp
 from loguru import logger
 
 import simulator.utils.cost as cst
-import simulator.utils.task_execution_prediction as tep
 import simulator.vms as vms
 import simulator.workflows as wfs
 
@@ -154,7 +153,7 @@ class EPSMScheduler(SchedulerInterface):
                           if task.parents
                           else 0)
 
-        task_execution_time = tep.io_consumption(
+        task_execution_time = self.predict_func(
             task=task,
             vm_type=self.vm_manager.get_slowest_vm_type(),
             storage=self.storage_manager.get_storage(),
@@ -259,7 +258,7 @@ class EPSMScheduler(SchedulerInterface):
         current_time = self.event_loop.get_current_time()
 
         for vm in idle_vms:
-            total_exec_time = tep.io_consumption(
+            total_exec_time = self.predict_func(
                 task=task,
                 vm_type=vm.type,
                 storage=self.storage_manager.get_storage(),
@@ -310,7 +309,7 @@ class EPSMScheduler(SchedulerInterface):
         container_prov = task.container.provision_time
 
         for vm_type in vm_types:
-            task_execution_time = tep.io_consumption(
+            task_execution_time = self.predict_func(
                 task=task,
                 vm_type=vm_type,
                 storage=self.storage_manager.get_storage(),
@@ -423,7 +422,7 @@ class EPSMScheduler(SchedulerInterface):
                 total_exec_time += task.container.provision_time
 
             # Get task execution time.
-            total_exec_time += tep.io_consumption(
+            total_exec_time += self.predict_func(
                 task=task,
                 vm_type=vm.type,
                 storage=self.storage_manager.get_storage(),
