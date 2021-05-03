@@ -22,6 +22,7 @@ class Task:
             parents: list["Task"],
             input_files: list[File],
             output_files: list[File],
+            runtime: float,
             container: Container,
 
     ) -> None:
@@ -38,6 +39,9 @@ class Task:
         self.input_files = input_files
         # Files that task produces
         self.output_files = output_files
+
+        # Amount of time required for task to execute on one CPU.
+        self.runtime = runtime
 
         # Container that simulates required libraries and software.
         self.container = container

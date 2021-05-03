@@ -93,6 +93,11 @@ class PegasusTraceParser:
                 elif task_file["link"] == "output":
                     output_files.append(file_obj)
 
+            # Process runtime.
+            total_runtime = task_json["runtime"]
+            cores = task_json["cores"]
+            runtime = total_runtime / cores
+
             # Save task
             task = wfs.Task(
                 workflow_uuid=self.workflow.uuid,
@@ -101,6 +106,7 @@ class PegasusTraceParser:
                 parents=parents,
                 input_files=input_files,
                 output_files=output_files,
+                runtime=runtime,
                 container=container,
             )
 
