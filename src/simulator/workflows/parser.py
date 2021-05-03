@@ -46,7 +46,7 @@ class PegasusTraceParser:
 
         workflow_json = self._data["workflow"]
 
-        # Parse container
+        # Parse container.
         if self.container_prov is not None:
             provision_time = self.container_prov
         else:
@@ -65,9 +65,9 @@ class PegasusTraceParser:
         #   is listed only after all its predecessors (if exists).
         tasks: dict[str, wfs.Task] = dict()
 
-        # Parse tasks
+        # Parse tasks.
         for ind, task_json in enumerate(workflow_json["jobs"]):
-            # Process parents
+            # Process parents.
             parents_names = task_json["parents"]
             parents: list[wfs.Task] = []
 
@@ -76,13 +76,13 @@ class PegasusTraceParser:
                     parent = tasks[name]
                     parents.append(parent)
 
-                    # set edge from parent to current in DAG structure
+                    # Set edge from parent to current in DAG structure.
                     self.workflow.dag.add_edge(parent.id, ind)
                 except KeyError:
                     raise SyntaxError("Bad file structure. "
                                       "Child task is before its parent")
 
-            # Process files
+            # Process files.
             input_files: list[wfs.File] = []
             output_files: list[wfs.File] = []
 
@@ -98,7 +98,7 @@ class PegasusTraceParser:
             cores = task_json["cores"]
             runtime = total_runtime / cores
 
-            # Save task
+            # Save task.
             task = wfs.Task(
                 workflow_uuid=self.workflow.uuid,
                 task_id=ind,
