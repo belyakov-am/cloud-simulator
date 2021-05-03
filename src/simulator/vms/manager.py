@@ -64,12 +64,29 @@ class Manager:
         )
 
     def set_metric_collector(self, collector: mc.MetricCollector) -> None:
+        """Set metric collector for stats.
+
+        :param collector: metric collector.
+        :return: None
+        """
+
         self.collector = collector
 
     def set_provision_delay(self, delay: int) -> None:
+        """Set VM provision delay from simulator.
+
+        :param delay: VM provision delay.
+        :return: None
+        """
+
         self.provision_delay = delay
 
     def get_provision_delay(self) -> int:
+        """Return VM provision delay.
+
+        :return: VM provision delay.
+        """
+
         return self.provision_delay
 
     def get_slowest_vm_type(self) -> vms.VMType:
