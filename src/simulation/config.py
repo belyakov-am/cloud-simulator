@@ -11,6 +11,9 @@ NUM_TASKS_EXECUTION: list[int] = [20, 100, 300]
 # Number of workflows to generate from each recipe.
 DEFAULT_WORKFLOWS_PER_RECIPE = 10
 
+# Number of workflows to parse. Used for testing.
+NUMBER_OF_WORKFLOWS = 10000000
+
 # Container provisioning delay for different types of workflows.
 # Declared in seconds.
 CONTAINER_PROV_DELAY: dict[str, int] = {
@@ -30,8 +33,8 @@ DEADLINES = {
 # Budgets for different sets based on workflows' sizes.
 # Declared in dollars.
 BUDGETS = {
-    20: 10,
-    100: 40,
-    300: 100,
-    600: 150,
+    20: 20,
+    100: 100,
+    300: 300,
+    600: 600,
 }

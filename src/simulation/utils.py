@@ -53,9 +53,14 @@ def parse_workflows() -> dict[int, dict[str, wfs.Workflow]]:
 
     workflow_sets: dict[int, dict[str, wfs.Workflow]] = defaultdict(dict)
 
+    count = 0
+
     for trace_path in config.WORKFLOW_DIR.glob("**/*"):
         if trace_path.is_dir():
             continue
+
+        if count == config.NUMBER_OF_WORKFLOWS:
+            break
 
         trace_path_str = str(trace_path)
 
@@ -82,5 +87,7 @@ def parse_workflows() -> dict[int, dict[str, wfs.Workflow]]:
         workflow.set_budget(budget=budget)
 
         workflow_sets[num_tasks][workflow.uuid] = workflow
+
+        count += 1
 
     return workflow_sets
