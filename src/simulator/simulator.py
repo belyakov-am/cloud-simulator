@@ -19,6 +19,7 @@ class Simulator:
             self,
             scheduler: sch.SchedulerInterface,
             predict_func: str,
+            vm_prov: int,
             logger_flag: bool = False,
     ) -> None:
         self.scheduler: sch.SchedulerInterface = scheduler
@@ -31,7 +32,7 @@ class Simulator:
         self.collector: mc.MetricCollector = mc.MetricCollector()
 
         self.scheduler.set_metric_collector(collector=self.collector)
-        self.scheduler.set_vm_provision_delay(delay=config.VM_PROVISION_DELAY)
+        self.scheduler.set_vm_provision_delay(delay=vm_prov)
         self._set_predict_function(predict_func=predict_func)
 
     def _init_logger(self) -> None:

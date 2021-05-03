@@ -30,6 +30,7 @@ def main() -> None:
             simulator = sm.Simulator(
                 scheduler=current_scheduler,
                 predict_func=config.PREDICT_EXEC_TIME_FUNC,
+                vm_prov=config.VM_PROVISION_DELAY,
                 logger_flag=logger_flag,
             )
 
