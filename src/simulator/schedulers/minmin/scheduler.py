@@ -314,6 +314,11 @@ class MinMinScheduler(SchedulerInterface):
         current_time = self.event_loop.get_current_time()
 
         workflow = self.workflows[workflow_uuid]
+        task = workflow.tasks[task_id]
+
+        # Mark task as finished and release VM.
+        workflow.mark_task_finished(time=current_time, task=task)
+        self.vm_manager.release_vm(vm=vm)
 
         # Add new tasks to event loop.
         for t in workflow.unscheduled_tasks:
