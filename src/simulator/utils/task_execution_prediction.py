@@ -83,7 +83,7 @@ def io_consumption(
     return total_time
 
 
-def io_with_runtime(
+def io_and_runtime(
         task: wfs.Task,
         vm_type: vms.VMType,
         storage: sts.Storage,
@@ -154,5 +154,5 @@ def io_with_runtime(
 
 PREDICT_FUNCTIONS: dict[str, PredictFunc] = {
     "io_consumption": io_consumption,
-    "io_with_runtime": io_with_runtime,
+    "io_and_runtime": io_and_runtime,
 }
