@@ -107,6 +107,7 @@ class EPSMScheduler(SchedulerInterface):
                 parents=parents,
                 input_files=task.input_files,
                 output_files=task.output_files,
+                runtime=task.runtime,
                 container=task.container,
             )
 
