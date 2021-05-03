@@ -29,6 +29,7 @@ class Simulator:
         self.collector: mc.MetricCollector = mc.MetricCollector()
 
         self.scheduler.set_metric_collector(collector=self.collector)
+        self.scheduler.set_vm_provision_delay(delay=config.VM_PROVISION_DELAY)
 
     def _init_logger(self) -> None:
         iter_num = config.ITER_NUMBER

@@ -27,6 +27,8 @@ class SchedulerInterface(ABC):
 
         self.event_loop: sch.EventLoop = sch.EventLoop()
 
+        self.vm_provision_delay: int = 0
+
         self.name = ""
 
     def run_event_loop(self) -> None:
@@ -36,6 +38,9 @@ class SchedulerInterface(ABC):
         self.collector = collector
         self.storage_manager.set_metric_collector(collector=collector)
         self.vm_manager.set_metric_collector(collector=collector)
+
+    def set_vm_provision_delay(self, delay: int) -> None:
+        self.vm_manager.set_provision_delay(delay=delay)
 
     @abstractmethod
     def submit_workflow(

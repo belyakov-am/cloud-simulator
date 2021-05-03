@@ -22,12 +22,6 @@ class Settings:
     # search.
     on_demand_conf_max_iter: int = 1000
 
-    # Indicates time required for VM manager to provision VM. For
-    # simplicity, it is assumed that each VM requires same time to
-    # be provisioned.
-    # Declared in seconds.
-    vm_provision_delay: int = 120
-
     # Indicates amount of time for VM to be shut down. If time until
     # next billing period for idle VM is less than this variable, it
     # should be removed.
@@ -125,7 +119,7 @@ class DynaScheduler(SchedulerInterface):
                 vm_type=configuration_plan.plan[i],
                 storage=self.storage_manager.get_storage(),
                 container_prov=workflow.container.provision_time,
-                vm_prov=self.settings.vm_provision_delay,
+                vm_prov=self.vm_manager.get_provision_delay(),
             )
 
             # Set estimated time for further performance estimations.
@@ -346,7 +340,7 @@ class DynaScheduler(SchedulerInterface):
         # Provision VM if required.
         if vm.get_state() == vms.State.NOT_PROVISIONED:
             self.vm_manager.provision_vm(vm=vm, time=current_time)
-            total_exec_time += self.settings.vm_provision_delay
+            total_exec_time += self.vm_manager.get_provision_delay()
 
         # Provision container if required.
         if not vm.check_if_container_provisioned(container=task.container):

@@ -22,12 +22,6 @@ class Settings:
     # Declared in seconds.
     scheduling_interval: int = 10
 
-    # Indicates time required for VM manager to provision VM. For
-    # simplicity, it is assumed that each VM requires same time to
-    # be provisioned.
-    # Declared in seconds.
-    vm_provision_delay: int = 120
-
     # Indicates resource provisioning interval. During this stage
     # idle VMs can be shutdown.
     # Declared in seconds.
@@ -164,7 +158,7 @@ class EPSMScheduler(SchedulerInterface):
             vm_type=self.vm_manager.get_slowest_vm_type(),
             storage=self.storage_manager.get_storage(),
             container_prov=task.container.provision_time,
-            vm_prov=self.settings.vm_provision_delay,
+            vm_prov=self.vm_manager.get_provision_delay(),
         )
 
         task.eft = max_parent_eft + task_execution_time
@@ -311,7 +305,7 @@ class EPSMScheduler(SchedulerInterface):
         """
 
         current_time = self.event_loop.get_current_time()
-        vm_prov = self.settings.vm_provision_delay
+        vm_prov = self.vm_manager.get_provision_delay()
         container_prov = task.container.provision_time
 
         for vm_type in vm_types:
@@ -420,7 +414,7 @@ class EPSMScheduler(SchedulerInterface):
             # Provision VM if required.
             if vm.get_state() == vms.State.NOT_PROVISIONED:
                 self.vm_manager.provision_vm(vm=vm, time=current_time)
-                total_exec_time += self.settings.vm_provision_delay
+                total_exec_time += self.vm_manager.get_provision_delay()
 
             # Provision container if required.
             if not vm.check_if_container_provisioned(container=task.container):

@@ -30,6 +30,13 @@ class Manager:
         # Collector for metrics. Should be set by scheduler.
         self.collector: tp.Optional[mc.MetricCollector] = None
 
+        # Indicates time required for VM manager to provision VM. For
+        # simplicity, it is assumed that each VM requires same time to
+        # be provisioned.
+        # IMPORTANT: should be set by simulator.
+        # Declared in seconds.
+        self.provision_delay: int = 0
+
         self._get_vm_types_from_json(config.VM_TYPES)
 
     def _get_vm_types_from_json(self, filename: str) -> None:
@@ -58,6 +65,12 @@ class Manager:
 
     def set_metric_collector(self, collector: mc.MetricCollector) -> None:
         self.collector = collector
+
+    def set_provision_delay(self, delay: int) -> None:
+        self.provision_delay = delay
+
+    def get_provision_delay(self) -> int:
+        return self.provision_delay
 
     def get_slowest_vm_type(self) -> vms.VMType:
         """Return slowest VM which is defined by its CPU.

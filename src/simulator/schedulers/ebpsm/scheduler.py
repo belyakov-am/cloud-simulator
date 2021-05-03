@@ -20,12 +20,6 @@ from .workflow import Workflow
 
 @dataclass
 class Settings:
-    # Indicates time required for VM manager to provision VM. For
-    # simplicity, it is assumed that each VM requires same time to
-    # be provisioned.
-    # Declared in seconds.
-    vm_provision_delay: int = 120
-
     # After this time idle VMs will be terminated during
     # `MANAGE_RESOURCES` event.
     # Declared in seconds.
@@ -184,7 +178,7 @@ class EBPSMScheduler(SchedulerInterface):
             vm_type=self.vm_manager.get_slowest_vm_type(),
             storage=self.storage_manager.get_storage(),
             container_prov=task.container.provision_time,
-            vm_prov=self.settings.vm_provision_delay,
+            vm_prov=self.vm_manager.get_provision_delay(),
         )
 
         task.eft = max_parent_eft + task_execution_time
@@ -241,7 +235,7 @@ class EBPSMScheduler(SchedulerInterface):
                 vm_type=vm_type,
                 storage=self.storage_manager.get_storage(),
                 container_prov=task.container.provision_time,
-                vm_prov=self.settings.vm_provision_delay,
+                vm_prov=self.vm_manager.get_provision_delay(),
             )
 
             # WARNING!
@@ -349,7 +343,7 @@ class EBPSMScheduler(SchedulerInterface):
                     storage=self.storage_manager.get_storage(),
                     vm=v,
                     container_prov=task.container.provision_time,
-                    vm_prov=self.settings.vm_provision_delay,
+                    vm_prov=self.vm_manager.get_provision_delay(),
                 )
                 possible_finish_time = (current_time
                                         + timedelta(seconds=exec_time))
@@ -389,7 +383,7 @@ class EBPSMScheduler(SchedulerInterface):
         # Provision VM if required.
         if vm.get_state() == vms.State.NOT_PROVISIONED:
             self.vm_manager.provision_vm(vm=vm, time=current_time)
-            total_exec_time += self.settings.vm_provision_delay
+            total_exec_time += self.vm_manager.get_provision_delay()
 
         # Provision container if required.
         if not vm.check_if_container_provisioned(container=task.container):

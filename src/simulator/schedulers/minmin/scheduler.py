@@ -16,15 +16,6 @@ from .task import Task
 from .workflow import Workflow
 
 
-@dataclass
-class Settings:
-    # Indicates time required for VM manager to provision VM. For
-    # simplicity, it is assumed that each VM requires same time to
-    # be provisioned.
-    # Declared in seconds.
-    vm_provision_delay: int = 120
-
-
 class HostType(enum.Enum):
     VMInstance = enum.auto()
     VMType = enum.auto()
@@ -41,9 +32,6 @@ class MinMinScheduler(SchedulerInterface):
         super().__init__()
         # Map from workflow UUID to workflow instance.
         self.workflows: dict[str, Workflow] = dict()
-
-        # Settings of scheduler. Slightly control its behaviour.
-        self.settings: Settings = Settings()
 
         self.name = "Min-MinBUDG"
 
@@ -123,7 +111,7 @@ class MinMinScheduler(SchedulerInterface):
                 vm_type=average_vm_type,
                 storage=self.storage_manager.get_storage(),
                 container_prov=task.container.provision_time,
-                vm_prov=self.settings.vm_provision_delay,
+                vm_prov=self.vm_manager.get_provision_delay(),
             )
 
             task.execution_time_prediction = execution_time
@@ -179,6 +167,7 @@ class MinMinScheduler(SchedulerInterface):
         """
 
         current_time = self.event_loop.get_current_time()
+        vm_prov = self.vm_manager.get_provision_delay()
 
         total_budget = task.budget + pot
         new_pot = 0.0
@@ -193,7 +182,7 @@ class MinMinScheduler(SchedulerInterface):
             vm_type=best_host.host,
             storage=self.storage_manager.get_storage(),
             container_prov=task.container.provision_time,
-            vm_prov=self.settings.vm_provision_delay,
+            vm_prov=vm_prov,
         )
 
         # Find better host among all VM types.
@@ -203,7 +192,7 @@ class MinMinScheduler(SchedulerInterface):
                 vm_type=vm_type,
                 storage=self.storage_manager.get_storage(),
                 container_prov=task.container.provision_time,
-                vm_prov=self.settings.vm_provision_delay,
+                vm_prov=vm_prov,
             )
             execution_price = cst.estimate_price_for_vm_type(
                 use_time=execution_time,
@@ -225,7 +214,7 @@ class MinMinScheduler(SchedulerInterface):
                 vm_type=vm.type,
                 storage=self.storage_manager.get_storage(),
                 container_prov=task.container.provision_time,
-                vm_prov=self.settings.vm_provision_delay,
+                vm_prov=vm_prov,
                 vm=vm,
             )
             execution_price = cst.calculate_price_for_vm(
