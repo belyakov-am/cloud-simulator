@@ -18,11 +18,14 @@ def io_consumption(
 ) -> float:
     """Return prediction for time execution based on IO consumption.
     It includes time for process data over network and disk.
-    Calculations are made in seconds.
+    IMPORTANT: Calculations are made in seconds.
 
-    If `vm` is passed, input files are checked for existence.
-    If `container_prov` is passed, it is added to total time.
-    If `vm_prov` is passed, it is added to total time.
+    - If `vm` is passed, input files are checked for existence.
+    Moreover, VM state and containers are checked. If VM has already
+    been provisioned, this time will not be added. If VM has task's
+    container, this time will not be added.
+    - If `container_prov` is passed, it is added to total time.
+    - If `vm_prov` is passed, it is added to total time.
 
     :param task: task for prediction.
     :param vm_type: VM type where task is executed.
@@ -30,7 +33,7 @@ def io_consumption(
     :param vm: VM instance where task is executed.
     :param container_prov: container provisioning delay.
     :param vm_prov: VM provisioning delay.
-    :return:
+    :return: task execution time.
     """
 
     total_time = 0.0
