@@ -36,7 +36,10 @@ def main() -> None:
                 workflows.items(),
                 key=lambda it: it[1].name,
         ):
-            inspected = ins.inspect_workflow(workflow=workflow)
+            inspected = ins.inspect_workflow(
+                workflow=workflow,
+                vm_prov=config.VM_PROVISION_DELAY,
+            )
             logger.info(
                 f"Workflow name = {workflow.name}\n"
                 f"Exec time on slowest VM = {inspected.exec_time_slowest_vm}\n"
