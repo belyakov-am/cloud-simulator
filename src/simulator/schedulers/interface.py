@@ -4,6 +4,7 @@ import typing as tp
 import simulator.metric_collector as mc
 import simulator.schedulers as sch
 import simulator.storages as sts
+import simulator.utils.task_execution_prediction as tep
 import simulator.vms as vms
 import simulator.workflows as wfs
 
@@ -29,6 +30,8 @@ class SchedulerInterface(ABC):
 
         self.vm_provision_delay: int = 0
 
+        self.predict_func: tp.Optional[tep.PredictFunc] = None
+
         self.name = ""
 
     def run_event_loop(self) -> None:
@@ -41,6 +44,9 @@ class SchedulerInterface(ABC):
 
     def set_vm_provision_delay(self, delay: int) -> None:
         self.vm_manager.set_provision_delay(delay=delay)
+
+    def set_predict_function(self, predict_func: tep.PredictFunc) -> None:
+        self.predict_func = predict_func
 
     @abstractmethod
     def submit_workflow(

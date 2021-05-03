@@ -6,6 +6,7 @@ from loguru import logger
 import simulator.config as config
 import simulator.metric_collector as mc
 import simulator.schedulers as sch
+import simulator.utils.task_execution_prediction as tep
 import simulator.workflows as wfs
 
 
@@ -17,6 +18,7 @@ class Simulator:
     def __init__(
             self,
             scheduler: sch.SchedulerInterface,
+            predict_func: str,
             logger_flag: bool = False,
     ) -> None:
         self.scheduler: sch.SchedulerInterface = scheduler
@@ -30,6 +32,7 @@ class Simulator:
 
         self.scheduler.set_metric_collector(collector=self.collector)
         self.scheduler.set_vm_provision_delay(delay=config.VM_PROVISION_DELAY)
+        self._set_predict_function(predict_func=predict_func)
 
     def _init_logger(self) -> None:
         iter_num = config.ITER_NUMBER
@@ -53,8 +56,26 @@ class Simulator:
             rotation="50MB",
         )
 
-    def _init_scheduler_collector(self) -> None:
-        self.scheduler.set_metric_collector(collector=self.collector)
+    def _set_predict_function(self, predict_func: str) -> None:
+        """Set execution time prediction function to scheduler.
+        Possible values are:
+          - `io_consumption` -- considers only IO operations (read/write
+          file, file transfer).
+          - `io_and_runtime` -- considers both IO operations and task's
+          runtime.
+
+        :param predict_func: name of predict function.
+        :return: None.
+        """
+
+        if predict_func not in tep.PREDICT_FUNCTIONS.keys():
+            raise ValueError(
+                f"Bad predict function name {predict_func}.\n"
+                f"Possible values = {tep.PREDICT_FUNCTIONS.keys()}\n"
+            )
+
+        pf = tep.PREDICT_FUNCTIONS[predict_func]
+        self.scheduler.set_predict_function(predict_func=pf)
 
     def submit_workflow(self, workflow: wfs.Workflow, time: datetime) -> None:
         self.workflows[workflow.uuid] = workflow

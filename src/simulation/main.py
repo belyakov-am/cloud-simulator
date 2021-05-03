@@ -29,7 +29,8 @@ def main() -> None:
             current_scheduler = deepcopy(scheduler)
             simulator = sm.Simulator(
                 scheduler=current_scheduler,
-                logger_flag=logger_flag
+                predict_func=config.PREDICT_EXEC_TIME_FUNC,
+                logger_flag=logger_flag,
             )
 
             if logger_flag:

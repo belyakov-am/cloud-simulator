@@ -4,6 +4,14 @@ import pathlib
 ROOT_DIR = pathlib.Path(__file__).parent.parent.parent
 WORKFLOW_DIR = ROOT_DIR / "workflow-traces" / "pegasus" / "generated"
 
+# Function for predicting task execution time.
+# Possible values are:
+#   - `io_consumption` -- considers only IO operations (read/write file,
+#   file transfer).
+#   - `io_and_runtime` -- considers both IO operations and task's
+#   runtime.
+PREDICT_EXEC_TIME_FUNC = "io_consumption"
+
 # List of num_tasks for workflow generation.
 DEFAULT_NUM_TASKS: list[int] = [20, 100, 300, 600]
 # List of num_tasks for execution.

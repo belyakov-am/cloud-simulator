@@ -7,6 +7,18 @@ import simulator.workflows as wfs
 
 KILOBYTES_IN_MEGABIT = 125
 
+PredictFunc = tp.TypeVar(
+    name="PredictFunc",
+    bound=tp.Callable[[
+        wfs.Task,
+        vms.VMType,
+        sts.Storage,
+        tp.Optional[vms.VM],
+        int,
+        int,
+    ], float]
+)
+
 
 def io_consumption(
         task: wfs.Task,
@@ -138,3 +150,9 @@ def io_with_runtime(
     total_time += task.runtime / vm_type.cpu
 
     return total_time
+
+
+PREDICT_FUNCTIONS: dict[str, PredictFunc] = {
+    "io_consumption": io_consumption,
+    "io_with_runtime": io_with_runtime,
+}
