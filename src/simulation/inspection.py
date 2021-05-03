@@ -6,7 +6,7 @@ from simulator.config import LOGS_DIR
 import simulator.utils.inspection as ins
 
 
-ITER_NUMBER = 0
+ITER_NUMBER = 1
 
 
 def setup_logger() -> None:
@@ -26,7 +26,10 @@ def main() -> None:
 
     workflow_sets = utils.parse_workflows()
 
-    for num_tasks, workflows in workflow_sets.items():
+    for num_tasks, workflows in sorted(
+            workflow_sets.items(),
+            key=lambda it: it[0],
+    ):
         logger.info(f"Number of tasks in workflow = {num_tasks}")
 
         for _, workflow in workflows.items():
