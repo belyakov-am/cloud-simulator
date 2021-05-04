@@ -1,5 +1,7 @@
 import typing as tp
 
+from loguru import logger
+
 import simulator.storages as sts
 import simulator.vms as vms
 import simulator.workflows as wfs
@@ -134,10 +136,12 @@ def io_and_runtime(
         # Time for storage to process file.
         # If vm was given, check if file already on it, so no network
         # transfer is required.
-        if (vm is None
-                or (vm is not None
-                    and not vm.check_if_files_present(files=[input_file]))):
+        if vm is None:
             total_time += input_file.size_in_megabits() / storage.read_rate
+        else:
+            file_on_vm = vm.check_if_files_present(files=[input_file])
+            if not file_on_vm:
+                total_time += input_file.size_in_megabits() / storage.read_rate
 
     for output_file in task.output_files:
         # Time for VM to write file.
