@@ -15,7 +15,12 @@ def main() -> None:
     utils.generate_workflows(recipes=[GenomeRecipe, CyclesRecipe])
     workflow_sets = utils.parse_workflows()
 
-    schedulers = [sch.EPSMScheduler(), sch.EBPSMScheduler()]
+    schedulers = [
+        sch.EPSMScheduler(),
+        sch.DynaScheduler(),
+        sch.EBPSMScheduler(),
+        sch.MinMinScheduler(),
+    ]
 
     # Map from num_tasks to map for workflow UUID to its metric collector
     total_stats: dict[int, dict[str, sm.MetricCollector]] = defaultdict(dict)
