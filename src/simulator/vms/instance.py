@@ -115,7 +115,6 @@ class VM:
         :return: None.
         """
 
-        # TODO: do something with time
         self.containers.add(container)
 
     def get_state(self) -> State:
