@@ -98,3 +98,18 @@ class Task:
 
         self.state = State.FINISHED
         self.finish_time = time
+
+    def get_files_size(self) -> int:
+        """Return sum of all files (input and output) sizes.
+
+        :return: files size.
+        """
+
+        total_size = 0
+        for f in self.input_files:
+            total_size += f.size
+
+        for f in self.output_files:
+            total_size += f.size
+
+        return total_size
