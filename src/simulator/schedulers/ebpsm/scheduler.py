@@ -403,7 +403,7 @@ class EBPSMScheduler(SchedulerInterface):
         task.execution_price = vm.calculate_cost(time=finish_time)
 
         # Reserve VM and submit event to event loop.
-        self.vm_manager.reserve_vm(vm)
+        self.vm_manager.reserve_vm(vm=vm, task=task)
 
         self.event_loop.add_event(event=Event(
             start_time=finish_time,

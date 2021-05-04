@@ -134,15 +134,24 @@ class VM:
         self.start_time = time
         self.state = State.PROVISIONED
 
-    def reserve(self) -> None:
-        """Mark VM as busy.
+    def reserve(self, task: wfs.Task) -> None:
+        """Mark VM as busy for executing given task.
 
+        :param task: task to execute.
         :return: None.
         """
 
         assert self.state == State.PROVISIONED
 
+        # Update state.
         self.state = State.BUSY
+
+        # Save files.
+        for f in task.input_files:
+            self.files.add(f)
+
+        for f in task.output_files:
+            self.files.add(f)
 
     def release(self) -> None:
         """Mark VM as provisioned.

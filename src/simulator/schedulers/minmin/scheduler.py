@@ -272,7 +272,7 @@ class MinMinScheduler(SchedulerInterface):
             vm.provision_container(container=task.container)
 
         # Reserve VM and submit event to event loop.
-        self.vm_manager.reserve_vm(vm)
+        self.vm_manager.reserve_vm(vm=vm, task=task)
 
         finish_time = current_time + timedelta(seconds=exec_time)
         self.event_loop.add_event(event=Event(

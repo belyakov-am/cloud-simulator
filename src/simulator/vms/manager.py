@@ -201,17 +201,18 @@ class Manager:
         vm.provision(time=time)
         self.idle_vms.add(vm)
 
-    def reserve_vm(self, vm: vms.VM) -> None:
-        """Reserve given VM. No one else can use it until it is
-        released. It should be provisioned and not busy.
+    def reserve_vm(self, vm: vms.VM, task: wfs.Task) -> None:
+        """Reserve given VM for given task. No one else can use it until
+        it is released. It should be provisioned and not busy.
 
         :param vm: VM to reserve.
+        :param task: task to execute.
         :return: None.
         """
 
         assert vm.get_state() == vms.State.PROVISIONED
 
-        vm.reserve()
+        vm.reserve(task=task)
         self.idle_vms.remove(vm)
 
     def release_vm(self, vm: vms.VM) -> None:
