@@ -6,7 +6,7 @@ from simulator.config import LOGS_DIR
 import simulator.utils.inspection as ins
 
 
-ITER_NUMBER = 2
+ITER_NUMBER = 0
 
 
 def setup_logger() -> None:
@@ -50,7 +50,7 @@ def main() -> None:
                 f"Total size = {inspected.total_size}\n"
             )
 
-        logger.info("=" * 80)
+        logger.info("=" * 79)
 
 
 if __name__ == "__main__":
