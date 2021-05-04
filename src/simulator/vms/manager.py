@@ -257,13 +257,12 @@ class Manager:
         :return: None
         """
 
-        vms_to_shutdown = self.vms
+        vms_to_shutdown = self.idle_vms
         if vm_list is not None:
             vms_to_shutdown = vm_list
 
         for vm in vms_to_shutdown:
-            if vm.get_state() != vms.State.SHUTDOWN:
-                vm.shutdown(time=time)
+            vm.shutdown(time=time)
 
             self.collector.vms_left += 1
             self.collector.cost += vm.calculate_cost()
