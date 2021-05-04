@@ -97,7 +97,7 @@ class VM:
 
         incoming_files_set = set(files)
 
-        return self.files.issubset(incoming_files_set)
+        return incoming_files_set.issubset(self.files)
 
     def check_if_container_provisioned(self, container: wfs.Container) -> bool:
         """Check if given container is provisioned on VM.
