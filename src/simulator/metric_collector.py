@@ -35,7 +35,7 @@ class MetricCollector:
         self.workflows: dict[str, Stats] = defaultdict(Stats)
 
         # Total cost of executing workload.
-        self.cost = 0.0
+        self.cost: float = 0.0
 
         # Start and finish time of simulation.
         self.start_time: tp.Optional[datetime] = None
