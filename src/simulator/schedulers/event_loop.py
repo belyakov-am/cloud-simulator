@@ -51,9 +51,9 @@ class EventLoop:
 
                 workflow = event.workflow
                 scheduler.submit_workflow(workflow=workflow)
+
                 scheduler.collector.workflows[workflow.uuid].start_time = \
                     self.current_time
-
                 scheduler.collector.workflows_total_tasks += len(
                     workflow.tasks)
                 continue
