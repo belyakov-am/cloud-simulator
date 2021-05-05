@@ -27,11 +27,15 @@ def main() -> None:
     total_stats: dict[int, dict[str, sm.MetricCollector]] = defaultdict(dict)
 
     logger_flag = True
+
+    # For each scheduler launch every workload.
     for scheduler in schedulers:
         for num_tasks, workflows in workflow_sets.items():
+            # Skip workload if it is not in config.
             if num_tasks not in config.NUM_TASKS_EXECUTION:
                 continue
 
+            # Create simulator.
             current_scheduler = deepcopy(scheduler)
             simulator = sm.Simulator(
                 scheduler=current_scheduler,
@@ -40,23 +44,30 @@ def main() -> None:
                 logger_flag=logger_flag,
             )
 
+            # Set logger only for first launch (for further it will be
+            # configured).
             if logger_flag:
                 logger_flag = False
 
+            # Submit all workflows.
             for _, workflow in workflows.items():
                 simulator.submit_workflow(
                     workflow=workflow,
                     time=datetime.now(),
                 )
 
+            # Start simulation.
             simulator.run_simulation()
 
+            # Save metrics.
             collector = simulator.get_metric_collector()
             total_stats[num_tasks][scheduler.name] = collector
 
+    # Print splitter for convenience.
     splitter = ("=" * 79 + "\n") * 3
     logger.opt(raw=True).info(splitter)
 
+    # For each workload get every scheduler metrics.
     for num_tasks, scheduler_stats in sorted(
             total_stats.items(),
             key=lambda it: it[0]
@@ -64,8 +75,9 @@ def main() -> None:
         for scheduler_name, stats in scheduler_stats.items():
             deadlines = set()
             budgets = set()
-
             workflows = workflow_sets[num_tasks]
+
+            # Get constraints.
             for workflow_uuid, workflow in workflows.items():
                 deadlines.add(workflow.deadline)
                 budgets.add(workflow.budget)
