@@ -13,6 +13,9 @@ class Stats:
         self.start_time: tp.Optional[datetime] = None
         self.finish_time: tp.Optional[datetime] = None
 
+        # Cost of workflow.
+        self.cost: float = 0.0
+
         # Number of initialized VMs.
         self.initialized_vms: list[vms.VM] = []
         # Number of times when scheduler used VM. Used for comparing
@@ -43,6 +46,8 @@ class MetricCollector:
 
         # Number of new (initialized) VMs leased.
         self.initialized_vms: int = 0
+        # Set of used VMs (unique).
+        self.used_vms: set[vms.VM] = set()
         # Number of removed VMs by scheduler.
         self.removed_vms: int = 0
         # Number of idle VMs left after simulation.
@@ -54,3 +59,23 @@ class MetricCollector:
         self.scheduled_tasks: int = 0
         # Number of `FINISH_TASK` events.
         self.finished_tasks: int = 0
+
+        # Number of constraints met.
+        self.constraints_met: int = 0
+
+    def parse_constraints(self) -> None:
+        """Calculate how many constraints were met in workload.
+
+        :return: None.
+        """
+
+        for _, stats in self.workflows.items():
+            assert stats.deadline is not None or stats.budget is not None
+
+            if stats.deadline is not None:
+                self.constraints_met += stats.finish_time <= stats.deadline
+                continue
+
+            if stats.budget is not None:
+                self.constraints_met += stats.cost <= stats.budget
+                continue

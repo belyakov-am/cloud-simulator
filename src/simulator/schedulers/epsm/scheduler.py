@@ -431,6 +431,11 @@ class EPSMScheduler(SchedulerInterface):
                 storage=self.storage_manager.get_storage(),
                 vm=vm,
             )
+            exec_price = cst.calculate_price_for_vm(
+                current_time=current_time,
+                use_time=total_exec_time,
+                vm=vm,
+            )
 
             # Reserve VM and submit event to event loop.
             self.vm_manager.reserve_vm(vm=vm, task=task)
@@ -445,6 +450,8 @@ class EPSMScheduler(SchedulerInterface):
 
             # Save info to metric collector.
             self.collector.workflows[workflow_uuid].used_vms.add(vm)
+            self.collector.used_vms.add(vm)
+            self.collector.workflows[workflow_uuid].cost += exec_price
 
     def finish_task(
             self,

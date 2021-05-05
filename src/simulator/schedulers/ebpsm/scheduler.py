@@ -400,6 +400,11 @@ class EBPSMScheduler(SchedulerInterface):
             storage=self.storage_manager.get_storage(),
             vm=vm,
         )
+        exec_price = cst.calculate_price_for_vm(
+            current_time=current_time,
+            use_time=total_exec_time,
+            vm=vm,
+        )
 
         # Set task's execution price.
         finish_time = current_time + timedelta(seconds=total_exec_time)
@@ -417,6 +422,8 @@ class EBPSMScheduler(SchedulerInterface):
 
         # Save info to metric collector.
         self.collector.workflows[workflow_uuid].used_vms.add(vm)
+        self.collector.used_vms.add(vm)
+        self.collector.workflows[workflow_uuid].cost += exec_price
 
     def finish_task(
             self,

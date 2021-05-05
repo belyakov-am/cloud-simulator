@@ -82,17 +82,22 @@ def main() -> None:
                 deadlines.add(workflow.deadline)
                 budgets.add(workflow.budget)
 
+            # Parse number of met constraints.
+            stats.parse_constraints()
+
             exec_time = (stats.finish_time - stats.start_time).total_seconds()
 
             logger.info(
                 f"Scheduler name = {scheduler_name}\n"
                 f"Number of workflows = {len(stats.workflows.keys())}\n"
+                f"Number of constraints met = {stats.constraints_met}\n"
                 f"Number of tasks in workflows = {num_tasks}\n"
                 f"Total cost = {stats.cost}\n"
                 f"Total exec time = {exec_time}\n"
                 f"Start time = {stats.start_time}\n"
                 f"Finish time = {stats.finish_time}\n"
                 f"Initialized VMs = {stats.initialized_vms}\n"
+                f"Used VMs = {len(stats.used_vms)}\n"
                 f"Removed VMs = {stats.removed_vms}\n"
                 f"VMs left = {stats.vms_left}\n"
                 f"Total tasks = {stats.workflows_total_tasks}\n"
