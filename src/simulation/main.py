@@ -22,7 +22,8 @@ def main() -> None:
         sch.MinMinScheduler(),
     ]
 
-    # Map from num_tasks to map for workflow UUID to its metric collector
+    # Map from num_tasks to map from scheduler name to its metric
+    # collector.
     total_stats: dict[int, dict[str, sm.MetricCollector]] = defaultdict(dict)
 
     logger_flag = True
