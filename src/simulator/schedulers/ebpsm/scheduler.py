@@ -74,6 +74,9 @@ class EBPSMScheduler(SchedulerInterface):
             workflow=ebpsm_workflow,
         ))
 
+        # Save info to metric collector.
+        self.collector.workflows[workflow.uuid].budget = workflow.budget
+
     def _convert_to_ebpsm_instances(self, workflow: wfs.Workflow) -> None:
         """Convert basic workflow instance to EPSM workflow instance
         (including tasks).

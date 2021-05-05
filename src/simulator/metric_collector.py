@@ -19,6 +19,10 @@ class Stats:
         # efficiency of reusing existing VMs.
         self.used_vms: set[vms.VM] = set()
 
+        # User constraints for workflow. Only one is not None.
+        self.deadline: tp.Optional[datetime] = None
+        self.budget: tp.Optional[float] = None
+
 
 class MetricCollector:
     """Collects various metrics from simulation. Its instance is passed

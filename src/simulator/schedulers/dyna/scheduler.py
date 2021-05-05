@@ -53,6 +53,9 @@ class DynaScheduler(SchedulerInterface):
             workflow=dyna_workflow,
         ))
 
+        # Save info to metric collector.
+        self.collector.workflows[workflow.uuid].deadline = workflow.deadline
+
     def _convert_to_dyna_instances(self, workflow: wfs.Workflow) -> None:
         """Convert basic workflow instance to Dyna workflow instance
         (including tasks).

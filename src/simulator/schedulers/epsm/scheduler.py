@@ -73,6 +73,9 @@ class EPSMScheduler(SchedulerInterface):
             event_type=EventType.MANAGE_RESOURCES,
         ))
 
+        # Save info to metric collector.
+        self.collector.workflows[workflow.uuid].deadline = workflow.deadline
+
     def _convert_to_epsm_instances(self, workflow: wfs.Workflow) -> None:
         """Convert basic workflow instance to EPSM workflow instance
         (including tasks).
