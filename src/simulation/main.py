@@ -74,6 +74,7 @@ def main() -> None:
 
             logger.info(
                 f"Scheduler name = {scheduler_name}\n"
+                f"Number of workflows = {len(stats.workflows.keys())}\n"
                 f"Number of tasks in workflows = {num_tasks}\n"
                 f"Total cost = {stats.cost}\n"
                 f"Total exec time = {exec_time}\n"
