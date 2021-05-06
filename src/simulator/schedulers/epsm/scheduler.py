@@ -130,35 +130,65 @@ class EPSMScheduler(SchedulerInterface):
         # WARNING!
         #   Assumed that every parent task is listed before its child.
 
-        # TODO: check that makespan is within a deadline.
-        #   Otherwise iterate over VM types until OK. If impossible - set
-        #   proper status for this workflow (i.e. rejected).
-        workflow = self.workflows[workflow_uuid]
-        for task in workflow.tasks:
-            current_eft = self._calculate_eft(task)
+        current_time = self.event_loop.get_current_time()
 
-            # Update workflow's total makespan.
-            if current_eft > workflow.makespan:
-                workflow.makespan = current_eft
+        workflow = self.workflows[workflow_uuid]
+        vm_types = self.vm_manager.get_vm_types()
+        proper_deadline = False
+
+        for vm_type in vm_types:
+            workflow.makespan = 0.0
+            self._clear_efts(workflow_uuid=workflow_uuid)
+
+            for task in workflow.tasks:
+                current_eft = self._calculate_eft(task=task, vm_type=vm_type)
+
+                # Update workflow's total makespan.
+                if current_eft > workflow.makespan:
+                    workflow.makespan = current_eft
+
+            finish_time = current_time + timedelta(seconds=workflow.makespan)
+            if finish_time <= workflow.deadline:
+                proper_deadline = True
+                break
+
+        if not proper_deadline:
+            # TODO: set status(?)
+            raise ValueError(
+                f"Bad deadline for workflow = {workflow.uuid} {workflow.name}"
+            )
 
         workflow.orig_makespan = workflow.makespan
 
-    def _calculate_eft(self, task: Task) -> float:
-        """Calculate eft for given task. That is just maximum among
-        parents' efts plus task execution time prediction on slowest
-        VM type.
+    def _clear_efts(self, workflow_uuid: str) -> None:
+        """Set 0 to tasks' EFTs.
+
+        :param workflow_uuid: UUID of workflow that is processed.
+        :return: None.
+        """
+
+        workflow = self.workflows[workflow_uuid]
+        for task in workflow.tasks:
+            task.eft = 0.0
+
+    def _calculate_eft(self, task: Task, vm_type: vms.VMType) -> float:
+        """Calculate eft for given task on given VM type.
+        That is just maximum among parents' efts plus task execution
+        time prediction on given VM type.
         Used for scheduling and assigning appropriate VM types.
 
         :param task: task for eft calculation.
+        :param vm_type: VM type for task execution prediction.
         :return: eft.
         """
+
         max_parent_eft = (max(parent.eft for parent in task.parents)
                           if task.parents
                           else 0)
 
         task_execution_time = self.predict_func(
             task=task,
-            vm_type=self.vm_manager.get_slowest_vm_type(),
+            vm_type=vm_type,
             storage=self.storage_manager.get_storage(),
             container_prov=task.container.provision_time,
             vm_prov=self.vm_manager.get_provision_delay(),
