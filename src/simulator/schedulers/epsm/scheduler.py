@@ -415,7 +415,7 @@ class EPSMScheduler(SchedulerInterface):
                     # If there is no time for delaying, initialize new
                     # VM for cheapest price that can finish task on
                     # time.
-                    if spare_time <= 0:
+                    if spare_time <= 0 or not task.parents:
                         cheapest_vmt = self._find_cheapest_vm_type_for_task(
                             task=task,
                             vm_types=self.vm_manager.get_vm_types(),
