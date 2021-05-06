@@ -535,7 +535,6 @@ class EPSMScheduler(SchedulerInterface):
 
         # Shutdown VMs.
         for vm in idle_vms:
-            # TODO: add deprovisioning delay (?)
             time_until_next_period = cst.time_until_next_billing_period(
                 current_time=current_time,
                 vm=vm,
