@@ -73,6 +73,8 @@ def main() -> None:
             key=lambda it: it[0]
     ):
         for scheduler_name, stats in scheduler_stats.items():
+            stats: sm.MetricCollector = stats
+
             deadlines = set()
             budgets = set()
             workflows = workflow_sets[num_tasks]
