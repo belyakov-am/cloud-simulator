@@ -89,6 +89,11 @@ def main() -> None:
 
             exec_time = (stats.finish_time - stats.start_time).total_seconds()
 
+            # Map from VM type name to number of used VMs of this type.
+            used_vm_types: dict[str, int] = defaultdict(int)
+            for used_vm in stats.used_vms:
+                used_vm_types[used_vm.type.name] += 1
+
             logger.info(
                 f"Scheduler name = {scheduler_name}\n"
                 f"Number of workflows = {len(stats.workflows.keys())}\n"
@@ -107,6 +112,7 @@ def main() -> None:
                 f"Finished tasks = {stats.finished_tasks}\n"
                 f"Deadlines = {deadlines}\n"
                 f"Budgets = {budgets}\n"
+                f"Used VM types = {used_vm_types}\n"
             )
 
 
