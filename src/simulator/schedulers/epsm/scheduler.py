@@ -196,7 +196,9 @@ class EPSMScheduler(SchedulerInterface):
         """
 
         workflow = self.workflows[workflow_uuid]
-        spare_to_makespan_proportion = workflow.spare_time / workflow.makespan
+        spare_to_makespan_proportion = (workflow.spare_time / workflow.makespan
+                                        if workflow.makespan != 0.0
+                                        else 0.0)
 
         for task in tasks:
             task.spare_time = (task.execution_time_prediction
@@ -453,6 +455,39 @@ class EPSMScheduler(SchedulerInterface):
             self.collector.used_vms.add(vm)
             self.collector.workflows[workflow_uuid].cost += exec_price
 
+    def _update_spare_time(self, workflow_uuid):
+        """Calculate new makespan based only on not finished tasks and
+        update makespan.
+
+        :param workflow_uuid: UUID of workflow that is processed.
+        :return: None.
+        """
+
+        current_time = self.event_loop.get_current_time()
+
+        workflow = self.workflows[workflow_uuid]
+        tasks = [
+            task for task in workflow.tasks
+            if task.state != wfs.State.FINISHED
+        ]
+
+        # Map from task's ID to its EFT.
+        efts: dict[int, float] = dict()
+        workflow.makespan = 0.0
+
+        for task in tasks:
+            max_parent_eft = (max(efts.get(p.id, 0) for p in task.parents)
+                              if task.parents
+                              else 0)
+
+            efts[task.id] = max_parent_eft + task.execution_time_prediction
+
+            if (eft := efts[task.id]) > workflow.makespan:
+                workflow.makespan = eft
+
+        available_time = (workflow.deadline - current_time).total_seconds()
+        workflow.spare_time = available_time - workflow.makespan
+
     def finish_task(
             self,
             workflow_uuid: str,
@@ -484,11 +519,8 @@ class EPSMScheduler(SchedulerInterface):
         task_extra_time = (task.deadline - current_time).total_seconds()
 
         if task_extra_time != 0:
-            # Update workflow total spare time and makespan.
-            time_passed = (current_time - workflow.submit_time).total_seconds()
-            workflow.makespan = workflow.orig_makespan - time_passed
-            available_time = (workflow.deadline - current_time).total_seconds()
-            workflow.spare_time = available_time - workflow.makespan
+            # Update workflow total spare time.
+            self._update_spare_time(workflow_uuid=workflow_uuid)
 
             # Update spare time and deadlines for tasks.
             self._distribute_spare_time_among_tasks(
