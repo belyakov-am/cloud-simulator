@@ -341,7 +341,6 @@ class EPSMScheduler(SchedulerInterface):
         workflow = self.workflows[workflow_uuid]
         task = workflow.tasks[task_id]
 
-        idle_vms = self.vm_manager.get_idle_vms()
         idle_vms_with_input = self.vm_manager.get_idle_vms(task=task)
 
         # Search for VM with task's input files.
@@ -353,7 +352,6 @@ class EPSMScheduler(SchedulerInterface):
         # If no available VM with input files, search for VM with
         # task's provisioned container.
         if vm is None:
-            idle_vms -= idle_vms_with_input
             idle_vms_with_container = self.vm_manager.get_idle_vms(
                 container=task.container
             )
@@ -365,7 +363,9 @@ class EPSMScheduler(SchedulerInterface):
             # If no available VM with container, search just for idle
             # VMs.
             if vm is None:
-                idle_vms -= idle_vms_with_container
+                idle_vms = (self.vm_manager.get_idle_vms()
+                             - idle_vms_with_input
+                             - idle_vms_with_container)
 
                 vm = self._find_cheapest_vm_for_task(
                     task=task,
