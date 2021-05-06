@@ -19,7 +19,7 @@ class Settings:
     # Indicates scheduling cycle, which occurs every
     # `scheduling_interval`, during which tasks in queue are processed.
     # Declared in seconds.
-    scheduling_interval: int = 10
+    scheduling_interval: int = 100
 
     # Indicates resource provisioning interval. During this stage
     # idle VMs can be shutdown.
