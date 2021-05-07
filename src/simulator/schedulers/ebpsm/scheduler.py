@@ -241,10 +241,6 @@ class EBPSMScheduler(SchedulerInterface):
                 vm_prov=self.vm_manager.get_provision_delay(),
             )
 
-            # WARNING!
-            #   remove this (?)
-            #   It can be more useful in future as it more real.
-            #   Previously it is set in eft calculation.
             task.execution_time_prediction = task_execution_time
 
             price = cst.estimate_price_for_vm_type(
@@ -367,10 +363,6 @@ class EBPSMScheduler(SchedulerInterface):
                 budget=task.budget,
             )
 
-            # TODO: do something if it happens (EBPSM doesn't mention
-            #   what actually).
-            #   Maybe postpone scheduling.
-            # assert fastest_vmt is not None
             if fastest_vmt is None:
                 vm_type = self.vm_manager.get_slowest_vm_type()
             else:
