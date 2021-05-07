@@ -35,24 +35,6 @@ CONTAINER_PROV_DELAY: dict[str, int] = {
     "Cycles": 300,
 }
 
-# Deadlines for different sets based on workflows' sizes.
-# Declared in hours.
-DEADLINES = {
-    20: 1,
-    100: 4,
-    300: 5,
-    600: 7,
-}
-
-# Budgets for different sets based on workflows' sizes.
-# Declared in dollars.
-BUDGETS = {
-    20: 20,
-    100: 100,
-    300: 300,
-    600: 600,
-}
-
 # Step from minimal constraint (execution time or cost. Controls
 # constraints set to workflows. Each workflow will have
 # constraint = (max - min) * STEP_FROM_MIN_CONSTRAINT + min
