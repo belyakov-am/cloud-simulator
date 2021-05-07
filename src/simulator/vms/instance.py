@@ -71,20 +71,20 @@ class VM:
     def __str__(self) -> str:
         return (f"<VM "
                 f"uuid = {self.uuid}, "
+                f"state = {self.state}, "
                 f"type = {self.type}, "
                 f"start_time = {self.start_time}, "
                 f"finish_time = {self.finish_time}, "
-                f"state = {self.state}, "
                 f"files = {self.files}, "
                 f"containers = {self.containers}>")
 
     def __repr__(self) -> str:
         return (f"(VM "
                 f"uuid = {self.uuid}, "
+                f"state = {self.state}, "
                 f"type = {self.type}, "
                 f"start_time = {self.start_time}, "
                 f"finish_time = {self.finish_time}, "
-                f"state = {self.state}, "
                 f"files = {self.files}, "
                 f"containers = {self.containers})")
 
