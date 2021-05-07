@@ -83,14 +83,6 @@ def parse_workflows() -> dict[int, dict[str, wfs.Workflow]]:
         workflow = parser.get_workflow()
         num_tasks = int(trace_path.parent.name)
 
-        # deadline = datetime.now() + timedelta(
-        #     hours=config.DEADLINES[num_tasks]
-        # )
-        # workflow.set_deadline(time=deadline)
-        #
-        # budget = config.BUDGETS[num_tasks]
-        # workflow.set_budget(budget=budget)
-
         workflow_sets[num_tasks][workflow.uuid] = workflow
 
         count += 1
