@@ -154,7 +154,10 @@ class WorkflowPool:
         :return: None.
         """
 
-        workflows_per_recipe = self.workflow_number // len(self.recipes)
+        workflows_per_recipe = (self.workflow_number
+                                // len(self.recipes)
+                                // len(self.num_tasks)
+                                + len(self.num_tasks))
         generate_workflows(
             recipes=self.recipes,
             num_tasks=self.num_tasks,
