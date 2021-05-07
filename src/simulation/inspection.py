@@ -44,6 +44,8 @@ def main() -> None:
                 f"Workflow name = {workflow.name}\n"
                 f"Exec time on slowest VM = {inspected.exec_time_slowest_vm}\n"
                 f"Exec time on fastest VM = {inspected.exec_time_fastest_vm}\n"
+                f"Exec cost on slowest VM = {inspected.exec_cost_slowest_vm}\n"
+                f"Exec cost on fastest VM = {inspected.exec_cost_fastest_vm}\n"
                 f"Number of levels = {inspected.levels}\n"
                 f"Tasks on levels = {inspected.levels_tasks}\n"
                 f"Total files = {inspected.total_files}\n"
