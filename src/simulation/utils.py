@@ -14,7 +14,7 @@ import simulator.workflows as wfs
 
 
 def generate_workflows(
-        recipes: list[WorkflowRecipe],
+        recipes: list[tp.Type[WorkflowRecipe]],
         num_tasks: tp.Optional[list[int]] = None,
         workflows_per_recipe: int = config.DEFAULT_WORKFLOWS_PER_RECIPE,
 ) -> None:
@@ -136,7 +136,7 @@ def set_constraints(
 class WorkflowPool:
     def __init__(
             self,
-            recipes: list[WorkflowRecipe],
+            recipes: list[tp.Type[WorkflowRecipe]],
             num_tasks: list[int],
             workflow_number: int,
     ) -> None:
