@@ -81,6 +81,21 @@ class Manager:
 
         self.provision_delay = delay
 
+    def set_billing_period(self, period: tp.Optional[int] = None) -> None:
+        """Set billing period and update price.
+
+        :param period: billing period to set.
+        :return: None.
+        """
+
+        if period is None:
+            return
+
+        for vm_type in self.vm_types:
+            new_price = vm_type.price * period / vm_type.billing_period
+            vm_type.price = new_price
+            vm_type.billing_period = period
+
     def get_provision_delay(self) -> int:
         """Return VM provision delay.
 

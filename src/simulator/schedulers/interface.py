@@ -43,6 +43,9 @@ class SchedulerInterface(ABC):
     def set_vm_provision_delay(self, delay: int) -> None:
         self.vm_manager.set_provision_delay(delay=delay)
 
+    def set_billing_period(self, period: tp.Optional[int] = None) -> None:
+        self.vm_manager.set_billing_period(period=period)
+
     def set_predict_function(self, predict_func: tep.PredictFunc) -> None:
         self.predict_func = predict_func
 

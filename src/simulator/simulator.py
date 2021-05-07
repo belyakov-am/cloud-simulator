@@ -1,5 +1,6 @@
 from datetime import datetime
 import sys
+import typing as tp
 
 from loguru import logger
 
@@ -21,6 +22,7 @@ class Simulator:
             predict_func: str,
             vm_prov: int,
             logger_flag: bool = False,
+            billing_period: tp.Optional[int] = None,
     ) -> None:
         self.scheduler: sch.SchedulerInterface = scheduler
         self.workflows: dict[str, wfs.Workflow] = dict()
@@ -33,6 +35,7 @@ class Simulator:
 
         self.scheduler.set_metric_collector(collector=self.collector)
         self.scheduler.set_vm_provision_delay(delay=vm_prov)
+        self.scheduler.set_billing_period(period=billing_period)
         self._set_predict_function(predict_func=predict_func)
 
     def _init_logger(self) -> None:
