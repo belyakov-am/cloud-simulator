@@ -114,11 +114,15 @@ def parse_dag_levels(workflow: wfs.Workflow) -> tp.Tuple[int, dict[int, int]]:
 def inspect_workflow(
         workflow: wfs.Workflow,
         vm_prov: int = 0,
+        inspect_levels: bool = True,
+        inspect_files: bool = True,
 ) -> InspectedWorkflow:
     """Inspect inner structure of given workflow.
 
     :param workflow: workflow to inspect.
     :param vm_prov: VM provisioning delay.
+    :param inspect_levels: flag for parsing levels.
+    :param inspect_files: flag for parsing files.
     :return: inspected workflow.
     """
 
@@ -137,18 +141,20 @@ def inspect_workflow(
         vm_prov=vm_prov,
     )
 
-    levels, levels_tasks = parse_dag_levels(workflow=workflow)
-    inspected.levels = levels
-    inspected.levels_tasks = levels_tasks
+    if inspect_levels:
+        levels, levels_tasks = parse_dag_levels(workflow=workflow)
+        inspected.levels = levels
+        inspected.levels_tasks = levels_tasks
 
-    for task in workflow.tasks:
-        inspected.input_files += len(task.input_files)
-        inspected.output_size += len(task.output_files)
+    if inspect_files:
+        for task in workflow.tasks:
+            inspected.input_files += len(task.input_files)
+            inspected.output_size += len(task.output_files)
 
-        inspected.input_size += sum(f.size for f in task.input_files)
-        inspected.output_size += sum(f.size for f in task.output_files)
+            inspected.input_size += sum(f.size for f in task.input_files)
+            inspected.output_size += sum(f.size for f in task.output_files)
 
-    inspected.total_files = inspected.input_files + inspected.output_files
-    inspected.total_size = inspected.input_size + inspected.output_size
+        inspected.total_files = inspected.input_files + inspected.output_files
+        inspected.total_size = inspected.input_size + inspected.output_size
 
     return inspected
