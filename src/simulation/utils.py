@@ -1,15 +1,20 @@
 from collections import defaultdict
+from copy import deepcopy
 from datetime import datetime, timedelta
+import enum
+import random
 import typing as tp
 
 from wfcommons import WorkflowGenerator
+from wfcommons.generator.generator import WorkflowRecipe
 
 import simulation.config as config
+import simulator.utils.inspection as ins
 import simulator.workflows as wfs
 
 
 def generate_workflows(
-        recipes: list[tp.Any],
+        recipes: list[WorkflowRecipe],
         num_tasks: tp.Optional[list[int]] = None,
         workflows_per_recipe: int = config.DEFAULT_WORKFLOWS_PER_RECIPE,
 ) -> None:
@@ -78,16 +83,123 @@ def parse_workflows() -> dict[int, dict[str, wfs.Workflow]]:
         workflow = parser.get_workflow()
         num_tasks = int(trace_path.parent.name)
 
-        deadline = datetime.now() + timedelta(
-            hours=config.DEADLINES[num_tasks]
-        )
-        workflow.set_deadline(time=deadline)
-
-        budget = config.BUDGETS[num_tasks]
-        workflow.set_budget(budget=budget)
+        # deadline = datetime.now() + timedelta(
+        #     hours=config.DEADLINES[num_tasks]
+        # )
+        # workflow.set_deadline(time=deadline)
+        #
+        # budget = config.BUDGETS[num_tasks]
+        # workflow.set_budget(budget=budget)
 
         workflow_sets[num_tasks][workflow.uuid] = workflow
 
         count += 1
 
     return workflow_sets
+
+
+class LoadType(enum.Enum):
+    # One time load. All workflows are submitted almost at the same time.
+    ONE_TIME = enum.auto()
+    # Evenly spread load. N workflows are submitted every k seconds.
+    EVEN = enum.auto()
+
+
+def set_constraints(
+        workflows: list[wfs.Workflow],
+        load_type: LoadType,
+) -> None:
+    """Set constraints (deadlines and budgets) based on inspection.
+
+    :param workflows: list of workflows for setting constraints.
+    :param load_type: type of load for setting constraints.
+    :return: None.
+    """
+
+    for workflow in workflows:
+        inspected = ins.inspect_workflow(
+            workflow=workflow,
+            vm_prov=config.VM_PROVISION_DELAY,
+            inspect_levels=False,
+            inspect_files=False,
+        )
+
+        max_time = inspected.exec_time_slowest_vm
+        min_time = inspected.exec_time_fastest_vm
+        deadline = ((max_time - min_time)
+                    * config.STEP_FROM_MIN_CONSTRAINT + min_time)
+
+        min_cost = inspected.exec_cost_slowest_vm
+        max_cost = inspected.exec_cost_fastest_vm
+        budget = ((max_cost - min_cost)
+                  * config.STEP_FROM_MIN_CONSTRAINT + min_cost)
+
+        if load_type == LoadType.ONE_TIME:
+            workflow.set_deadline(time=datetime.now()
+                                       + timedelta(seconds=deadline))
+
+        workflow.set_budget(budget=budget)
+
+
+class WorkflowPool:
+    def __init__(
+            self,
+            recipes: list[WorkflowRecipe],
+            num_tasks: list[int],
+            workflow_number: int,
+    ) -> None:
+        self.recipes = recipes
+        self.num_tasks = num_tasks
+        self.workflow_number = workflow_number
+
+        self.workflows: list[wfs.Workflow] = []
+
+        random.seed(config.SEED)
+
+    def generate_workflows(self) -> None:
+        """Generate workflow traces from given recipes.
+
+        :return: None.
+        """
+
+        workflows_per_recipe = self.workflow_number // len(self.recipes)
+        generate_workflows(
+            recipes=self.recipes,
+            num_tasks=self.num_tasks,
+            workflows_per_recipe=workflows_per_recipe,
+        )
+
+    def parse_workflows(self) -> None:
+        """Parse workflows from files with traces and save instances to
+        list.
+
+        :return: None.
+        """
+
+        # Map from num_tasks to map from UUID to workflow.
+        workflow_map: dict[int, dict[str, wfs.Workflow]] = parse_workflows()
+
+        # Save workflows to list.
+        for _, workflows in workflow_map.items():
+            for _, workflow in workflows.items():
+                self.workflows.append(workflow)
+
+    def get_sample(self, size: int, load_type: LoadType) -> list[wfs.Workflow]:
+        """Get workload of given size with randomly picked workflows.
+
+        :param size: number of workflows in workload.
+        :param load_type: type of load for setting constrains.
+        :return: workload (list of workflows).
+        """
+
+        original_workflows = random.sample(
+            population=self.workflows,
+            k=size,
+        )
+
+        workflows = deepcopy(original_workflows)
+        set_constraints(workflows=workflows, load_type=load_type)
+
+        assert workflows[0].budget != 0.0
+
+        return workflows
