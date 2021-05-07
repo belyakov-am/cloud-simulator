@@ -48,8 +48,9 @@ WORKLOAD_SIZE = [
     2500,
 ]
 
-# Number of workflows to parse. Used for testing.
-NUMBER_OF_WORKFLOWS = 10000000
+# Number of simulation per one series. Series is list of fixed
+# parameters for simulation (scheduler, workload size, billing period).
+SIMULATIONS_IN_SERIES = 100
 
 # Container provisioning delay for different types of workflows.
 # Declared in seconds.
@@ -71,3 +72,6 @@ CONTAINER_PROV_DELAY: dict[str, int] = {
 STEP_FROM_MIN_CONSTRAINT = 0.8
 
 SEED = 42
+
+# Number of workflows to parse. Used for testing.
+NUMBER_OF_WORKFLOWS = 10000000
