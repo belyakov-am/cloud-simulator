@@ -100,11 +100,13 @@ class LoadType(enum.Enum):
 def set_constraints(
         workflows: list[wfs.Workflow],
         load_type: LoadType,
+        current_time: datetime,
 ) -> None:
     """Set constraints (deadlines and budgets) based on inspection.
 
     :param workflows: list of workflows for setting constraints.
     :param load_type: type of load for setting constraints.
+    :param current_time: time for calculating and setting deadlines.
     :return: None.
     """
 
@@ -127,7 +129,7 @@ def set_constraints(
                   * config.STEP_FROM_MIN_CONSTRAINT + min_cost)
 
         if load_type == LoadType.ONE_TIME:
-            workflow.set_deadline(time=datetime.now()
+            workflow.set_deadline(time=current_time
                                        + timedelta(seconds=deadline))
 
         workflow.set_budget(budget=budget)
@@ -179,11 +181,17 @@ class WorkflowPool:
             for _, workflow in workflows.items():
                 self.workflows.append(workflow)
 
-    def get_sample(self, size: int, load_type: LoadType) -> list[wfs.Workflow]:
+    def get_sample(
+            self,
+            size: int,
+            load_type: LoadType,
+            current_time: datetime,
+    ) -> list[wfs.Workflow]:
         """Get workload of given size with randomly picked workflows.
 
         :param size: number of workflows in workload.
         :param load_type: type of load for setting constrains.
+        :param current_time: time for calculating and setting deadlines.
         :return: workload (list of workflows).
         """
 
@@ -193,7 +201,11 @@ class WorkflowPool:
         )
 
         workflows = deepcopy(original_workflows)
-        set_constraints(workflows=workflows, load_type=load_type)
+        set_constraints(
+            workflows=workflows,
+            load_type=load_type,
+            current_time=current_time,
+        )
 
         assert workflows[0].budget != 0.0
 
