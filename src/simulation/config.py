@@ -60,4 +60,6 @@ BUDGETS = {
 # respectively if constraint is deadline, and they are execution costs
 # on slowest and fastest VM types respectively if constraint is budget.
 # Should fall in [0; 1).
-STEP_FROM_MIN_CONSTRAINT = 0.1
+STEP_FROM_MIN_CONSTRAINT = 0.8
+
+SEED = 42
