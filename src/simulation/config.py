@@ -52,3 +52,11 @@ BUDGETS = {
     300: 300,
     600: 600,
 }
+
+# Step from minimal constraint (execution time or cost on slowest VM
+# type). Controls constraints set to workflows.
+# Each workflow will have
+# constraint = (max - min) * STEP_FROM_MIN_CONSTRAINT + min
+# where min is constraint on slowest VM type, max -- on fastest VM type.
+# Should fall in [0; 1).
+STEP_FROM_MIN_CONSTRAINT = 0.1
