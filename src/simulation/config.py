@@ -17,13 +17,36 @@ PREDICT_EXEC_TIME_FUNC = "io_and_runtime"
 # be provisioned.
 # Declared in seconds.
 VM_PROVISION_DELAY: int = 120
+# Billing periods for VMs in seconds.
+VM_BILLING_PERIODS = [
+    3600,
+    60,
+    1,
+]
 
 # List of num_tasks for workflow generation.
-DEFAULT_NUM_TASKS: list[int] = [20, 100, 300, 600]
+DEFAULT_NUM_TASKS: list[int] = [
+    100,
+    1000,
+    10000,
+]
 # List of num_tasks for execution.
-NUM_TASKS_EXECUTION: list[int] = [20, 100, 300]
+NUM_TASKS_EXECUTION: list[int] = [
+    100,
+    1000,
+    10000,
+]
+
 # Number of workflows to generate from each recipe.
 DEFAULT_WORKFLOWS_PER_RECIPE = 10
+# Total number of workflows to generate by workflow pool.
+WORKFLOW_NUMBER = 2500
+# Workload size i.e. number of workflows in one simulation.
+WORKLOAD_SIZE = [
+    25,
+    250,
+    2500,
+]
 
 # Number of workflows to parse. Used for testing.
 NUMBER_OF_WORKFLOWS = 10000000
@@ -32,7 +55,10 @@ NUMBER_OF_WORKFLOWS = 10000000
 # Declared in seconds.
 CONTAINER_PROV_DELAY: dict[str, int] = {
     "Genome": 600,
-    "Cycles": 300,
+    "Epigenomics": 600,
+    "Seismology": 600,
+    "Montage": 600,
+    "SoyKB": 600,
 }
 
 # Step from minimal constraint (execution time or cost. Controls
