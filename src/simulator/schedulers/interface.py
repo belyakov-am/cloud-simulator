@@ -40,6 +40,9 @@ class SchedulerInterface(ABC):
         self.storage_manager.set_metric_collector(collector=collector)
         self.vm_manager.set_metric_collector(collector=collector)
 
+        # Save info to metric collector.
+        self.collector.scheduler_name = self.name
+
     def set_vm_provision_delay(self, delay: int) -> None:
         self.vm_manager.set_provision_delay(delay=delay)
 

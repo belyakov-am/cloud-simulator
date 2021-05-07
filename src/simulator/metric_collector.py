@@ -34,6 +34,9 @@ class MetricCollector:
     """
 
     def __init__(self) -> None:
+        # Scheduler name.
+        self.scheduler_name: str = ""
+
         # Map from workflow UUID to Stats instance.
         self.workflows: dict[str, Stats] = defaultdict(Stats)
 
