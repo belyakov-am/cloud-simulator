@@ -156,12 +156,12 @@ class EBPSMScheduler(SchedulerInterface):
         # WARNING!
         #   Assumed that every parent task is listed before its child.
 
-        # TODO: check that makespan is within a deadline.
+        # TODO: check that cost is within a budget.
         #   Otherwise iterate over VM types until OK. If impossible - set
         #   proper status for this workflow (i.e. rejected).
         workflow = self.workflows[workflow_uuid]
         for task in workflow.tasks:
-            current_eft = self._calculate_eft(task)
+            self._calculate_eft(task)
 
     def _calculate_eft(self, task: Task) -> float:
         """Calculate eft for given task. That is just maximum among
