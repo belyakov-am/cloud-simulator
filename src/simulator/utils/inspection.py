@@ -5,6 +5,7 @@ from loguru import logger
 import networkx as nx
 
 import simulator.storages as sts
+import simulator.utils.cost as cst
 import simulator.utils.task_execution_prediction as tep
 import simulator.vms as vms
 import simulator.workflows as wfs
@@ -18,6 +19,10 @@ class InspectedWorkflow:
         # on slowest and fastest VM types.
         self.exec_time_slowest_vm: float = 0.0  # in seconds
         self.exec_time_fastest_vm: float = 0.0  # in seconds
+
+        # Total execution cost on slowest and fastest VM types.
+        self.exec_cost_slowest_vm: float = 0.0
+        self.exec_cost_fastest_vm: float = 0.0
 
         # Number of levels in DAG.
         self.levels: int = 0
@@ -35,22 +40,23 @@ class InspectedWorkflow:
         self.total_size: int = 0
 
 
-def calculate_exec_time(
+def calculate_exec_time_and_cost(
         workflow: wfs.Workflow,
         vm_type: vms.VMType,
         vm_prov: int,
-) -> float:
+) -> tp.Tuple[float, float]:
     """Calculate total workflow's execution time on a given VM type.
 
     :param workflow: workflow for calculations.
     :param vm_type: VM type where tasks should be executed.
     :param vm_prov: VM provisioning delay.
-    :return: total execution time.
+    :return: total execution time and cost.
     """
 
     # Map from task ID to its EFT.
     efts: dict[int, float] = dict()
     makespan: float = 0.0
+    cost: float = 0.0
 
     storage_manager = sts.Manager()
 
@@ -67,12 +73,17 @@ def calculate_exec_time(
             vm_prov=vm_prov,
         )
 
+        cost += cst.estimate_price_for_vm_type(
+            use_time=task_exec_time,
+            vm_type=vm_type,
+        )
+
         efts[task.id] = max_parent_eft + task_exec_time
 
         if efts[task.id] > makespan:
             makespan = efts[task.id]
 
-    return makespan
+    return makespan, cost
 
 
 def parse_dag_levels(workflow: wfs.Workflow) -> tp.Tuple[int, dict[int, int]]:
@@ -129,17 +140,21 @@ def inspect_workflow(
     inspected = InspectedWorkflow(workflow=workflow)
     vm_manager = vms.Manager()
 
-    inspected.exec_time_slowest_vm = calculate_exec_time(
+    makespan, cost = calculate_exec_time_and_cost(
         workflow=workflow,
         vm_type=vm_manager.get_slowest_vm_type(),
         vm_prov=vm_prov,
     )
+    inspected.exec_time_slowest_vm = makespan
+    inspected.exec_cost_slowest_vm = cost
 
-    inspected.exec_time_fastest_vm = calculate_exec_time(
+    makespan, cost = calculate_exec_time_and_cost(
         workflow=workflow,
         vm_type=vm_manager.get_fastest_vm_type(),
         vm_prov=vm_prov,
     )
+    inspected.exec_time_fastest_vm = makespan
+    inspected.exec_cost_fastest_vm = cost
 
     if inspect_levels:
         levels, levels_tasks = parse_dag_levels(workflow=workflow)
