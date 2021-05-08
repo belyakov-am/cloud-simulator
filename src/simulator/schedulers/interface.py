@@ -122,5 +122,3 @@ class SchedulerInterface(ABC):
         :return: None.
         """
         pass
-
-    # TODO: add method(s) for getting workflow status
