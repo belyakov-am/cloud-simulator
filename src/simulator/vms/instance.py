@@ -176,7 +176,7 @@ class VM:
 
         total_seconds = (finish_time - self.start_time).total_seconds()
         billing_periods = (total_seconds // self.type.billing_period
-                           + (total_seconds % self.type.billing_period) > 0)
+                           + ((total_seconds % self.type.billing_period) > 0))
 
         return billing_periods * self.type.price
 

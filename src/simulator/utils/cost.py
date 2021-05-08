@@ -29,7 +29,7 @@ def calculate_price_for_vm(
 
     # Find how many billing periods should be paid for use_time left.
     billing_periods = (use_time_left // vm.type.billing_period
-            + (use_time_left % vm.type.billing_period) > 0)
+            + ((use_time_left % vm.type.billing_period) > 0))
 
     return billing_periods * vm.type.price
 
@@ -61,6 +61,6 @@ def estimate_price_for_vm_type(
     :return: estimated price.
     """
     billing_periods = (use_time // vm_type.billing_period
-                       + (use_time % vm_type.billing_period) > 0)
+                       + ((use_time % vm_type.billing_period) > 0))
 
     return billing_periods * vm_type.price
