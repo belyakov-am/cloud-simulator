@@ -337,6 +337,25 @@ class MinMinScheduler(SchedulerInterface):
         workflow.mark_task_finished(time=current_time, task=task)
         self.vm_manager.release_vm(vm=vm)
 
+        # Remove idle VMs if they are approaching next billing periods.
+        idle_vms = self.vm_manager.get_idle_vms()
+        vms_to_remove: list[vms.VM] = []
+
+        for idle_vm in idle_vms:
+            time_until_next_period = cst.time_until_next_billing_period(
+                current_time=current_time,
+                vm=vm,
+            )
+
+            if time_until_next_period < self.settings.time_to_shutdown_vm:
+                vms_to_remove.append(idle_vm)
+
+        for vm in vms_to_remove:
+            self.vm_manager.shutdown_vm(
+                time=current_time,
+                vm=vm,
+            )
+
         # Add new tasks to event loop.
         for t in workflow.unscheduled_tasks:
             # Task can be scheduled if all parents have finished.
