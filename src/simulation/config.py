@@ -24,12 +24,6 @@ VM_BILLING_PERIODS = [
     1,
 ]
 
-# List of num_tasks for workflow generation.
-DEFAULT_NUM_TASKS: list[int] = [
-    100,
-    1000,
-    10000,
-]
 # List of num_tasks for execution.
 NUM_TASKS_EXECUTION: list[int] = [
     100,
@@ -37,8 +31,6 @@ NUM_TASKS_EXECUTION: list[int] = [
     10000,
 ]
 
-# Number of workflows to generate from each recipe.
-DEFAULT_WORKFLOWS_PER_RECIPE = 10
 # Total number of workflows to generate by workflow pool.
 WORKFLOW_NUMBER = 2500
 # Workload size i.e. number of workflows in one simulation.
