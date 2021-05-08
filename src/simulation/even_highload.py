@@ -2,6 +2,7 @@ from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
 import itertools
+from multiprocessing import Pool
 
 from loguru import logger
 import matplotlib.pyplot as plt
@@ -17,6 +18,16 @@ import simulation.config as config
 import simulation.utils as utils
 import simulator as sm
 import simulator.schedulers as sch
+
+
+def run_simulation(simulator: sm.Simulator) -> sm.MetricCollector:
+    """Run simulation on given simulator.
+
+    :param simulator: simulator for running simulation.
+    :return: metric collector from simulator.
+    """
+    simulator.run_simulation()
+    return simulator.get_metric_collector()
 
 
 def main() -> None:
@@ -73,45 +84,49 @@ def main() -> None:
         )
 
         # Iterate several times for better metrics.
-        for i in range(config.SIMULATIONS_IN_SERIES):
-            current_scheduler = deepcopy(scheduler)
-            # Create simulator.
-            simulator = sm.Simulator(
-                scheduler=current_scheduler,
-                predict_func=config.PREDICT_EXEC_TIME_FUNC,
-                vm_prov=config.VM_PROVISION_DELAY,
-                vm_deprov_percent=config.VM_DEPROVISION_PERCENT,
-                logger_flag=logger_flag,
-                billing_period=billing_period,
-            )
+        for i in range(config.SIMULATIONS_IN_SERIES // config.PROCESS_NUMBER):
+            simulators: list[sm.Simulator] = []
 
-            # Set logger only for first launch (for further it will be
-            # configured).
-            if logger_flag:
-                logger_flag = False
-
-            current_time = datetime.now()
-
-            # Get workload sample with submit times.
-            workload, submit_times = workflow_pool.get_sample(
-                size=workload_size,
-                load_type=load_type,
-                current_time=current_time,
-            )
-
-            # Submit workflows.
-            for workflow, submit_time in zip(workload, submit_times):
-                simulator.submit_workflow(
-                    workflow=workflow,
-                    time=submit_time,
+            # Collect simulators for executing in parallel.
+            for _ in range(config.PROCESS_NUMBER):
+                current_scheduler = deepcopy(scheduler)
+                # Create simulator.
+                simulator = sm.Simulator(
+                    scheduler=current_scheduler,
+                    predict_func=config.PREDICT_EXEC_TIME_FUNC,
+                    vm_prov=config.VM_PROVISION_DELAY,
+                    vm_deprov_percent=config.VM_DEPROVISION_PERCENT,
+                    logger_flag=logger_flag,
+                    billing_period=billing_period,
                 )
 
-            # Start simulation.
-            simulator.run_simulation()
+                # Set logger only for first launch (for further it will be
+                # configured).
+                if logger_flag:
+                    logger_flag = False
 
-            # Save metrics.
-            collector = simulator.get_metric_collector()
-            collectors.append(collector)
+                current_time = datetime.now()
+
+                # Get workload sample with submit times.
+                workload, submit_times = workflow_pool.get_sample(
+                    size=workload_size,
+                    load_type=load_type,
+                    current_time=current_time,
+                )
+
+                # Submit workflows.
+                for workflow, submit_time in zip(workload, submit_times):
+                    simulator.submit_workflow(
+                        workflow=workflow,
+                        time=submit_time,
+                    )
+
+                simulators.append(simulator)
+
+            # Run simulations.
+            with Pool(processes=config.PROCESS_NUMBER) as pool:
+                current_collectors = pool.map(run_simulation, simulators)
+                collectors.extend(current_collectors)
 
         # Init metrics.
         mean_exec_time = 0.0
