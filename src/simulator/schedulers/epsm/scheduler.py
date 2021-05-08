@@ -14,6 +14,7 @@ from .task import Task
 from .workflow import Workflow
 
 
+# TODO: change to 10 and 1 as in EPSM paper (?)
 @dataclass
 class Settings:
     # Indicates scheduling cycle, which occurs every
