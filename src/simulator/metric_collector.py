@@ -26,6 +26,10 @@ class Stats:
         self.deadline: tp.Optional[datetime] = None
         self.budget: tp.Optional[float] = None
 
+        # Flag if constraint was met.
+        self.constraint_met: bool = False
+        self.constraint_overflow: float = 0.0
+
 
 class MetricCollector:
     """Collects various metrics from simulation. Its instance is passed
@@ -76,9 +80,29 @@ class MetricCollector:
             assert stats.deadline is not None or stats.budget is not None
 
             if stats.deadline is not None:
-                self.constraints_met += stats.finish_time <= stats.deadline
+                constraint_met = stats.finish_time <= stats.deadline
+
+                self.constraints_met += constraint_met
+                stats.constraint_met = constraint_met
+
+                if not constraint_met:
+                    extra_time = (stats.finish_time
+                                  - stats.deadline).total_seconds()
+                    overflow = (extra_time
+                                / (stats.deadline
+                                   - stats.start_time).total_seconds())
+                    stats.constraint_overflow = overflow
+
                 continue
 
             if stats.budget is not None:
-                self.constraints_met += stats.cost <= stats.budget
+                constraint_met = stats.cost <= stats.budget
+
+                self.constraints_met += constraint_met
+                stats.constraint_met = constraint_met
+
+                if not constraint_met:
+                    extra_cost = stats.cost - stats.budget
+                    stats.constraint_overflow = extra_cost / stats.budget
+
                 continue
