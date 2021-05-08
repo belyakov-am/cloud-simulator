@@ -74,5 +74,8 @@ STEP_FROM_MIN_CONSTRAINT = 0.85
 
 SEED = 42
 
+# Number of processes to start for executing simulations in series.
+PROCESS_NUMBER = 5
+
 # Number of workflows to parse. Used for testing.
 NUMBER_OF_WORKFLOWS = 10000000
