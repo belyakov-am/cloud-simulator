@@ -22,19 +22,13 @@ class Settings:
     # After this time idle VMs will be terminated during
     # `MANAGE_RESOURCES` event.
     # Declared in seconds.
+    # Should be configured by scheduler according to billing period.
     idle_vm_threshold: int = 3000
 
     # Indicates resource provisioning interval. During this stage
     # idle VMs can be shutdown.
     # Declared in seconds.
     provisioning_interval: int = 1
-
-    # Indicates amount of time for VM to be shut down. If time until
-    # next billing period for idle VM is less than this variable, it
-    # should be removed.
-    # Declared in seconds.
-    # Should be configured by scheduler according to billing period.
-    time_to_shutdown_vm: int = 600
 
 
 FastestVMType = namedtuple(
@@ -58,8 +52,8 @@ class EBPSMScheduler(SchedulerInterface):
         self.name = "EBPSM"
 
     def set_vm_deprovision(self, deprov_percent: float) -> None:
-        time_to_shutdown = deprov_percent * self.vm_manager.billing_period
-        self.settings.time_to_shutdown_vm = time_to_shutdown
+        threshold = (1 - deprov_percent) * self.vm_manager.billing_period
+        self.settings.idle_vm_threshold = threshold
 
     def submit_workflow(
             self,
