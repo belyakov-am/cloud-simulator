@@ -28,7 +28,7 @@ class Settings:
     # Indicates resource provisioning interval. During this stage
     # idle VMs can be shutdown.
     # Declared in seconds.
-    provisioning_interval: int = 1
+    provisioning_interval: int = 600
 
 
 FastestVMType = namedtuple(

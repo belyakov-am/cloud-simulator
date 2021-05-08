@@ -19,12 +19,12 @@ class Settings:
     # Indicates scheduling cycle, which occurs every
     # `scheduling_interval`, during which tasks in queue are processed.
     # Declared in seconds.
-    scheduling_interval: int = 10
+    scheduling_interval: int = 120
 
     # Indicates resource provisioning interval. During this stage
     # idle VMs can be shutdown.
     # Declared in seconds.
-    provisioning_interval: int = 1
+    provisioning_interval: int = 600
 
     # Indicates amount of time for VM to be shut down. If time until
     # next billing period for idle VM is less than this variable, it
