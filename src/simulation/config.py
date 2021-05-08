@@ -3,6 +3,7 @@ import pathlib
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent.parent
 WORKFLOW_DIR = ROOT_DIR / "workflow-traces" / "pegasus" / "generated"
+GRAPHICS_DIR = ROOT_DIR / "src" / "graphics"
 
 # Function for predicting task execution time.
 # Possible values are:
@@ -17,6 +18,10 @@ PREDICT_EXEC_TIME_FUNC = "io_and_runtime"
 # be provisioned.
 # Declared in seconds.
 VM_PROVISION_DELAY: int = 120
+# Indicates percent from billing period. If VM has less amount of time
+# until next billing period that this value multiplied by billing
+# period, it can be shutdown.
+VM_DEPROVISION_PERCENT: float = 0.2
 # Billing periods for VMs in seconds.
 VM_BILLING_PERIODS = [
     3600,
@@ -26,18 +31,18 @@ VM_BILLING_PERIODS = [
 
 # List of num_tasks for execution.
 NUM_TASKS_EXECUTION: list[int] = [
-    100,
-    1000,
-    10000,
+    150,
+    # 1000,
+    # 10000,
 ]
 
 # Total number of workflows to generate by workflow pool.
-WORKFLOW_NUMBER = 2500
+WORKFLOW_NUMBER = 25
 # Workload size i.e. number of workflows in one simulation.
 WORKLOAD_SIZE = [
     25,
-    250,
-    2500,
+    # 125,
+    # 600,
 ]
 # Interval for submitting workflows in even load.
 EVEN_LOAD_INTERVAL = 720
@@ -46,10 +51,11 @@ EVEN_LOAD_WORKFLOWS_PER_INTERVAL = 0.2
 
 # Number of simulation per one series. Series is list of fixed
 # parameters for simulation (scheduler, workload size, billing period).
-SIMULATIONS_IN_SERIES = 100
+SIMULATIONS_IN_SERIES = 2
 
 # Container provisioning delay for different types of workflows.
 # Declared in seconds.
+# TODO: differ values.
 CONTAINER_PROV_DELAY: dict[str, int] = {
     "Genome": 600,
     "Epigenomics": 600,
@@ -65,7 +71,7 @@ CONTAINER_PROV_DELAY: dict[str, int] = {
 # respectively if constraint is deadline, and they are execution costs
 # on slowest and fastest VM types respectively if constraint is budget.
 # Should fall in [0; 1).
-STEP_FROM_MIN_CONSTRAINT = 0.8
+STEP_FROM_MIN_CONSTRAINT = 0.9
 
 SEED = 42
 

@@ -26,6 +26,13 @@ class Settings:
     # Declared in seconds.
     provisioning_interval: int = 1
 
+    # Indicates amount of time for VM to be shut down. If time until
+    # next billing period for idle VM is less than this variable, it
+    # should be removed.
+    # Declared in seconds.
+    # Should be configured by scheduler according to billing period.
+    time_to_shutdown_vm: int = 600
+
 
 class EPSMScheduler(SchedulerInterface):
     def __init__(self) -> None:
@@ -37,6 +44,10 @@ class EPSMScheduler(SchedulerInterface):
         self.settings: Settings = Settings()
 
         self.name = "EPSM"
+
+    def set_vm_deprovision(self, deprov_percent: float) -> None:
+        time_to_shutdown = deprov_percent * self.vm_manager.billing_period
+        self.settings.time_to_shutdown_vm = time_to_shutdown
 
     def set_settings(self, settings: Settings) -> None:
         self.settings = settings
@@ -602,7 +613,7 @@ class EPSMScheduler(SchedulerInterface):
                 vm=vm,
             )
 
-            if time_until_next_period < self.settings.provisioning_interval:
+            if time_until_next_period < self.settings.time_to_shutdown_vm:
                 vms_to_remove.append(vm)
 
         for vm in vms_to_remove:

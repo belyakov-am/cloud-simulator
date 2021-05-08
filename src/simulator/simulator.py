@@ -21,6 +21,7 @@ class Simulator:
             scheduler: sch.SchedulerInterface,
             predict_func: str,
             vm_prov: int,
+            vm_deprov_percent: float,
             logger_flag: bool = False,
             billing_period: tp.Optional[int] = None,
     ) -> None:
@@ -35,6 +36,7 @@ class Simulator:
 
         self.scheduler.set_metric_collector(collector=self.collector)
         self.scheduler.set_vm_provision_delay(delay=vm_prov)
+        self.scheduler.set_vm_deprovision(deprov_percent=vm_deprov_percent)
         self.scheduler.set_billing_period(period=billing_period)
         self._set_predict_function(predict_func=predict_func)
 

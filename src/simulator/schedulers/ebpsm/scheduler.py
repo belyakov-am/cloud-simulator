@@ -29,6 +29,13 @@ class Settings:
     # Declared in seconds.
     provisioning_interval: int = 1
 
+    # Indicates amount of time for VM to be shut down. If time until
+    # next billing period for idle VM is less than this variable, it
+    # should be removed.
+    # Declared in seconds.
+    # Should be configured by scheduler according to billing period.
+    time_to_shutdown_vm: int = 600
+
 
 FastestVMType = namedtuple(
     typename="FastestVMType",
@@ -49,6 +56,10 @@ class EBPSMScheduler(SchedulerInterface):
         self.settings: Settings = Settings()
 
         self.name = "EBPSM"
+
+    def set_vm_deprovision(self, deprov_percent: float) -> None:
+        time_to_shutdown = deprov_percent * self.vm_manager.billing_period
+        self.settings.time_to_shutdown_vm = time_to_shutdown
 
     def submit_workflow(
             self,

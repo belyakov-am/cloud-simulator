@@ -26,13 +26,30 @@ class Host:
     host: tp.Union[vms.VM, vms.VMType]
 
 
+@dataclass
+class Settings:
+    # Indicates amount of time for VM to be shut down. If time until
+    # next billing period for idle VM is less than this variable, it
+    # should be removed.
+    # Declared in seconds.
+    # Should be configured by scheduler according to billing period.
+    time_to_shutdown_vm: int = 600
+
+
 class MinMinScheduler(SchedulerInterface):
     def __init__(self) -> None:
         super().__init__()
         # Map from workflow UUID to workflow instance.
         self.workflows: dict[str, Workflow] = dict()
 
+        # Settings of scheduler. Slightly control its behaviour.
+        self.settings: Settings = Settings()
+
         self.name = "Min-MinBUDG"
+
+    def set_vm_deprovision(self, deprov_percent: float) -> None:
+        time_to_shutdown = deprov_percent * self.vm_manager.billing_period
+        self.settings.time_to_shutdown_vm = time_to_shutdown
 
     def submit_workflow(self, workflow: wfs.Workflow) -> None:
         logger.debug(f"Got new workflow {workflow.uuid} {workflow.name}")

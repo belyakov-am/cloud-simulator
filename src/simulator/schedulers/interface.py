@@ -46,6 +46,14 @@ class SchedulerInterface(ABC):
     def set_vm_provision_delay(self, delay: int) -> None:
         self.vm_manager.set_provision_delay(delay=delay)
 
+    @abstractmethod
+    def set_vm_deprovision(self, deprov_percent: float) -> None:
+        """Scheduler should save this to its settings.
+
+        :param deprov_percent: deprovision percent from billing period.
+        :return: None.
+        """
+
     def set_billing_period(self, period: tp.Optional[int] = None) -> None:
         self.vm_manager.set_billing_period(period=period)
 
