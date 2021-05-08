@@ -15,8 +15,8 @@ import simulator.workflows as wfs
 
 def generate_workflows(
         recipes: list[tp.Type[WorkflowRecipe]],
-        num_tasks: tp.Optional[list[int]] = None,
-        workflows_per_recipe: int = config.DEFAULT_WORKFLOWS_PER_RECIPE,
+        num_tasks: tp.Optional[list[int]],
+        workflows_per_recipe: int,
 ) -> None:
     """Generate workflows using wfcommons tool. Produce
     `workflow_per_recipe` workflows for each recipe for each number of
@@ -27,9 +27,6 @@ def generate_workflows(
     :param workflows_per_recipe: number of workflows per recipe.
     :return: None.
     """
-
-    if num_tasks is None:
-        num_tasks = config.DEFAULT_NUM_TASKS
 
     for recipe in recipes:
         for num_task in num_tasks:
