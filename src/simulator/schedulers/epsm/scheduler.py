@@ -14,18 +14,17 @@ from .task import Task
 from .workflow import Workflow
 
 
-# TODO: change to 10 and 1 as in EPSM paper (?)
 @dataclass
 class Settings:
     # Indicates scheduling cycle, which occurs every
     # `scheduling_interval`, during which tasks in queue are processed.
     # Declared in seconds.
-    scheduling_interval: int = 100
+    scheduling_interval: int = 10
 
     # Indicates resource provisioning interval. During this stage
     # idle VMs can be shutdown.
     # Declared in seconds.
-    provisioning_interval: int = 600
+    provisioning_interval: int = 1
 
 
 class EPSMScheduler(SchedulerInterface):
