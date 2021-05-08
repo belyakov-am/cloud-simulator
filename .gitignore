@@ -9,3 +9,6 @@ generated
 
 # Simulator logs
 logs
+
+# Simulation graphics
+graphics
