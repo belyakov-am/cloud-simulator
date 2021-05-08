@@ -101,14 +101,21 @@ def set_constraints(
         workflows: list[wfs.Workflow],
         load_type: LoadType,
         current_time: datetime,
-) -> None:
+) -> list[datetime]:
     """Set constraints (deadlines and budgets) based on inspection.
 
     :param workflows: list of workflows for setting constraints.
     :param load_type: type of load for setting constraints.
     :param current_time: time for calculating and setting deadlines.
-    :return: None.
+    :return: list of submit times.
     """
+
+    workflows_per_interval = int(len(workflows)
+                                 * config.EVEN_LOAD_WORKFLOWS_PER_INTERVAL)
+    current_number_in_interval = 0
+    current_interval = 0
+
+    submit_times: list[datetime] = []
 
     for workflow in workflows:
         inspected = ins.inspect_workflow(
@@ -131,8 +138,25 @@ def set_constraints(
         if load_type == LoadType.ONE_TIME:
             workflow.set_deadline(time=current_time
                                        + timedelta(seconds=deadline))
+        elif load_type == LoadType.EVEN:
+            if current_number_in_interval == workflows_per_interval:
+                current_number_in_interval = 0
+                current_interval += 1
+
+            shift = config.EVEN_LOAD_INTERVAL * current_interval
+            shifted_deadline = deadline + shift
+
+            workflow.set_deadline(time=current_time
+                                       + timedelta(seconds=shifted_deadline))
+
+            submit_time = current_time + timedelta(seconds=shift)
+            submit_times.append(submit_time)
+
+            current_number_in_interval += 1
 
         workflow.set_budget(budget=budget)
+
+    return submit_times
 
 
 class WorkflowPool:
@@ -186,13 +210,13 @@ class WorkflowPool:
             size: int,
             load_type: LoadType,
             current_time: datetime,
-    ) -> list[wfs.Workflow]:
+    ) -> tp.Tuple[list[wfs.Workflow], list[datetime]]:
         """Get workload of given size with randomly picked workflows.
 
         :param size: number of workflows in workload.
         :param load_type: type of load for setting constrains.
         :param current_time: time for calculating and setting deadlines.
-        :return: workload (list of workflows).
+        :return: workload (list of workflows) and list of submit times.
         """
 
         original_workflows = random.sample(
@@ -201,7 +225,7 @@ class WorkflowPool:
         )
 
         workflows = deepcopy(original_workflows)
-        set_constraints(
+        submit_times = set_constraints(
             workflows=workflows,
             load_type=load_type,
             current_time=current_time,
@@ -209,4 +233,4 @@ class WorkflowPool:
 
         assert workflows[0].budget != 0.0
 
-        return workflows
+        return workflows, submit_times

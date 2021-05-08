@@ -47,6 +47,10 @@ WORKLOAD_SIZE = [
     250,
     2500,
 ]
+# Interval for submitting workflows in even load.
+EVEN_LOAD_INTERVAL = 720
+# Percent of workload size for submitting each interval.
+EVEN_LOAD_WORKFLOWS_PER_INTERVAL = 0.2
 
 # Number of simulation per one series. Series is list of fixed
 # parameters for simulation (scheduler, workload size, billing period).
