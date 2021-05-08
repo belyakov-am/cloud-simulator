@@ -37,6 +37,9 @@ class Manager:
         # Declared in seconds.
         self.provision_delay: int = 0
 
+        # Billing period for all VM types.
+        self.billing_period: int = 0
+
         self._get_vm_types_from_json(config.VM_TYPES)
 
     def _get_vm_types_from_json(self, filename: str) -> None:
@@ -90,6 +93,8 @@ class Manager:
 
         if period is None:
             return
+
+        self.billing_period = period
 
         for vm_type in self.vm_types:
             new_price = vm_type.price * period / vm_type.billing_period
