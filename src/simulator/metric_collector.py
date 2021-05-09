@@ -69,6 +69,9 @@ class MetricCollector:
 
         # Number of constraints met.
         self.constraints_met: int = 0
+        # Percent of constraints met.
+        self.constraints_met_percent: float = 0.0
+        # Percent of constraints o
 
     def parse_constraints(self) -> None:
         """Calculate how many constraints were met in workload.
@@ -91,7 +94,7 @@ class MetricCollector:
                     overflow = (extra_time
                                 / (stats.deadline
                                    - stats.start_time).total_seconds())
-                    stats.constraint_overflow = overflow
+                    stats.constraint_overflow = overflow * 100
 
                 continue
 
@@ -103,6 +106,10 @@ class MetricCollector:
 
                 if not constraint_met:
                     extra_cost = stats.cost - stats.budget
-                    stats.constraint_overflow = extra_cost / stats.budget
+                    stats.constraint_overflow = extra_cost / stats.budget * 100
 
                 continue
+
+        self.constraints_met_percent = (self.constraints_met
+                                        / len(self.workflows.keys())
+                                        * 100)
