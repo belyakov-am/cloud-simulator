@@ -133,8 +133,13 @@ def set_constraints(
                   * config.STEP_FROM_MIN_CONSTRAINT + min_cost)
 
         if load_type == LoadType.ONE_TIME:
+            # Little randomization within a minute.
+            rs = random.randint(0, 60)
             workflow.set_deadline(time=current_time
-                                       + timedelta(seconds=deadline))
+                                       + timedelta(seconds=deadline + rs))
+
+            submit_time = current_time + timedelta(seconds=rs)
+            submit_times.append(submit_time)
         elif load_type == LoadType.EVEN:
             if current_number_in_interval == workflows_per_interval:
                 current_number_in_interval = 0
