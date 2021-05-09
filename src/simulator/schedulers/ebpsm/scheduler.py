@@ -161,9 +161,6 @@ class EBPSMScheduler(SchedulerInterface):
         # WARNING!
         #   Assumed that every parent task is listed before its child.
 
-        # TODO: check that cost is within a budget.
-        #   Otherwise iterate over VM types until OK. If impossible - set
-        #   proper status for this workflow (i.e. rejected).
         workflow = self.workflows[workflow_uuid]
         for task in workflow.tasks:
             self._calculate_eft(task)

@@ -16,7 +16,6 @@ class Manager:
     def set_metric_collector(self, collector: mc.MetricCollector) -> None:
         self.collector = collector
 
-    # TODO: implement
     def get_storage(self) -> sts.Storage:
         return sts.Storage(
             read_rate=1000,
