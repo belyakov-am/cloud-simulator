@@ -3,10 +3,10 @@ from copy import deepcopy
 from datetime import datetime
 import itertools
 from multiprocessing import Pool
+import typing as tp
 
 from loguru import logger
 import matplotlib.pyplot as plt
-import typing as tp
 from wfcommons.generator import (
     GenomeRecipe,
     EpigenomicsRecipe,
