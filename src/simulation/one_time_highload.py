@@ -183,6 +183,7 @@ def main() -> None:
         )
 
         # Save stats.
+        # TODO: move dict to class.
         stats = {
             "scheduler": scheduler.name,
             "workload_size": workload_size,
