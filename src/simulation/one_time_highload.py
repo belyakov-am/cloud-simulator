@@ -17,6 +17,7 @@ from wfcommons.generator import (
 import simulation.config as config
 import simulation.utils as utils
 import simulator as sm
+import simulator.config as smconfig
 import simulator.schedulers as sch
 
 
@@ -133,11 +134,11 @@ def main() -> None:
                 collectors.extend(current_collectors)
 
         # Init metrics.
-        mean_exec_time = 0.0
-        mean_cost = 0.0
-        constraints_met_percent = 0.0
+        exec_times: list[float] = []
+        costs: list[float] = []
+        constraints_met_percent: list[float] = []
         constraints_met = 0
-        constraint_overflow = 0.0
+        constraint_overflows_percent: list[float] = []
         number_of_overflows = 0
 
         # Iterate over metric collectors for averaging metrics.
@@ -150,39 +151,28 @@ def main() -> None:
                              - workflow_stats.start_time).total_seconds()
                 cost = workflow_stats.cost
 
-                mean_exec_time += exec_time
-                mean_cost += cost
+                exec_times.append(exec_time)
+                costs.append(cost)
 
                 if not workflow_stats.constraint_met:
-                    constraint_overflow += workflow_stats.constraint_overflow
+                    overflow_percent = workflow_stats.constraint_overflow
+                    constraint_overflows_percent.append(overflow_percent)
                     number_of_overflows += 1
 
             # Average metrics.
-            mean_exec_time /= len(collector.workflows.keys())
-            mean_cost /= len(collector.workflows.keys())
-            constraints_met_percent += (collector.constraints_met
-                                        / len(collector.workflows.keys()))
+            constraints_met_percent.append(collector.constraints_met_percent)
             constraints_met += collector.constraints_met
-
-        # Average metrics.
-        mean_exec_time /= len(collectors)
-        mean_cost /= len(collectors)
-        constraints_met_percent /= len(collectors)
-        constraints_met_percent *= 100
-        if number_of_overflows > 0:
-            constraint_overflow /= number_of_overflows
-            constraint_overflow *= 100
 
         logger.info(
             f"Scheduler name = {scheduler.name}\n"
             f"Workload size = {workload_size}\n"
             f"Billing period = {billing_period}\n"
             f"Load type = {load_type.name}\n"
-            f"Mean exec time = {mean_exec_time}\n"
-            f"Mean cost workflows = {mean_cost}\n"
+            f"Mean exec time = {exec_times}\n"
+            f"Mean cost workflows = {costs}\n"
             f"Constraints met percent = {constraints_met_percent}\n"
             f"Constraints met = {constraints_met}\n"
-            f"Constraints overflow = {constraint_overflow}\n"
+            f"Constraints overflow = {constraint_overflows_percent}\n"
             f"Number of overflows = {number_of_overflows}\n"
         )
 
@@ -192,10 +182,10 @@ def main() -> None:
             "scheduler": scheduler.name,
             "workload_size": workload_size,
             "billing_period": billing_period,
-            "cost": mean_cost,
-            "exec_time": mean_exec_time,
+            "cost": costs,
+            "exec_time": exec_times,
             "constraints_met": constraints_met_percent,
-            "constraints_overflow": constraint_overflow,
+            "constraints_overflow": constraint_overflows_percent,
         }
 
         global_stats[workload_size, billing_period][scheduler.name] = stats
@@ -236,17 +226,10 @@ def main() -> None:
             billing_period = params[1]
 
             # Get proper index for subplot.
-            plt_ind1 = 0
-            plt_ind2 = 0
-            for ind, ws in enumerate(config.WORKLOAD_SIZE):
-                if ws == workload_size:
-                    plt_ind1 = ind
-                    break
-
-            for ind, bp in enumerate(config.VM_BILLING_PERIODS):
-                if bp == billing_period:
-                    plt_ind2 = ind
-                    break
+            plt_ind1, plt_ind2 = utils.get_indexes_for_subplot(
+                workload_size=workload_size,
+                billing_period=billing_period,
+            )
 
             schedulers_stats = global_stats[params]
             values = []
@@ -257,15 +240,17 @@ def main() -> None:
                 values.append(scheduler_stat[metric])
                 names.append(scheduler_name)
 
-            # Plot graphic and set title.
-            axs[plt_ind1][plt_ind2].bar(names, values, color="steelblue")
+            # Plot graphic and set title with labels.
+            axs[plt_ind1][plt_ind2].boxplot(values)
+            axs[plt_ind1][plt_ind2].set_xticklabels(names)
             axs[plt_ind1][plt_ind2].set_title(
                 f"{metric} with WS = {workload_size}, BP = {billing_period}"
             )
 
         # Get graphic's path.
+        itr = smconfig.ITER_NUMBER
         fig_file = (config.GRAPHICS_DIR
-                    / f"load-{load_type.name}_metric-{metric}.png")
+                    / f"load-{load_type.name}_metric-{metric}_{itr}.png")
         config.GRAPHICS_DIR.mkdir(parents=True, exist_ok=True)
 
         # Add shared Y label.
