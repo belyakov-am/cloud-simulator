@@ -263,7 +263,7 @@ def generate_workloads(
     ] = defaultdict(list)
 
     parameters = list(itertools.product(
-        config.WORKLOAD_SIZE,
+        config.WORKLOAD_SIZES,
         config.VM_BILLING_PERIODS,
     ))
 
@@ -297,7 +297,7 @@ def get_indexes_for_subplot(
 
     ind1 = 0
     ind2 = 0
-    for ind, ws in enumerate(config.WORKLOAD_SIZE):
+    for ind, ws in enumerate(config.WORKLOAD_SIZES):
         if ws == workload_size:
             ind1 = ind
             break

@@ -39,7 +39,7 @@ NUM_TASKS_EXECUTION: list[int] = [
 # Total number of workflows to generate by workflow pool.
 WORKFLOW_NUMBER: int = 150
 # Workload size i.e. number of workflows in one simulation.
-WORKLOAD_SIZE: list[int] = [
+WORKLOAD_SIZES: list[int] = [
     5,
     10,
     15,
@@ -75,7 +75,7 @@ STEP_FROM_MIN_CONSTRAINT: float = 0.85
 SEED: int = 42
 
 # Number of processes to start for executing simulations in series.
-PROCESS_NUMBER: int = 5
+PROCESS_NUMBER: int = 60
 
 # Number of workflows to parse. Used for testing.
 NUMBER_OF_WORKFLOWS: int = 10000000

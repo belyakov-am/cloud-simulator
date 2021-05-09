@@ -75,6 +75,7 @@ def run_worker(context: WorkerContext) -> tp.Tuple[
 def main() -> None:
     load_type = utils.LoadType.ONE_TIME
 
+    # TODO: move to config (?).
     # Create workflow recipes.
     recipes = [
         GenomeRecipe,
@@ -110,7 +111,7 @@ def main() -> None:
     # Generate simulation series.
     simulation_series = list(itertools.product(
         schedulers,
-        config.WORKLOAD_SIZE,
+        config.WORKLOAD_SIZES,
         config.VM_BILLING_PERIODS,
     ))
 
@@ -258,7 +259,7 @@ def main() -> None:
 
     # List of all parameters set for iteration.
     parameters_sets = list(itertools.product(
-        config.WORKLOAD_SIZE,
+        config.WORKLOAD_SIZES,
         config.VM_BILLING_PERIODS,
     ))
 
@@ -272,10 +273,10 @@ def main() -> None:
 
     # Create boxplot graphics.
     for metric in metrics:
-        # Init plot with len(WORKLOAD_SIZE) x len(VM_BILLING_PERIODS)
+        # Init plot with len(WORKLOAD_SIZES) x len(VM_BILLING_PERIODS)
         # subplots.
         fig, axs = plt.subplots(
-            nrows=len(config.WORKLOAD_SIZE),
+            nrows=len(config.WORKLOAD_SIZES),
             ncols=len(config.VM_BILLING_PERIODS),
             figsize=(14, 14),
         )
@@ -320,10 +321,10 @@ def main() -> None:
         plt.savefig(fig_file, dpi=fig.dpi)
 
     # Create plot graphic.
-    # Init plot with len(WORKLOAD_SIZE) x len(VM_BILLING_PERIODS)
+    # Init plot with len(WORKLOAD_SIZES) x len(VM_BILLING_PERIODS)
     # subplots.
     fig, axs = plt.subplots(
-        nrows=len(config.WORKLOAD_SIZE),
+        nrows=len(config.WORKLOAD_SIZES),
         ncols=len(config.VM_BILLING_PERIODS),
         figsize=(14, 14),
     )

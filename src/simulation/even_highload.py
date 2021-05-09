@@ -62,7 +62,7 @@ def main() -> None:
     # Generate simulation series.
     simulation_series = list(itertools.product(
         schedulers,
-        config.WORKLOAD_SIZE,
+        config.WORKLOAD_SIZES,
         config.VM_BILLING_PERIODS,
     ))
 
@@ -204,7 +204,7 @@ def main() -> None:
 
     # List of all parameters set for iteration.
     parameters_sets = list(itertools.product(
-        config.WORKLOAD_SIZE,
+        config.WORKLOAD_SIZES,
         config.VM_BILLING_PERIODS,
     ))
 
@@ -217,10 +217,10 @@ def main() -> None:
     }
 
     for metric in metrics:
-        # Init plot with len(WORKLOAD_SIZE) x len(VM_BILLING_PERIODS)
+        # Init plot with len(WORKLOAD_SIZES) x len(VM_BILLING_PERIODS)
         # subplots.
         fig, axs = plt.subplots(
-            nrows=len(config.WORKLOAD_SIZE),
+            nrows=len(config.WORKLOAD_SIZES),
             ncols=len(config.VM_BILLING_PERIODS),
             figsize=(14, 14),
         )
@@ -232,7 +232,7 @@ def main() -> None:
             # Get proper index for subplot.
             plt_ind1 = 0
             plt_ind2 = 0
-            for ind, ws in enumerate(config.WORKLOAD_SIZE):
+            for ind, ws in enumerate(config.WORKLOAD_SIZES):
                 if ws == workload_size:
                     plt_ind1 = ind
                     break
