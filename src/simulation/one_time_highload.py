@@ -56,8 +56,14 @@ def main() -> None:
         num_tasks=config.NUM_TASKS_EXECUTION,
         workflow_number=config.WORKFLOW_NUMBER,
     )
-    workflow_pool.generate_workflows()
+    # workflow_pool.generate_workflows()
     workflow_pool.parse_workflows()
+
+    workloads = utils.generate_workloads(
+        workflow_pool=workflow_pool,
+        load_type=load_type,
+        current_time=datetime.now(),
+    )
 
     # Generate simulation series.
     simulation_series = list(itertools.product(
@@ -84,11 +90,12 @@ def main() -> None:
         )
 
         # Iterate several times for better metrics.
-        for _ in range(config.SIMULATIONS_IN_SERIES // config.PROCESS_NUMBER):
+        iters = config.SIMULATIONS_IN_SERIES // config.PROCESS_NUMBER
+        for i in range(iters):
             simulators: list[sm.Simulator] = []
 
             # Collect simulators for executing in parallel.
-            for _ in range(config.PROCESS_NUMBER):
+            for j in range(config.PROCESS_NUMBER):
                 current_scheduler = deepcopy(scheduler)
                 # Create simulator.
                 simulator = sm.Simulator(
@@ -105,20 +112,17 @@ def main() -> None:
                 if logger_flag:
                     logger_flag = False
 
-                current_time = datetime.now()
-
                 # Get workload sample.
-                workload, _ = workflow_pool.get_sample(
-                    size=workload_size,
-                    load_type=load_type,
-                    current_time=current_time,
-                )
+                ind = i * iters + j
+                workload, submit_times = workloads[
+                    (workload_size, billing_period)
+                ][ind]
 
                 # Submit workflows.
-                for workflow in workload:
+                for workflow, submit_time in zip(workload, submit_times):
                     simulator.submit_workflow(
                         workflow=workflow,
-                        time=current_time,
+                        time=submit_time,
                     )
 
                 simulators.append(simulator)

@@ -2,6 +2,7 @@ from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime, timedelta
 import enum
+import itertools
 import random
 import typing as tp
 
@@ -236,3 +237,47 @@ class WorkflowPool:
         assert workflows[0].budget != 0.0
 
         return workflows, submit_times
+
+
+def generate_workloads(
+        workflow_pool: WorkflowPool,
+        load_type: LoadType,
+        current_time: datetime,
+) -> dict[
+    tp.Tuple[int, int],
+    list[tp.Tuple[list[wfs.Workflow], list[datetime]]]
+]:
+    """Generate workloads from given workflow pool.
+
+    :param workflow_pool: workflow pool for sampling workflows.
+    :param load_type: load type for experiment.
+    :param current_time: current time (can be virtual).
+    :return: map from (workload_size, billing_period) to list of items,
+    where each item corresponds to one simulation in series and consists
+    of list of workflows (workload) and list of submit times for them.
+    """
+
+    workloads: dict[
+        tp.Tuple[int, int],
+        list[tp.Tuple[list[wfs.Workflow], list[datetime]]]
+    ] = defaultdict(list)
+
+    parameters = list(itertools.product(
+        config.WORKLOAD_SIZE,
+        config.VM_BILLING_PERIODS,
+    ))
+
+    for param in parameters:
+        workload_size, billing_period = param
+        for _ in range(config.SIMULATIONS_IN_SERIES):
+            workload, submit_times = workflow_pool.get_sample(
+                size=workload_size,
+                load_type=load_type,
+                current_time=current_time,
+            )
+
+            workloads[(workload_size, billing_period)].append((
+                workload, submit_times
+            ))
+
+    return workloads
