@@ -281,3 +281,30 @@ def generate_workloads(
             ))
 
     return workloads
+
+
+def get_indexes_for_subplot(
+        workload_size: int,
+        billing_period: int
+) -> tp.Tuple[int, int]:
+    """Get indexes for subplots based on workload size and billing
+    period.
+
+    :param workload_size: current workload size of series.
+    :param billing_period: current billing period of series.
+    :return: (x, y) indexes.
+    """
+
+    ind1 = 0
+    ind2 = 0
+    for ind, ws in enumerate(config.WORKLOAD_SIZE):
+        if ws == workload_size:
+            ind1 = ind
+            break
+
+    for ind, bp in enumerate(config.VM_BILLING_PERIODS):
+        if bp == billing_period:
+            ind2 = ind
+            break
+
+    return ind1, ind2
