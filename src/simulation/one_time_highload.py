@@ -75,6 +75,7 @@ def main() -> None:
 
     logger_flag = True
 
+    # TODO: add type hints.
     global_stats = defaultdict(dict)
 
     for series in simulation_series:
