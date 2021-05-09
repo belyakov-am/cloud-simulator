@@ -6,6 +6,7 @@ from multiprocessing import Pool
 
 from loguru import logger
 import matplotlib.pyplot as plt
+import typing as tp
 from wfcommons.generator import (
     GenomeRecipe,
     EpigenomicsRecipe,
@@ -21,14 +22,54 @@ import simulator.config as smconfig
 import simulator.schedulers as sch
 
 
-def run_simulation(simulator: sm.Simulator) -> sm.MetricCollector:
-    """Run simulation on given simulator.
+class WorkerContext:
+    def __init__(
+            self,
+            simulator: sm.Simulator,
+            workload_size: int,
+            billing_period: int,
+            scheduler_name: str,
+    ) -> None:
+        self.simulator = simulator
+        self.workload_size = workload_size
+        self.billing_period = billing_period
+        self.scheduler_name = scheduler_name
 
-    :param simulator: simulator for running simulation.
-    :return: metric collector from simulator.
+    def __call__(self, *args, **kwargs) -> tp.Tuple[
+        sm.MetricCollector,
+        int,
+        int,
+        str,
+    ]:
+        """Run simulation on simulator and return context.
+
+        :param args:
+        :param kwargs:
+        :return:
+        """
+
+        self.simulator.run_simulation()
+        return (
+            self.simulator.get_metric_collector(),
+            self.workload_size,
+            self.billing_period,
+            self.scheduler_name
+        )
+
+
+def run_worker(context: WorkerContext) -> tp.Tuple[
+    sm.MetricCollector,
+    int,
+    int,
+    str,
+]:
+    """Run worker's context and return its results.
+
+    :param context: worker context.
+    :return: worker results.
     """
-    simulator.run_simulation()
-    return simulator.get_metric_collector()
+
+    return context()
 
 
 def main() -> None:
@@ -75,64 +116,80 @@ def main() -> None:
 
     logger_flag = True
 
-    # TODO: add type hints.
-    global_stats = defaultdict(dict)
+    # List of contexts for workers.
+    contexts = []
 
     for series in simulation_series:
-        collectors: list[sm.MetricCollector] = []
-
         # Get current parameters.
         scheduler, workload_size, billing_period = series
 
-        logger.debug(
-            f"Starting new series\n"
-            f"Scheduler = {scheduler.name}\n"
-            f"Workload size = {workload_size}\n"
-            f"Billing period = {billing_period}\n"
-        )
+        for i in range(config.SIMULATIONS_IN_SERIES):
+            current_scheduler = deepcopy(scheduler)
+            # Create simulator.
+            simulator = sm.Simulator(
+                scheduler=current_scheduler,
+                predict_func=config.PREDICT_EXEC_TIME_FUNC,
+                vm_prov=config.VM_PROVISION_DELAY,
+                vm_deprov_percent=config.VM_DEPROVISION_PERCENT,
+                logger_flag=logger_flag,
+                billing_period=billing_period,
+            )
 
-        # Iterate several times for better metrics.
-        iters = config.SIMULATIONS_IN_SERIES // config.PROCESS_NUMBER
-        for i in range(iters):
-            simulators: list[sm.Simulator] = []
+            # Set logger only for first launch (for further it will
+            # be configured).
+            if logger_flag:
+                logger_flag = False
 
-            # Collect simulators for executing in parallel.
-            for j in range(config.PROCESS_NUMBER):
-                current_scheduler = deepcopy(scheduler)
-                # Create simulator.
-                simulator = sm.Simulator(
-                    scheduler=current_scheduler,
-                    predict_func=config.PREDICT_EXEC_TIME_FUNC,
-                    vm_prov=config.VM_PROVISION_DELAY,
-                    vm_deprov_percent=config.VM_DEPROVISION_PERCENT,
-                    logger_flag=logger_flag,
-                    billing_period=billing_period,
+            # Get workload sample.
+            workload, submit_times = workloads[
+                (workload_size, billing_period)
+            ][i]
+
+            # Submit workflows.
+            for workflow, submit_time in zip(workload, submit_times):
+                simulator.submit_workflow(
+                    workflow=workflow,
+                    time=submit_time,
                 )
 
-                # Set logger only for first launch (for further it will
-                # be configured).
-                if logger_flag:
-                    logger_flag = False
+            context = WorkerContext(
+                simulator=simulator,
+                workload_size=workload_size,
+                billing_period=billing_period,
+                scheduler_name=scheduler.name,
+            )
 
-                # Get workload sample.
-                ind = i * iters + j
-                workload, submit_times = workloads[
-                    (workload_size, billing_period)
-                ][ind]
+            contexts.append(context)
 
-                # Submit workflows.
-                for workflow, submit_time in zip(workload, submit_times):
-                    simulator.submit_workflow(
-                        workflow=workflow,
-                        time=submit_time,
-                    )
+    # Map from (ws, bp, scheduler.name) to list of collectors.
+    global_collectors: dict[
+        tp.Tuple[int, int, str],
+        list[sm.MetricCollector]
+    ] = defaultdict(list)
 
-                simulators.append(simulator)
+    # Run simulations and obtain collectors.
+    # SAFETY: number of total simulations (closures) should be divisible
+    #   without remainder by number of processes.
+    for i in range(len(contexts) // config.PROCESS_NUMBER):
+        start = i * config.PROCESS_NUMBER
+        end = start + config.PROCESS_NUMBER
+        current_closures = contexts[start:end]
 
-            # Run simulations.
-            with Pool(processes=config.PROCESS_NUMBER) as pool:
-                current_collectors = pool.map(run_simulation, simulators)
-                collectors.extend(current_collectors)
+        with Pool(processes=config.PROCESS_NUMBER) as p:
+            traces = p.map(run_worker, current_closures)
+
+        for trace in traces:
+            collector, ws, bp, scheduler_name = trace
+            global_collectors[(ws, bp, scheduler_name)].append(collector)
+
+    # TODO: add type hints.
+    # Map from (ws, bp) to map from scheduler.name to dict of stats.
+    global_stats = defaultdict(dict)
+
+    # Collect aggregated stats.
+    for params, collectors in global_collectors.items():
+        # Get series params.
+        workload_size, billing_period, scheduler_name = params
 
         # Init metrics.
         exec_times: list[float] = []
@@ -165,7 +222,7 @@ def main() -> None:
             constraints_met += collector.constraints_met
 
         logger.info(
-            f"Scheduler name = {scheduler.name}\n"
+            f"Scheduler name = {scheduler_name}\n"
             f"Workload size = {workload_size}\n"
             f"Billing period = {billing_period}\n"
             f"Load type = {load_type.name}\n"
@@ -180,7 +237,7 @@ def main() -> None:
         # Save stats.
         # TODO: move dict to class.
         stats = {
-            "scheduler": scheduler.name,
+            "scheduler": scheduler_name,
             "workload_size": workload_size,
             "billing_period": billing_period,
             "cost": costs,
@@ -189,7 +246,7 @@ def main() -> None:
             "constraints_overflow": constraint_overflows_percent,
         }
 
-        global_stats[workload_size, billing_period][scheduler.name] = stats
+        global_stats[workload_size, billing_period][scheduler_name] = stats
 
     # Create graphics.
     metrics = [
@@ -261,6 +318,65 @@ def main() -> None:
 
         # Save graphic.
         plt.savefig(fig_file, dpi=fig.dpi)
+
+    # Create plot graphic.
+    # Init plot with len(WORKLOAD_SIZE) x len(VM_BILLING_PERIODS)
+    # subplots.
+    fig, axs = plt.subplots(
+        nrows=len(config.WORKLOAD_SIZE),
+        ncols=len(config.VM_BILLING_PERIODS),
+        figsize=(14, 14),
+    )
+
+    for params in parameters_sets:
+        workload_size = params[0]
+        billing_period = params[1]
+
+        # Get proper index for subplot.
+        plt_ind1, plt_ind2 = utils.get_indexes_for_subplot(
+            workload_size=workload_size,
+            billing_period=billing_period,
+        )
+
+        schedulers_stats = global_stats[params]
+        # Cost on X axis.
+        x_values = []
+        # Exec time on Y axis.
+        y_values = []
+        names = []
+
+        # Fill metric for each scheduler.
+        for scheduler_name, scheduler_stat in schedulers_stats.items():
+            x_values.append(scheduler_stat["cost"])
+            y_values.append(scheduler_stat["exec_time"])
+            names.append(scheduler_name)
+
+        # Plot graphic.
+        for x, y in zip(x_values, y_values):
+            axs[plt_ind1][plt_ind2].scatter(x, y)
+
+        # Add legend.
+        axs[plt_ind1][plt_ind2].legend(names)
+        # Set title.
+        axs[plt_ind1][plt_ind2].set_title(
+            f"cost VS exec_time with WS = {workload_size}, BP = "
+            f"{billing_period}"
+        )
+
+    # Get graphic's path.
+    itr = smconfig.ITER_NUMBER
+    fig_file = (config.GRAPHICS_DIR
+                / f"load-{load_type.name}_metric-cost-vs-exec-time_{itr}.png")
+    config.GRAPHICS_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Add shared X label.
+    fig.text(x=0.5, y=0.04, s=y_labels["cost"], ha="center", fontsize=16)
+    # Add shared Y label.
+    fig.text(x=0.04, y=0.5, s=y_labels["exec_time"], va="center",
+             rotation="vertical", fontsize=16)
+
+    # Save graphic.
+    plt.savefig(fig_file, dpi=fig.dpi)
 
     # Print splitter for convenience.
     splitter = ("=" * 79 + "\n") * 3
