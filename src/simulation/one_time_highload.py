@@ -256,8 +256,8 @@ def main() -> None:
         config.GRAPHICS_DIR.mkdir(parents=True, exist_ok=True)
 
         # Add shared Y label.
-        fig.text(x=0.04, y=0.5, s=y_labels[metric],
-                 va="center", rotation="vertical", fontsize=16)
+        fig.text(x=0.04, y=0.5, s=y_labels[metric], va="center",
+                 rotation="vertical", fontsize=16)
 
         # Save graphic.
         plt.savefig(fig_file, dpi=fig.dpi)
