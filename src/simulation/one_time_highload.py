@@ -93,6 +93,12 @@ def main() -> None:
         sch.MinMinScheduler(),
     ]
 
+    assert ((len(config.WORKLOAD_SIZES)
+            * len(config.VM_BILLING_PERIODS)
+            * len(schedulers)
+            * config.SIMULATIONS_IN_SERIES)
+            % config.PROCESS_NUMBER == 0)
+
     # Create workflow pool.
     workflow_pool = utils.WorkflowPool(
         recipes=recipes,
