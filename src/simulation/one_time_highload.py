@@ -213,6 +213,7 @@ def main() -> None:
         "constraints_overflow": "Percent of constraints overflow",
     }
 
+    # Create boxplot graphics.
     for metric in metrics:
         # Init plot with len(WORKLOAD_SIZE) x len(VM_BILLING_PERIODS)
         # subplots.
