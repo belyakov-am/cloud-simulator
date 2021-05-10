@@ -59,7 +59,6 @@ class VM:
 
         # Set of present files on VM. They can appear as task output
         # or can be delivered over network.
-        # TODO: clean up old files
         self.files: set[wfs.File] = set()
         self.containers: set[wfs.Container] = set()
 
