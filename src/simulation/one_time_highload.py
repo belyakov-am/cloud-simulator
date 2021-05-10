@@ -73,6 +73,7 @@ def run_worker(context: WorkerContext) -> tp.Tuple[
 
 
 def main() -> None:
+    # TODO: dump config values.
     load_type = utils.LoadType.ONE_TIME
 
     # TODO: move to config (?).
@@ -315,13 +316,20 @@ def main() -> None:
 
         # Get graphic's path.
         itr = smconfig.ITER_NUMBER
+        step = int(round(config.STEP_FROM_MIN_CONSTRAINT, 2) * 100)
         fig_file = (config.GRAPHICS_DIR
-                    / f"load-{load_type.name}_metric-{metric}_{itr}.png")
+                    / f"load-{load_type.name}_metric-{metric}_step-"
+                      f"{step}_{itr}.png")
         config.GRAPHICS_DIR.mkdir(parents=True, exist_ok=True)
 
         # Add shared Y label.
         fig.text(x=0.04, y=0.5, s=y_labels[metric], va="center",
                  rotation="vertical", fontsize=16)
+
+        # Add figure title.
+        f_step = round(config.STEP_FROM_MIN_CONSTRAINT, 2)
+        fig.suptitle(f"Load type {load_type.name} with STEP_CONS = {f_step}",
+                     fontsize=20)
 
         # Save graphic.
         plt.savefig(fig_file, dpi=fig.dpi)
@@ -372,8 +380,10 @@ def main() -> None:
 
     # Get graphic's path.
     itr = smconfig.ITER_NUMBER
+    step = int(round(config.STEP_FROM_MIN_CONSTRAINT, 2) * 100)
     fig_file = (config.GRAPHICS_DIR
-                / f"load-{load_type.name}_metric-cost-vs-exec-time_{itr}.png")
+                / f"load-{load_type.name}_metric-cost-vs-exec-time_s"
+                  f"tep-{step}_{itr}.png")
     config.GRAPHICS_DIR.mkdir(parents=True, exist_ok=True)
 
     # Add shared X label.
@@ -381,6 +391,11 @@ def main() -> None:
     # Add shared Y label.
     fig.text(x=0.04, y=0.5, s=y_labels["exec_time"], va="center",
              rotation="vertical", fontsize=16)
+
+    # Add figure title.
+    f_step = round(config.STEP_FROM_MIN_CONSTRAINT, 2)
+    fig.suptitle(f"Load type {load_type.name} with STEP_CONS = {f_step}",
+                 fontsize=20)
 
     # Save graphic.
     plt.savefig(fig_file, dpi=fig.dpi)
