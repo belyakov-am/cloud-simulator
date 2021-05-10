@@ -32,17 +32,17 @@ VM_BILLING_PERIODS: list[int] = [
 # List of num_tasks for execution.
 NUM_TASKS_EXECUTION: list[int] = [
     150,
-    # 300,
-    # 600,
+    300,
+    600,
 ]
 
 # Total number of workflows to generate by workflow pool.
 WORKFLOW_NUMBER: int = 150
 # Workload size i.e. number of workflows in one simulation.
 WORKLOAD_SIZES: list[int] = [
-    5,
     10,
-    15,
+    20,
+    40,
 ]
 # Interval for submitting workflows in even load.
 EVEN_LOAD_INTERVAL: int = 720
@@ -51,7 +51,7 @@ EVEN_LOAD_WORKFLOWS_PER_INTERVAL: float = 0.2
 
 # Number of simulation per one series. Series is list of fixed
 # parameters for simulation (scheduler, workload size, billing period).
-SIMULATIONS_IN_SERIES: int = 5
+SIMULATIONS_IN_SERIES: int = 10
 
 # Container provisioning delay for different types of workflows.
 # Declared in seconds.
@@ -70,7 +70,7 @@ CONTAINER_PROV_DELAY: dict[str, int] = {
 # respectively if constraint is deadline, and they are execution costs
 # on slowest and fastest VM types respectively if constraint is budget.
 # Should fall in [0; 1).
-STEP_FROM_MIN_CONSTRAINT: float = 0.85
+STEP_FROM_MIN_CONSTRAINT: float = 1.0
 
 SEED: int = 42
 
