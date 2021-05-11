@@ -17,7 +17,7 @@ PREDICT_EXEC_TIME_FUNC: str = "io_and_runtime"
 # simplicity, it is assumed that each VM requires same time to
 # be provisioned.
 # Declared in seconds.
-VM_PROVISION_DELAY: int = 120
+VM_PROVISION_DELAY: int = 60
 # Indicates percent from billing period. If VM has less amount of time
 # until next billing period that this value multiplied by billing
 # period, it can be shutdown.
