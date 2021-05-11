@@ -88,10 +88,10 @@ def main() -> None:
 
     # Create schedulers.
     schedulers = [
-        sch.EPSMScheduler(),
-        sch.DynaScheduler(),
         sch.EBPSMScheduler(),
         sch.MinMinScheduler(),
+        sch.EPSMScheduler(),
+        sch.DynaScheduler(),
     ]
 
     assert ((len(config.WORKLOAD_SIZES)
@@ -299,13 +299,15 @@ def main() -> None:
             )
 
             schedulers_stats = global_stats[params]
-            values = []
-            names = []
+            indexes = config.GRAPHICS_INDEXES
+            values = [[] for _ in range(len(indexes.keys()))]
+            names = ["" for _ in range(len(indexes.keys()))]
 
             # Fill metric for each scheduler.
             for scheduler_name, scheduler_stat in schedulers_stats.items():
-                values.append(scheduler_stat[metric])
-                names.append(scheduler_name)
+                ind = indexes[scheduler_name]
+                values[ind] = scheduler_stat[metric]
+                names[ind] = scheduler_name
 
             # Plot graphic and set title with labels.
             axs[plt_ind1][plt_ind2].boxplot(values)
@@ -354,17 +356,19 @@ def main() -> None:
         )
 
         schedulers_stats = global_stats[params]
+        indexes = config.GRAPHICS_INDEXES
         # Cost on X axis.
-        x_values = []
+        x_values = [[] for _ in range(len(indexes.keys()))]
         # Exec time on Y axis.
-        y_values = []
-        names = []
+        y_values = [[] for _ in range(len(indexes.keys()))]
+        names = ["" for _ in range(len(indexes.keys()))]
 
         # Fill metric for each scheduler.
         for scheduler_name, scheduler_stat in schedulers_stats.items():
-            x_values.append(scheduler_stat["cost"])
-            y_values.append(scheduler_stat["exec_time"])
-            names.append(scheduler_name)
+            ind = indexes[scheduler_name]
+            x_values[ind] = scheduler_stat["cost"]
+            y_values[ind] = scheduler_stat["exec_time"]
+            names[ind] = scheduler_name
 
         # Plot graphic.
         for x, y in zip(x_values, y_values):

@@ -79,3 +79,10 @@ PROCESS_NUMBER: int = 60
 
 # Number of workflows to parse. Used for testing.
 NUMBER_OF_WORKFLOWS: int = 10000000
+
+GRAPHICS_INDEXES: dict[str, int] = {
+    "EPSM": 0,
+    "DynaNS": 1,
+    "EBPSM": 2,
+    "Min-MinBUDG": 3,
+}
