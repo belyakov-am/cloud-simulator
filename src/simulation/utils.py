@@ -99,7 +99,7 @@ def set_constraints(
         workflows: list[wfs.Workflow],
         load_type: LoadType,
         current_time: datetime,
-) -> list[datetime]:
+) -> None:
     """Set constraints (deadlines and budgets) based on inspection.
 
     :param workflows: list of workflows for setting constraints.
@@ -112,8 +112,6 @@ def set_constraints(
                                  * config.EVEN_LOAD_WORKFLOWS_PER_INTERVAL)
     current_number_in_interval = 0
     current_interval = 0
-
-    submit_times: list[datetime] = []
 
     for workflow in workflows:
         inspected = ins.inspect_workflow(
@@ -140,7 +138,7 @@ def set_constraints(
                                        + timedelta(seconds=deadline + rs))
 
             submit_time = current_time + timedelta(seconds=rs)
-            submit_times.append(submit_time)
+            workflow.set_submit_time(time=submit_time)
         elif load_type == LoadType.EVEN:
             if current_number_in_interval == workflows_per_interval:
                 current_number_in_interval = 0
@@ -153,13 +151,11 @@ def set_constraints(
                                        + timedelta(seconds=shifted_deadline))
 
             submit_time = current_time + timedelta(seconds=shift)
-            submit_times.append(submit_time)
+            workflow.set_submit_time(time=submit_time)
 
             current_number_in_interval += 1
 
         workflow.set_budget(budget=budget)
-
-    return submit_times
 
 
 class WorkflowPool:
@@ -213,13 +209,13 @@ class WorkflowPool:
             size: int,
             load_type: LoadType,
             current_time: datetime,
-    ) -> tp.Tuple[list[wfs.Workflow], list[datetime]]:
+    ) -> list[wfs.Workflow]:
         """Get workload of given size with randomly picked workflows.
 
         :param size: number of workflows in workload.
         :param load_type: type of load for setting constrains.
         :param current_time: time for calculating and setting deadlines.
-        :return: workload (list of workflows) and list of submit times.
+        :return: workload (list of workflows).
         """
 
         original_workflows = random.sample(
@@ -228,7 +224,7 @@ class WorkflowPool:
         )
 
         workflows = deepcopy(original_workflows)
-        submit_times = set_constraints(
+        set_constraints(
             workflows=workflows,
             load_type=load_type,
             current_time=current_time,
@@ -236,7 +232,7 @@ class WorkflowPool:
 
         assert workflows[0].budget != 0.0
 
-        return workflows, submit_times
+        return workflows
 
 
 def generate_workloads(
@@ -245,7 +241,7 @@ def generate_workloads(
         current_time: datetime,
 ) -> dict[
     tp.Tuple[int, int],
-    list[tp.Tuple[list[wfs.Workflow], list[datetime]]]
+    list[list[wfs.Workflow]]
 ]:
     """Generate workloads from given workflow pool.
 
@@ -254,12 +250,12 @@ def generate_workloads(
     :param current_time: current time (can be virtual).
     :return: map from (workload_size, billing_period) to list of items,
     where each item corresponds to one simulation in series and consists
-    of list of workflows (workload) and list of submit times for them.
+    of list of workflows (workload).
     """
 
     workloads: dict[
         tp.Tuple[int, int],
-        list[tp.Tuple[list[wfs.Workflow], list[datetime]]]
+        list[list[wfs.Workflow]]
     ] = defaultdict(list)
 
     parameters = list(itertools.product(
@@ -270,15 +266,13 @@ def generate_workloads(
     for param in parameters:
         workload_size, billing_period = param
         for _ in range(config.SIMULATIONS_IN_SERIES):
-            workload, submit_times = workflow_pool.get_sample(
+            workload = workflow_pool.get_sample(
                 size=workload_size,
                 load_type=load_type,
                 current_time=current_time,
             )
 
-            workloads[(workload_size, billing_period)].append((
-                workload, submit_times
-            ))
+            workloads[(workload_size, billing_period)].append(workload)
 
     return workloads
 

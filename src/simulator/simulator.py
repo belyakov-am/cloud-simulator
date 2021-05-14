@@ -83,11 +83,11 @@ class Simulator:
         pf = tep.PREDICT_FUNCTIONS[predict_func]
         self.scheduler.set_predict_function(predict_func=pf)
 
-    def submit_workflow(self, workflow: wfs.Workflow, time: datetime) -> None:
+    def submit_workflow(self, workflow: wfs.Workflow) -> None:
         self.workflows[workflow.uuid] = workflow
 
         self.scheduler.event_loop.add_event(event=sch.Event(
-            start_time=time,
+            start_time=workflow.submit_time,
             event_type=sch.EventType.SUBMIT_WORKFLOW,
             workflow=workflow,
         ))

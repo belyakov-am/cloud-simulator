@@ -149,15 +149,12 @@ def main() -> None:
                 logger_flag = False
 
             # Get workload sample.
-            workload, submit_times = workloads[
-                (workload_size, billing_period)
-            ][i]
+            workload = workloads[(workload_size, billing_period)][i]
 
             # Submit workflows.
-            for workflow, submit_time in zip(workload, submit_times):
+            for workflow in workload:
                 simulator.submit_workflow(
                     workflow=workflow,
-                    time=submit_time,
                 )
 
             context = WorkerContext(
