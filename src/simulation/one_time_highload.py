@@ -106,7 +106,7 @@ def main() -> None:
         num_tasks=config.NUM_TASKS_EXECUTION,
         workflow_number=config.WORKFLOW_NUMBER,
     )
-    # workflow_pool.generate_workflows()
+    workflow_pool.generate_workflows()
     workflow_pool.parse_workflows()
 
     workloads = utils.generate_workloads(
