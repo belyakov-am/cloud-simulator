@@ -75,6 +75,8 @@ STEP_FROM_MIN_CONSTRAINT: float = 1.0
 SEED: int = 42
 
 # Number of processes to start for executing simulations in series.
+# SAFETY: number of total simulations should be divisible without
+#   remainder by this value.
 PROCESS_NUMBER: int = 60
 
 # Number of workflows to parse. Used for testing.
